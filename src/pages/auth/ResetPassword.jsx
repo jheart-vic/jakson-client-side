@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Lock, Eye, EyeOff, ChevronLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { resetPassword } from '../../api/auth'
-import PasswordRules, { validatePassword } from '../../components/common/PasswordRules'
+import PasswordRules, { validatePassword } from '../../components/common/passwordRules'
 
 const ResetPassword = () => {
   const navigate   = useNavigate()

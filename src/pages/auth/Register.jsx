@@ -4,7 +4,7 @@ import { Phone, Lock, Eye, EyeOff, RefreshCw, ChevronLeft, ShieldCheck, Gift } f
 import toast from 'react-hot-toast'
 import { getCaptcha, getSecurityQuestions, register } from '../../api/auth'
 import { useAuth } from '../../context/AuthContext'
-import PasswordRules, { validatePassword } from '../../components/common/PasswordRules'
+import PasswordRules, { validatePassword } from '../../components/common/passwordRules'
 
 const STEPS = ['Account', 'Security', 'Verify']
 

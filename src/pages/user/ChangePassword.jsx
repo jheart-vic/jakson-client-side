@@ -4,7 +4,7 @@ import { Lock, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { changePassword } from '../../api/auth'
 import PageHeader from '../../components/layout/PageHeader'
-import PasswordRules, { validatePassword } from '../../components/common/PasswordRules'
+import PasswordRules, { validatePassword } from '../../components/common/passwordRules'
 
 const ChangePassword = () => {
   const navigate = useNavigate()
