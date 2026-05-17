@@ -225,7 +225,7 @@ const Dashboard = () => {
         {/* Status bar spacer */}
         <div className="h-safe-top" />
 
-        <div className="px-4 pt-3 pb-0">
+        <div className="px-4 pt-3 pb-1 animate-slide-down">
           {/* Row 1: logo + icons */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
@@ -252,34 +252,34 @@ const Dashboard = () => {
           {/* Balance card */}
           <div className="bg-white/12 backdrop-blur-sm rounded-2xl p-4 mb-4
                           border border-white/20 animate-slide-up">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
-                  Funding Account
-                </p>
-                {loading ? (
-                  <div className="h-8 w-28 skeleton rounded-lg bg-white/20" />
-                ) : (
-                  <p className="text-white text-3xl font-extrabold tracking-tight leading-none">
-                    {fmtUSD(bal.balance)}
-                  </p>
-                )}
-                <p className="text-white/50 text-xs mt-1">
-                  ≈ {fmtNGN(bal.balance * 1365)}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={() => navigate('/main/deposit')}
-                  className="bg-white text-primary text-xs font-bold px-3 py-1.5 rounded-xl
-                             active:scale-95 transition-transform">
-                  Recharge
-                </button>
-                <button onClick={() => navigate('/main/withdraw')}
-                  className="bg-white/20 border border-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-xl
-                             active:scale-95 transition-transform">
-                  Withdraw
-                </button>
-              </div>
+
+            {/* Balance amount */}
+            <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
+              Funding Account
+            </p>
+            {loading ? (
+              <div className="h-8 w-28 skeleton rounded-lg bg-white/20" />
+            ) : (
+              <p className="text-white text-3xl font-extrabold tracking-tight leading-none">
+                {fmtUSD(bal.balance)}
+              </p>
+            )}
+            <p className="text-white/50 text-xs mt-1 mb-3">
+              ≈ {fmtNGN(bal.balance * 1365)}
+            </p>
+
+            {/* Buttons — full width row below balance, no overflow */}
+            <div className="flex gap-2.5 mb-3">
+              <button onClick={() => navigate('/main/deposit')}
+                className="flex-1 bg-white text-primary text-xs font-bold py-2.5 rounded-xl
+                           active:scale-95 transition-transform">
+                Recharge
+              </button>
+              <button onClick={() => navigate('/main/withdraw')}
+                className="flex-1 bg-white/20 border border-white/30 text-white text-xs font-bold py-2.5 rounded-xl
+                           active:scale-95 transition-transform">
+                Withdraw
+              </button>
             </div>
 
             {/* Earnings row */}

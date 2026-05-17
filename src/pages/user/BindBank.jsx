@@ -15,8 +15,14 @@ const BindBank = () => {
   const [showSheet, setShowSheet]   = useState(false)
 
   const load = useCallback(async () => {
-    try { const { data } = await getBankList(); setBanks(data.banks) }
-    catch {} finally { setLoading(false) }
+    try {
+      const { data } = await getBankList()
+      setBanks(data.banks)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => { ;(async () => { await load() })() }, [load])
@@ -95,7 +101,7 @@ const BindBank = () => {
       {showSheet && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowSheet(false)} />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px]
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-120
                           bg-white rounded-t-3xl max-h-[75vh] flex flex-col overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <h3 className="font-extrabold text-gray-800 text-base">Select Bank</h3>

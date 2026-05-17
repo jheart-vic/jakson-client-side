@@ -115,7 +115,7 @@ const Withdraw = () => {
             Withdrawal Amount <span className="text-gray-300 font-normal normal-case ml-1">≈ {fmtNGN(toNGN(amountVal, RATE))}</span>
           </p>
           <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
-                          focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(26,159,212,0.15)] transition-all">
+                          focus-within:border-primary focus-within:shadow-input transition-all">
             <span className="text-gray-500 font-bold text-sm shrink-0">$</span>
             <input type="number" placeholder="Enter amount" value={amount}
               onChange={e => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
@@ -148,7 +148,7 @@ const Withdraw = () => {
         <div className="card card-p">
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Withdrawal PIN</p>
           <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
-                          focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(26,159,212,0.15)] transition-all">
+                          focus-within:border-primary focus-within:shadow-input transition-all">
             <Lock size={15} className="text-gray-400 shrink-0" />
             <input type="password" placeholder="6-digit withdrawal PIN" value={pin}
               onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}

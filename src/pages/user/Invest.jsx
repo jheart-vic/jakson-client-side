@@ -143,7 +143,7 @@ const Invest = () => {
               style={{ animationDelay: `${i * 0.06}s` }}>
 
               {/* Coloured top strip */}
-              <div className={`bg-gradient-to-r ${TIER_STYLE.grad} px-4 py-3 flex items-center justify-between`}>
+              <div className={`bg-linear-to-r ${TIER_STYLE.grad} px-4 py-3 flex items-center justify-between`}>
                 <div className="flex items-center gap-2">
                   {p.image
                     ? <img src={p.image} alt={p.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white/40" />
@@ -196,7 +196,7 @@ const Invest = () => {
                       <span>Max {p.maxUnits} unit{p.maxUnits !== 1 ? 's' : ''}/person</span>
                     </div>
                     <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-success to-emerald-400 rounded-full"
+                      <div className="h-full bg-linear-to-r from-success to-emerald-400 rounded-full"
                         style={{ width: `${Math.min(roi(p), 100)}%` }} />
                     </div>
                   </div>
@@ -221,7 +221,7 @@ const Invest = () => {
                     transition-all duration-150 active:scale-[0.98]
                     ${!canBuy
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : `bg-gradient-to-r ${TIER_STYLE.grad} text-white shadow-[0_4px_16px_rgba(26,159,212,0.3)]`}`}
+                      : `bg-linear-to-r ${TIER_STYLE.grad} text-white shadow-[0_4px_16px_rgba(26,159,212,0.3)]`}`}
                 >
                   {soldOut
                     ? '🔴 Sold Out'

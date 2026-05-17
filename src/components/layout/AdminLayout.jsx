@@ -99,7 +99,7 @@ const AdminLayout = () => {
   const closeMenu = () => setMenuOpen(false)
 
   return (
-    <div className="min-h-screen bg-gray-50 max-w-[480px] mx-auto relative">
+    <div className="min-h-screen bg-gray-50 max-w-120 mx-auto relative">
 
       {/* ── Top bar (mobile) ──────────────────────────── */}
       <header className="sticky top-0 z-30 bg-gray-900 text-white flex items-center justify-between px-4 py-3.5 shadow-lg">
@@ -126,7 +126,7 @@ const AdminLayout = () => {
           />
 
           {/* Menu panel */}
-          <div className="fixed top-[57px] left-1/2 -translate-x-1/2 w-full max-w-[480px] z-30
+          <div className="fixed top-14.25 left-1/2 -translate-x-1/2 w-full max-w-120 z-30
                           bg-gray-900 shadow-2xl animate-slide-up">
             <nav className="px-3 py-3 space-y-1">
               {links.map(({ to, label, icon: Icon }) => (

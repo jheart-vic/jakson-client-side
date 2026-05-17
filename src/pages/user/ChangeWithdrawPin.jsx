@@ -91,7 +91,7 @@ const ChangeWithdrawPin = () => {
                 <p className="text-gray-500 text-sm">Enter your login password to continue</p>
               </div>
               <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
-                              focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(26,159,212,0.15)] transition-all">
+                              focus-within:border-primary focus-within:shadow-input transition-all">
                 <Lock size={15} className="text-gray-400 shrink-0" />
                 <input type={showPw ? 'text' : 'password'} placeholder="Login password" value={loginPw}
                   onChange={e => setLoginPw(e.target.value)}

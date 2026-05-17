@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { History, Copy, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -78,7 +78,7 @@ const Deposit = () => {
         <div className="card card-p">
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Other Amount</p>
           <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
-                          focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(26,159,212,0.15)] transition-all">
+                          focus-within:border-primary focus-within:shadow-input transition-all">
             <span className="text-gray-500 font-bold text-sm shrink-0">$</span>
             <input type="number" placeholder="Minimum $5.00" value={amount} onChange={handleCustom}
               inputMode="decimal"

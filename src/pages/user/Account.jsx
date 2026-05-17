@@ -62,27 +62,23 @@ const handleTap = (item) => {
 
       {/* Balance card — overlaps header */}
       <div className="px-4 -mt-8">
-        <div className="card card-p shadow-float animate-slide-up">
-          <div className="flex items-center justify-between mb-4">
-            <div>
+            <div className="card card-p shadow-float animate-slide-up">
               <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Funding Account</p>
               <p className="text-3xl font-extrabold text-gray-800 mt-1">{fmtUSD(user?.balance || 0)}</p>
-              <p className="text-xs text-gray-400 mt-0.5">≈ {fmtNGN((user?.balance || 0) * 1365)}</p>
+              <p className="text-xs text-gray-400 mt-0.5 mb-4">≈ {fmtNGN((user?.balance || 0) * 1365)}</p>
+              <div className="flex gap-2.5">
+                <button onClick={() => navigate('/main/deposit')}
+                  className="flex-1 py-2.5 bg-primary text-white text-xs font-bold rounded-xl
+                            shadow-[0_4px_12px_rgba(26,159,212,0.3)] active:scale-95 transition-transform">
+                  Recharge
+                </button>
+                <button onClick={() => navigate('/main/withdraw')}
+                  className="flex-1 py-2.5 border-2 border-primary text-primary text-xs font-bold rounded-xl
+                            active:scale-95 transition-transform">
+                  Withdraw
+                </button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => navigate('/main/deposit')}
-                className="px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl
-                           shadow-[0_4px_12px_rgba(26,159,212,0.3)] active:scale-95 transition-transform">
-                Recharge
-              </button>
-              <button onClick={() => navigate('/main/withdraw')}
-                className="px-4 py-2 border-2 border-primary text-primary text-xs font-bold rounded-xl
-                           active:scale-95 transition-transform">
-                Withdraw
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Actions grid */}
