@@ -221,7 +221,7 @@ const Dashboard = () => {
     <div className="min-h-dvh bg-surface pb-24">
 
       {/* ── Top bar ──────────────────────────────────── */}
-      <div style={{ background: 'linear-gradient(160deg,#0e6a8f 0%,#1a9fd4 100%)' }}>
+      <div style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}>
         {/* Status bar spacer */}
         <div className="h-safe-top" />
 
@@ -234,7 +234,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-white font-extrabold text-sm leading-tight">Jakson Solar</p>
-                <p className="text-white/60 text-[10px] font-medium">Investment Platform</p>
+                <p className="text-surface text-[10px] font-medium">Investment Platform</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -243,8 +243,8 @@ const Dashboard = () => {
                 <QrCode size={16} />
               </button>
               <button className="w-9 h-9 rounded-xl bg-white/15 border border-white/20
-                                 flex items-center justify-center active:scale-95 transition-transform">
-                <span className="text-base leading-none">🇳🇬</span>
+                                 flex items-center justify-center text-white active:scale-95 transition-transform">
+                <span className="text-center leading-none">🇳🇬</span>
               </button>
             </div>
           </div>
@@ -254,7 +254,7 @@ const Dashboard = () => {
                           border border-white/20 animate-slide-up">
 
             {/* Balance amount */}
-            <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">
+            <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">
               Funding Account
             </p>
             {loading ? (
@@ -264,7 +264,7 @@ const Dashboard = () => {
                 {fmtUSD(bal.balance)}
               </p>
             )}
-            <p className="text-white/50 text-xs mt-1 mb-3">
+            <p className="text-surface text-xs mt-1 mb-3">
               ≈ {fmtNGN(bal.balance * 1365)}
             </p>
 
@@ -283,7 +283,7 @@ const Dashboard = () => {
             </div>
 
             {/* Earnings row */}
-            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/15">
+            <div className="grid grid-cols-3 gap-2 pt-3 border-t text-surface">
               {[
                 { label: 'Today',     val: bal.todayEarnings     },
                 { label: 'Yesterday', val: bal.yesterdayEarnings  },
@@ -293,7 +293,7 @@ const Dashboard = () => {
                   <p className="text-white font-bold text-sm leading-none">
                     {fmtUSD(val)}
                   </p>
-                  <p className="text-white/50 text-[10px] font-medium mt-1">{label}</p>
+                  <p className="text-surface text-[10px] font-medium mt-1">{label}</p>
                 </div>
               ))}
             </div>

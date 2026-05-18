@@ -21,24 +21,23 @@ const Team = () => {
   const [tierModal, setTierModal]   = useState(null)
   const [members, setMembers]       = useState([])
   const [membersLoading, setML]     = useState(false)
-console.log(stats, "stats")
-const load = useCallback(async () => {
+
+  const load = useCallback(async () => {
     try { const { data } = await getTeamStats(); setStats(data) }
     catch (err) { console.error('Failed to load team stats:', err) }
     finally { setLoading(false) }
-}, [])
+  }, [])
 
+ useEffect(() => { ;(async () => { await load() })() }, [load])
 
-  useEffect(() => { ;(async () => { await load() })() }, [load])
-
-
-const openTier = async (tier) => {
+  const openTier = async (tier) => {
     setTierModal(tier)
     setML(true)
     try { const { data } = await getTierMembers(tier.level); setMembers(data.members) }
     catch (err) { toast.error('Failed to load tier members'); console.error(err) }
     finally { setML(false) }
-}
+  }
+
   const copy = () => {
     navigator.clipboard.writeText(stats?.inviteLink || '')
       .then(() => toast.success('Invite link copied!'))
@@ -49,19 +48,21 @@ const openTier = async (tier) => {
   return (
     <div className="min-h-dvh bg-surface pb-24">
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg,#0e6a8f,#1a9fd4)' }}
+      <div style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}
         className="px-4 pt-12 pb-6">
         <h1 className="text-white text-xl font-extrabold">My Team</h1>
 
-        {/* Earnings summary */}
-        <div className="grid grid-cols-3 gap-3 mt-4">
+        {/* Earnings summary - FIXED: prevent overflow and keep centered */}
+        <div className="grid grid-cols-3 gap-2 mt-4">
           {[
             { label: 'Total Earnings', val: fmtUSD(stats?.totalEarnings || 0) },
             { label: 'Today',          val: fmtUSD(stats?.todayEarnings || 0) },
             { label: 'Yesterday',      val: fmtUSD(stats?.yesterdayEarnings || 0) },
           ].map(({ label, val }) => (
-            <div key={label} className="bg-white/15 backdrop-blur rounded-2xl p-3 text-center border border-white/20">
-              <p className="text-white font-extrabold text-sm">{val}</p>
+            <div key={label} className="bg-white/15 backdrop-blur rounded-2xl p-2 text-center border border-white/20 min-w-0">
+              <p className="text-white font-bold text-xs sm:text-sm wrap-break-word leading-tight px-1">
+                {val}
+              </p>
               <p className="text-white/60 text-[10px] font-medium mt-0.5">{label}</p>
             </div>
           ))}
@@ -77,7 +78,7 @@ const openTier = async (tier) => {
               { label: 'Today',        val: 0 },
             ].map(({ label, val }) => (
               <div key={label} className="text-center bg-gray-50 rounded-2xl p-4">
-                <p className="text-3xl font-extrabold text-gray-800">{val}</p>
+                <p className="text-3xl font-extrabold text-gray-800 wrap-break-word">{val}</p>
                 <p className="text-xs text-gray-400 font-medium mt-1">{label}</p>
               </div>
             ))}

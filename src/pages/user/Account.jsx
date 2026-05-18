@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   BarChart2, History, Headphones, Sun,
   ArrowDownCircle, ArrowUpCircle, Landmark,
-  ShieldCheck, Lock, KeyRound, Smartphone, LogOut,
+  Lock, KeyRound, Smartphone, LogOut,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/AuthContext'
@@ -26,7 +26,7 @@ const Account = () => {
     { icon: ArrowDownCircle,label: 'Recharge Record',         path: '/main/deposit/log',              color: '#06b6d4', bg: '#ecfeff' },
     { icon: ArrowUpCircle,  label: 'Withdrawal Record',       path: '/main/withdraw/log',             color: '#f43f5e', bg: '#fff1f2' },
     { icon: Landmark,       label: 'Withdrawal Account',      path: '/main/bank/accounts',            color: '#d97706', bg: '#fffbeb' },
-    { icon: ShieldCheck,    label: 'Real Name Auth',          path: null, action: 'kyc',              color: '#7c3aed', bg: '#f5f3ff' },
+    { icon: Landmark, label: 'Wealth Funds', path: '/main/wealth-fund', color: '#b8860b', bg: '#fff8e7' },
     { icon: Lock,           label: 'Modify Login Password',   path: '/main/change-password',          color: '#0284c7', bg: '#f0f9ff' },
     { icon: KeyRound,       label: 'Modify Withdraw PIN',     path: '/main/change-withdraw-pin',      color: '#0f766e', bg: '#f0fdfa' },
     { icon: Smartphone,     label: 'Download App',            path: null, action: 'app',              color: '#4f46e5', bg: '#eef2ff' },
@@ -45,7 +45,7 @@ const handleTap = (item) => {
   return (
     <div className="min-h-dvh bg-surface pb-24">
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg,#0e6a8f,#1a9fd4)' }}
+      <div  style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}
         className="px-4 pt-12 pb-16">
         <div className="flex items-center gap-3">
           <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center">

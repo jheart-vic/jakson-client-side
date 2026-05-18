@@ -59,12 +59,12 @@ const Invest = () => {
     <div className="min-h-dvh bg-surface pb-28">
 
       {/* ── Header ──────────────────────────────── */}
-      <div style={{ background: 'linear-gradient(135deg,#0e6a8f 0%,#1a9fd4 100%)' }}
+      <div style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}
         className="px-4 pt-12 pb-6 relative overflow-hidden">
         <div className="absolute -right-6 -top-6 w-36 h-36 rounded-full bg-white/10 blur-2xl pointer-events-none" />
         <div className="relative">
           <h1 className="text-white text-xl font-extrabold">Invest</h1>
-          <p className="text-white/60 text-xs mt-0.5">Choose a product and start earning daily</p>
+          <p className="text-surface text-xs mt-0.5">Choose a product and start earning daily</p>
 
           {/* Active investment count badge */}
           {myInvests.length > 0 && (

@@ -4,7 +4,7 @@
  *       fmtUSD(0)       → "$0.0000"
  */
 export const fmtUSD = (amount = 0) =>
-  `$${Number(amount).toFixed(4)}`
+  `$${Number(amount).toFixed(2)}`
 
 export const fmtUSDShort = (amount = 0) =>
   `$${Number(amount).toFixed(2)}`

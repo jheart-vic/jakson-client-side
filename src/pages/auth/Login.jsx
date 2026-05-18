@@ -212,7 +212,7 @@ const Login = () => {
 
   return (
     <div className="min-h-dvh flex flex-col relative overflow-hidden"
-      style={{ background: 'linear-gradient(160deg,#0e6a8f 0%,#1a9fd4 50%,#38bdf8 100%)' }}>
+      style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}>
 
       <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-white/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-32 -left-16 w-56 h-56 rounded-full bg-white/10 blur-3xl pointer-events-none" />
