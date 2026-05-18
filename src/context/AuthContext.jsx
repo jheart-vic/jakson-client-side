@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { getMe } from '../api/auth'
 import { storage } from '../utils/storage'

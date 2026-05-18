@@ -6,12 +6,14 @@ import { getMyWealthFunds, claimWealthFund } from '../../api/wealthFund'
 import { fmtUSD } from '../../utils/currency'
 import Spinner from '../../components/common/Spinner'
 import EmptyState from '../../components/common/EmptyState'
+import { useAuth } from '../../context/AuthContext'
 
 export default function MyWealthFunds() {
   const [funds, setFunds] = useState([])
   const [loading, setLoading] = useState(true)
   const [claimingId, setClaimingId] = useState(null)
   const now = useMemo(() => new Date(), [])
+  const { refreshUser } = useAuth()
 
   const loadFunds = useCallback(async () => {
     setLoading(true)
@@ -37,6 +39,7 @@ useEffect(() => { ;(async () => { await loadFunds() })() }, [loadFunds])
     try {
       await claimWealthFund(investmentId)
       toast.success('Fund claimed successfully!')
+      await refreshUser()
       await loadFunds()
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Claim failed')

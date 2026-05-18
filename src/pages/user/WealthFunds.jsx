@@ -6,6 +6,7 @@ import PageHeader from '../../components/layout/PageHeader'
 import { getWealthFunds, buyWealthFund, getMyWealthFunds } from '../../api/wealthFund'
 import { fmtUSD } from '../../utils/currency'
 import Spinner from '../../components/common/Spinner'
+import { useAuth } from '../../context/AuthContext'
 
 export default function WealthFunds() {
   const navigate = useNavigate()
@@ -13,6 +14,7 @@ export default function WealthFunds() {
   const [userInvestments, setUserInvestments] = useState([])
   const [loading, setLoading] = useState(true)
   const [buyingId, setBuyingId] = useState(null)
+  const { refreshUser } = useAuth()
 
   const loadData = useCallback(async () => {
     try {
@@ -47,6 +49,7 @@ useEffect(() => { ;(async () => { await loadData() })() }, [loadData])
     try {
       await buyWealthFund(fundId)
       toast.success('Wealth fund purchased successfully!')
+      await refreshUser()
       // ✅ FIX: Absolute path to the "My Wealth Funds" page
       navigate('/main/wealth-fund/me')
     } catch (err) {
