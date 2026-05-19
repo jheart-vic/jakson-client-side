@@ -78,6 +78,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Package, Users, ArrowDownCircle,
   ArrowUpCircle, Settings, LogOut, Menu, X,
+  Landmark,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
@@ -88,6 +89,7 @@ const links = [
   { to: '/admin/deposits',    label: 'Deposits',    icon: ArrowDownCircle },
   { to: '/admin/withdrawals', label: 'Withdrawals', icon: ArrowUpCircle   },
   { to: '/admin/settings',    label: 'Settings',    icon: Settings        },
+  { to: '/admin/wealth-funds', label: 'Wealth Funds', icon: Landmark }
 ]
 
 const AdminLayout = () => {

@@ -19,15 +19,23 @@ export const adminAssignRole   = (id, r) => api.put(`/admin/users/${id}/role`, {
 export const adminCreditWallet = (id, d) => api.post(`/admin/users/${id}/credit`, d)
 export const adminDeductWallet = (id, d) => api.post(`/admin/users/${id}/deduct`, d)
 
-// Deposits
-export const adminGetDeposits  = (p)     => api.get('/admin/deposits', { params: p })
-export const adminApproveDeposit=(id)    => api.put(`/admin/deposits/${id}/approve`)
-export const adminRejectDeposit= (id, r) => api.put(`/admin/deposits/${id}/reject`, { reason: r })
 
-// Withdrawals
-export const adminApproveWithdrawal=(id) => api.put(`/admin/withdraw/${id}/approve`)
-export const adminRejectWithdrawal=(id,r)=> api.put(`/admin/withdraw/${id}/reject`, { reason: r })
+// ── Deposits ───────────────────────────────────────────────
+export const adminGetDeposits = (params) => api.get('/admin/deposits', { params })
+export const adminApproveDeposit = (id) => api.put(`/admin/deposits/${id}/approve`)
+export const adminRejectDeposit = (id, reason) => api.put(`/admin/deposits/${id}/reject`, { reason })
 
-// Settings
-export const adminGetSettings  = ()      => api.get('/admin/settings')
-export const adminUpdateSetting= (k, v)  => api.put('/admin/settings', { key: k, value: v })
+// ── Withdrawals ────────────────────────────────────────────
+export const adminGetWithdrawals = (params) => api.get('/admin/withdrawals', { params })
+export const adminApproveWithdrawal = (id) => api.put(`/admin/withdrawals/${id}/approve`)
+export const adminRejectWithdrawal = (id, reason) => api.put(`/admin/withdrawals/${id}/reject`, { reason })
+
+// ── Settings ───────────────────────────────────────────────
+export const adminGetSettings = () => api.get('/admin/settings')
+export const adminUpdateSetting = (key, value) => api.put('/admin/settings', { key, value })
+
+// Wealth Funds
+export const adminGetWealthFunds = (params) => api.get('/admin/wealth-funds', { params })
+export const adminCreateWealthFund = (data) => api.post('/admin/wealth-funds', data)
+export const adminUpdateWealthFund = (id, data) => api.put(`/admin/wealth-funds/${id}`, data)
+export const adminDeleteWealthFund = (id) => api.delete(`/admin/wealth-funds/${id}`)

@@ -20,11 +20,12 @@ const InvestLog = () => {
 
   const load = useCallback(async () => {
     try { const { data } = await getMyInvestments(); setItems(data.investments) }
-   catch (err) {
-      console.error(err)} finally { setLoading(false) }
+    catch (err) {
+      console.error(err)
+    } finally { setLoading(false) }
   }, [])
 
-  useEffect(() => { ;(async () => { await load() })() }, [load])
+  useEffect(() => { (async () => { await load() })() }, [load])
 
   return (
     <div className="min-h-dvh bg-surface pb-8">
@@ -37,7 +38,9 @@ const InvestLog = () => {
             const s = STATUS_MAP[inv.status] || STATUS_MAP.in_progress
             const StatusIcon = s.icon
             const days = daysRemaining(inv.expirationDate)
-            const progress = Math.min(100, (inv.daysElapsed / (inv.productSnapshot?.cycleDays || 1)) * 100)
+            const totalDays = inv.productSnapshot?.cycleDays || 1
+            const progress = (inv.daysElapsed / totalDays) * 100
+            const clampedProgress = Math.min(100, Math.max(0, progress))
 
             return (
               <div key={inv._id} className="card animate-slide-up" style={{ animationDelay: `${i * 0.05}s` }}>
@@ -74,12 +77,12 @@ const InvestLog = () => {
                   {inv.status === 'in_progress' && (
                     <div>
                       <div className="flex justify-between text-[10px] text-gray-400 mb-1">
-                        <span>Day {inv.daysElapsed} of {inv.productSnapshot?.cycleDays}</span>
-                        <span>{progress.toFixed(0)}%</span>
+                        <span>Day {inv.daysElapsed} of {totalDays}</span>
+                        <span>{clampedProgress.toFixed(1)}%</span>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-primary rounded-full transition-all duration-700"
-                          style={{ width: `${progress}%` }} />
+                          style={{ width: `${clampedProgress}%` }} />
                       </div>
                     </div>
                   )}

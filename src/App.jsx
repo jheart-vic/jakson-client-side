@@ -43,6 +43,7 @@ import AdminDeposits from './pages/admin/AdminDeposits'
 import AdminWithdrawals from './pages/admin/AdminWithdrawals'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminLogin from './pages/admin/AdminLogin'
+import AdminWealthFunds from './pages/admin/AdminWealthFunds'
 
 const App = () => (
     <Routes>
@@ -132,6 +133,7 @@ const App = () => (
             <Route path='deposits' element={<AdminDeposits />} />
             <Route path='withdrawals' element={<AdminWithdrawals />} />
             <Route path='settings' element={<AdminSettings />} />
+            <Route path="wealth-funds" element={<AdminWealthFunds />} />
         </Route>
 
         {/* ── 404 ─────────────────────────────────────────── */}

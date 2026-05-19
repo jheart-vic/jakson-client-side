@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Landmark, Clock3, AlertCircle } from 'lucide-react'
+import { Clock3, AlertCircle, Image as ImageIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
 import PageHeader from '../../components/layout/PageHeader'
 import { getWealthFunds, buyWealthFund, getMyWealthFunds } from '../../api/wealthFund'
@@ -36,12 +36,23 @@ export default function WealthFunds() {
 
 useEffect(() => { ;(async () => { await loadData() })() }, [loadData])
 
-  // ✅ FIX: Compare wealthFund._id or wealthFund string properly
   const hasActiveInvestment = (fundId) => {
     return userInvestments.some((inv) => {
       const investedFundId = inv.wealthFund?._id || inv.wealthFund
       return investedFundId === fundId && !inv.isClaimed && inv.status === 'in_progress'
     })
+  }
+
+  const getButtonText = (fund) => {
+    if (!fund.isActive) return 'Coming Soon'
+    if (hasActiveInvestment(fund._id || fund.id)) return 'Already Invested'
+    return 'Buy Now'
+  }
+
+  const isButtonDisabled = (fund) => {
+    if (!fund.isActive) return true
+    if (hasActiveInvestment(fund._id || fund.id)) return true
+    return buyingId === (fund._id || fund.id)
   }
 
   const handleBuy = async (fundId) => {
@@ -50,7 +61,6 @@ useEffect(() => { ;(async () => { await loadData() })() }, [loadData])
       await buyWealthFund(fundId)
       toast.success('Wealth fund purchased successfully!')
       await refreshUser()
-      // ✅ FIX: Absolute path to the "My Wealth Funds" page
       navigate('/main/wealth-fund/me')
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Purchase failed')
@@ -105,21 +115,40 @@ useEffect(() => { ;(async () => { await loadData() })() }, [loadData])
           </div>
         ) : (
           funds.map((fund) => {
-            const activeInvestment = hasActiveInvestment(fund._id || fund.id)
-            const buttonDisabled = activeInvestment
-            const buttonText = activeInvestment ? 'Already Invested' : 'Buy Now'
+            const comingSoon = !fund.isActive
+            const buttonDisabled = isButtonDisabled(fund)
+            const buttonText = getButtonText(fund)
 
             return (
               <div key={fund._id || fund.id} className="card card-p rounded-3xl animate-slide-up">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-extrabold text-lg text-gray-800">{fund.name}</h3>
-                    <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                      <Clock3 size={14} /> {fund.durationType} plan · {fund.durationDays} days
-                    </p>
+                {/* Image + header */}
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-16 h-16 rounded-xl bg-primary-light flex items-center justify-center overflow-hidden shrink-0">
+                    {fund.image ? (
+                      <img
+                        src={fund.image}
+                        alt={fund.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ImageIcon size={24} className="text-primary" />
+                    )}
                   </div>
-                  <div className="w-12 h-12 rounded-2xl bg-primary-light flex items-center justify-center">
-                    <Landmark className="text-primary" size={22} />
+
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-extrabold text-lg text-gray-800">{fund.name}</h3>
+                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                          <Clock3 size={14} /> {fund.durationType} plan · {fund.durationDays} days
+                        </p>
+                      </div>
+                      {comingSoon && (
+                        <span className="bg-gray-200 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-full">
+                          Coming Soon
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -135,8 +164,8 @@ useEffect(() => { ;(async () => { await loadData() })() }, [loadData])
                 </div>
 
                 <button
-                  onClick={() => handleBuy(fund._id || fund.id)}
-                  disabled={buttonDisabled || buyingId === (fund._id || fund.id)}
+                  onClick={() => !comingSoon && !hasActiveInvestment(fund._id || fund.id) && handleBuy(fund._id || fund.id)}
+                  disabled={buttonDisabled}
                   className={`btn rounded-2xl ${!buttonDisabled ? 'btn-primary' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                 >
                   {buyingId === (fund._id || fund.id) ? (

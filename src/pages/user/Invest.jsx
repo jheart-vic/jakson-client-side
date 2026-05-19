@@ -18,27 +18,36 @@ import Spinner from '../../components/common/Spinner'
 
 const Invest = () => {
     const navigate = useNavigate()
-
     const [products, setProducts] = useState([])
     const [myInvests, setMyInvests] = useState([])
     const [loading, setLoading] = useState(true)
     const [selected, setSelected] = useState(null)
     const [buying, setBuying] = useState(false)
-    const [activeTab, setActiveTab] = useState('all') // 'all' | 'active'
+    const [activeTab, setActiveTab] = useState('all')
     const { refreshUser } = useAuth()
+
     const load = useCallback(async () => {
         try {
             const [prodRes, invRes] = await Promise.all([
                 getProducts(),
                 getMyInvestments({ limit: 100 }),
             ])
-            setProducts(prodRes.data.products)
-            setMyInvests(
-                invRes.data.investments.filter(
-                    (i) => i.status === 'in_progress',
-                ),
+
+            // Safely extract arrays
+            const productsArray = prodRes?.data?.products || prodRes?.products || []
+            setProducts(productsArray)
+
+            let investmentsArray = invRes?.data?.investments || invRes?.investments || []
+            if (!Array.isArray(investmentsArray)) investmentsArray = []
+
+            // Keep only active (in_progress) investments
+            const activeInvestments = investmentsArray.filter(
+                (i) => i.status === 'in_progress'
             )
-        } catch {
+            setMyInvests(activeInvestments)
+
+        } catch (err) {
+            console.error(err)
             toast.error('Failed to load products')
         } finally {
             setLoading(false)
@@ -46,7 +55,7 @@ const Invest = () => {
     }, [])
 
     useEffect(() => {
-        ;(async () => {
+       (async () => {
             await load()
         })()
     }, [load])
@@ -70,54 +79,50 @@ const Invest = () => {
     const totalReturn = (p) => +(p.dailyIncome * p.cycleDays).toFixed(2)
     const roi = (p) =>
         p.amount > 0 ? +((totalReturn(p) / p.amount) * 100).toFixed(1) : 0
-    const ownedCount = (p) =>
-        myInvests.filter((i) => i.product?._id === p._id || i.product === p._id)
-            .length
 
+    // Check how many active units the user owns for a given product
+    const ownedCount = (product) => {
+        return myInvests.filter((investment) => {
+            // Case 1: product field is populated (has _id)
+            const productId = investment.product?._id || investment.product
+            if (productId) return productId === product._id
+            // Case 2: product is null – fallback to productSnapshot.name
+            return investment.productSnapshot?.name === product.name
+        }).length
+    }
+
+    // Products for "My Active" tab: only those the user owns at least one unit of
     const displayProducts =
         activeTab === 'active'
-            ? products.filter((p) =>
-                  myInvests.some(
-                      (i) => i.product?._id === p._id || i.product === p._id,
-                  ),
-              )
+            ? products.filter((p) => ownedCount(p) > 0)
             : products
 
     return (
         <div className='min-h-dvh bg-surface pb-28'>
-            {/* ── Header ──────────────────────────────── */}
+            {/* Header */}
             <div
-                style={{
-                    background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)',
-                }}
+                style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}
                 className='px-4 pt-12 pb-6 relative overflow-hidden'
             >
                 <div className='absolute -right-6 -top-6 w-36 h-36 rounded-full bg-white/10 blur-2xl pointer-events-none' />
                 <div className='relative'>
-                    <h1 className='text-white text-xl font-extrabold'>
-                        Invest
-                    </h1>
+                    <h1 className='text-white text-xl font-extrabold'>Invest</h1>
                     <p className='text-surface text-xs mt-0.5'>
                         Choose a product and start earning daily
                     </p>
 
-                    {/* Active investment count badge */}
                     {myInvests.length > 0 && (
-                        <div
-                            className='mt-3 inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm
-                            border border-white/25 rounded-full px-3 py-1.5'
-                        >
+                        <div className='mt-3 inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm border border-white/25 rounded-full px-3 py-1.5'>
                             <Zap size={12} className='text-yellow-300' />
                             <span className='text-white text-xs font-bold'>
-                                {myInvests.length} active investment
-                                {myInvests.length !== 1 ? 's' : ''}
+                                {myInvests.length} active investment{myInvests.length !== 1 ? 's' : ''}
                             </span>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* ── Tabs ─────────────────────────────────── */}
+            {/* Tabs */}
             <div className='flex gap-1 mx-4 mt-4 bg-white rounded-2xl p-1 shadow-card'>
                 {[
                     { key: 'all', label: `All (${products.length})` },
@@ -127,23 +132,23 @@ const Invest = () => {
                         key={t.key}
                         onClick={() => setActiveTab(t.key)}
                         className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-200
-              ${
-                  activeTab === t.key
-                      ? 'bg-primary text-white shadow-[0_2px_8px_rgba(26,159,212,0.35)]'
-                      : 'text-gray-400'
-              }`}
+                        ${
+                            activeTab === t.key
+                                ? 'bg-primary text-white shadow-[0_2px_8px_rgba(26,159,212,0.35)]'
+                                : 'text-gray-400'
+                        }`}
                     >
                         {t.label}
                     </button>
                 ))}
             </div>
 
-            {/* ── My Investments quick link ─────────────── */}
+            {/* My Investments quick link */}
             <button
                 onClick={() => navigate('/main/invest-log')}
                 className='mx-4 mt-3 w-[calc(100%-2rem)] flex items-center justify-between
-                   bg-white rounded-2xl px-4 py-3 shadow-card border border-gray-50
-                   active:scale-[0.99] transition-transform'
+                           bg-white rounded-2xl px-4 py-3 shadow-card border border-gray-50
+                           active:scale-[0.99] transition-transform'
             >
                 <div className='flex items-center gap-2'>
                     <div className='w-8 h-8 rounded-xl bg-primary-light flex items-center justify-center'>
@@ -156,25 +161,26 @@ const Invest = () => {
                 <ChevronRight size={15} className='text-gray-300' />
             </button>
 
-            {/* ── Product list ──────────────────────────── */}
+            {/* Product list */}
             <div className='px-4 mt-4 space-y-4'>
                 {loading ? (
                     <Spinner />
                 ) : displayProducts.length === 0 ? (
                     <div className='text-center py-16 text-gray-400'>
-                        <Package
-                            size={40}
-                            className='mx-auto mb-3 opacity-30'
-                        />
+                        <Package size={40} className='mx-auto mb-3 opacity-30' />
                         <p className='text-sm font-medium'>
-                            No active investments yet
+                            {activeTab === 'active'
+                                ? 'No active investments yet'
+                                : 'No products available'}
                         </p>
-                        <button
-                            onClick={() => setActiveTab('all')}
-                            className='text-primary text-sm font-bold mt-2'
-                        >
-                            Browse products →
-                        </button>
+                        {activeTab === 'active' && (
+                            <button
+                                onClick={() => setActiveTab('all')}
+                                className='text-primary text-sm font-bold mt-2'
+                            >
+                                Browse products →
+                            </button>
+                        )}
                     </div>
                 ) : (
                     displayProducts.map((p, i) => {
@@ -182,15 +188,14 @@ const Invest = () => {
                         const owned = ownedCount(p)
                         const canBuy = !soldOut && owned < p.maxUnits
 
-                        // Color theme per product tier
                         const tier =
                             p.amount === 0
                                 ? 'free'
                                 : p.amount <= 30
-                                  ? 'bronze'
-                                  : p.amount <= 100
-                                    ? 'silver'
-                                    : 'gold'
+                                ? 'bronze'
+                                : p.amount <= 100
+                                ? 'silver'
+                                : 'gold'
 
                         const TIER_STYLE = {
                             free: {
@@ -221,7 +226,7 @@ const Invest = () => {
                                 className='card overflow-hidden animate-slide-up'
                                 style={{ animationDelay: `${i * 0.06}s` }}
                             >
-                                {/* Coloured top strip */}
+                                {/* Top strip */}
                                 <div
                                     className={`bg-linear-to-r ${TIER_STYLE.grad} px-4 py-3 flex items-center justify-between`}
                                 >
@@ -234,10 +239,7 @@ const Invest = () => {
                                             />
                                         ) : (
                                             <div className='w-10 h-10 rounded-xl bg-white/20 border-2 border-white/30 flex items-center justify-center'>
-                                                <Package
-                                                    size={18}
-                                                    className='text-white/80'
-                                                />
+                                                <Package size={18} className='text-white/80' />
                                             </div>
                                         )}
                                         <div>
@@ -270,15 +272,12 @@ const Invest = () => {
 
                                 {/* Body */}
                                 <div className='p-4'>
-                                    {/* Stats grid */}
                                     <div className='grid grid-cols-2 gap-3 mb-4'>
                                         {[
                                             {
                                                 icon: '💰',
                                                 label: 'Cost',
-                                                val: p.isFree
-                                                    ? 'Free'
-                                                    : fmtUSD(p.amount),
+                                                val: p.isFree ? 'Free' : fmtUSD(p.amount),
                                                 bold: !p.isFree,
                                             },
                                             {
@@ -300,10 +299,7 @@ const Invest = () => {
                                                 bold: true,
                                             },
                                         ].map(({ icon, label, val, bold }) => (
-                                            <div
-                                                key={label}
-                                                className='bg-gray-50 rounded-xl p-3'
-                                            >
+                                            <div key={label} className='bg-gray-50 rounded-xl p-3'>
                                                 <p className='text-[10px] text-gray-400 font-medium mb-1'>
                                                     {icon} {label}
                                                 </p>
@@ -316,63 +312,45 @@ const Invest = () => {
                                         ))}
                                     </div>
 
-                                    {/* ROI progress bar */}
                                     {!p.isFree && (
                                         <div className='mb-4'>
                                             <div className='flex justify-between text-[10px] text-gray-400 mb-1.5'>
                                                 <span>
-                                                    ROI:{' '}
-                                                    <strong className='text-success'>
-                                                        {roi(p)}%
-                                                    </strong>
+                                                    ROI: <strong className='text-success'>{roi(p)}%</strong>
                                                 </span>
                                                 <span>
-                                                    Max {p.maxUnits} unit
-                                                    {p.maxUnits !== 1
-                                                        ? 's'
-                                                        : ''}
-                                                    /person
+                                                    Max {p.maxUnits} unit{p.maxUnits !== 1 ? 's' : ''}/person
                                                 </span>
                                             </div>
                                             <div className='h-1.5 bg-gray-100 rounded-full overflow-hidden'>
                                                 <div
                                                     className='h-full bg-linear-to-r from-success to-emerald-400 rounded-full'
-                                                    style={{
-                                                        width: `${Math.min(roi(p), 100)}%`,
-                                                    }}
+                                                    style={{ width: `${Math.min(roi(p), 100)}%` }}
                                                 />
                                             </div>
                                         </div>
                                     )}
 
-                                    {/* Owned indicator */}
                                     {owned > 0 && (
                                         <div className='flex items-center gap-1.5 mb-3 bg-success-light rounded-xl px-3 py-2'>
-                                            <Star
-                                                size={12}
-                                                className='text-success fill-success'
-                                            />
+                                            <Star size={12} className='text-success fill-success' />
                                             <span className='text-xs text-success font-bold'>
-                                                You own {owned} active unit
-                                                {owned !== 1 ? 's' : ''}
-                                                {owned >= p.maxUnits
-                                                    ? ' (max reached)'
-                                                    : ''}
+                                                You own {owned} active unit{owned !== 1 ? 's' : ''}
+                                                {owned >= p.maxUnits ? ' (max reached)' : ''}
                                             </span>
                                         </div>
                                     )}
 
-                                    {/* CTA */}
                                     <button
                                         onClick={() => canBuy && setSelected(p)}
                                         disabled={!canBuy}
                                         className={`w-full py-3.5 rounded-2xl text-sm font-extrabold flex items-center justify-center gap-2
-                    transition-all duration-150 active:scale-[0.98]
-                    ${
-                        !canBuy
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : `bg-linear-to-r ${TIER_STYLE.grad} text-white shadow-[0_4px_16px_rgba(26,159,212,0.3)]`
-                    }`}
+                                            transition-all duration-150 active:scale-[0.98]
+                                            ${
+                                                !canBuy
+                                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                    : `bg-linear-to-r ${TIER_STYLE.grad} text-white shadow-[0_4px_16px_rgba(26,159,212,0.3)]`
+                                            }`}
                                     >
                                         {soldOut ? (
                                             '🔴 Sold Out'
@@ -380,11 +358,8 @@ const Invest = () => {
                                             '✅ Max Units Reached'
                                         ) : (
                                             <>
-                                                <ShoppingCart size={15} />{' '}
-                                                Invest Now —{' '}
-                                                {p.isFree
-                                                    ? 'Free'
-                                                    : fmtUSD(p.amount)}
+                                                <ShoppingCart size={15} /> Invest Now —{' '}
+                                                {p.isFree ? 'Free' : fmtUSD(p.amount)}
                                             </>
                                         )}
                                     </button>
@@ -395,7 +370,7 @@ const Invest = () => {
                 )}
             </div>
 
-            {/* ── Confirm Modal ─────────────────────────── */}
+            {/* Confirm Modal */}
             <Modal
                 isOpen={!!selected}
                 onClose={() => !buying && setSelected(null)}
@@ -403,7 +378,6 @@ const Invest = () => {
             >
                 {selected && (
                     <div className='space-y-4'>
-                        {/* Product header */}
                         <div className='flex items-center gap-3 bg-primary-light rounded-2xl p-3'>
                             <div className='w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-sm'>
                                 {selected.image ? (
@@ -413,30 +387,22 @@ const Invest = () => {
                                         className='w-full h-full rounded-2xl object-cover'
                                     />
                                 ) : (
-                                    <Package
-                                        size={20}
-                                        className='text-primary/50'
-                                    />
+                                    <Package size={20} className='text-primary/50' />
                                 )}
                             </div>
                             <div>
-                                <p className='font-extrabold text-gray-800 text-sm'>
-                                    {selected.name}
-                                </p>
+                                <p className='font-extrabold text-gray-800 text-sm'>{selected.name}</p>
                                 <p className='text-xs text-primary font-medium mt-0.5'>
                                     {selected.cycleDays}-day investment
                                 </p>
                             </div>
                         </div>
 
-                        {/* Breakdown */}
                         <div className='space-y-2.5'>
                             {[
                                 {
                                     label: 'Investment cost',
-                                    val: selected.isFree
-                                        ? 'Free'
-                                        : fmtUSD(selected.amount),
+                                    val: selected.isFree ? 'Free' : fmtUSD(selected.amount),
                                     highlight: true,
                                 },
                                 {
@@ -458,12 +424,8 @@ const Invest = () => {
                                     key={label}
                                     className='flex justify-between items-center py-2 border-b border-gray-50 last:border-0'
                                 >
-                                    <span className='text-sm text-gray-400 font-medium'>
-                                        {label}
-                                    </span>
-                                    <span
-                                        className={`text-sm font-extrabold ${highlight ? 'text-primary' : 'text-gray-800'}`}
-                                    >
+                                    <span className='text-sm text-gray-400 font-medium'>{label}</span>
+                                    <span className={`text-sm font-extrabold ${highlight ? 'text-primary' : 'text-gray-800'}`}>
                                         {val}
                                     </span>
                                 </div>
@@ -481,7 +443,7 @@ const Invest = () => {
                                 onClick={() => setSelected(null)}
                                 disabled={buying}
                                 className='flex-1 py-3.5 rounded-2xl border-2 border-gray-200 text-gray-500
-                           text-sm font-bold active:scale-95 transition-transform disabled:opacity-50'
+                                           text-sm font-bold active:scale-95 transition-transform disabled:opacity-50'
                             >
                                 Cancel
                             </button>
