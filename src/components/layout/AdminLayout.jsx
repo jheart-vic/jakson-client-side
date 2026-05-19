@@ -26,7 +26,7 @@
 //       <aside className="w-56 bg-gray-900 text-white flex flex-col fixed top-0 left-1/2 -translate-x-[240px] h-full z-40">
 //         {/* Logo */}
 //         <div className="px-5 py-5 border-b border-gray-700">
-//           <p className="text-primary font-bold text-lg">Jakson Solar</p>
+//           <p className="text-primary font-bold text-lg">Luminos Energy</p>
 //           <p className="text-gray-400 text-xs mt-0.5">Admin Panel</p>
 //         </div>
 
@@ -106,7 +106,7 @@ const AdminLayout = () => {
       {/* ── Top bar (mobile) ──────────────────────────── */}
       <header className="sticky top-0 z-30 bg-gray-900 text-white flex items-center justify-between px-4 py-3.5 shadow-lg">
         <div>
-          <p className="text-primary font-bold text-base leading-tight">Jakson Solar</p>
+          <p className="text-primary font-bold text-base leading-tight">Luminos Energy</p>
           <p className="text-gray-400 text-[10px] uppercase tracking-widest">Admin Panel</p>
         </div>
         <button

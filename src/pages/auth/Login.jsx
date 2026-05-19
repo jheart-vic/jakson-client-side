@@ -67,7 +67,7 @@
 //         <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 shadow-lg border border-white/30">
 //           <span className="text-4xl">☀️</span>
 //         </div>
-//         <h1 className="text-white text-2xl font-extrabold tracking-tight">Jakson Solar</h1>
+//         <h1 className="text-white text-2xl font-extrabold tracking-tight">Luminos Energy</h1>
 //         <p className="text-white/70 text-sm mt-1 font-medium">Smart Solar Investment</p>
 //       </div>
 
@@ -223,7 +223,7 @@ const Login = () => {
                         shadow-lg border border-white/30">
           <span className="text-4xl">☀️</span>
         </div>
-        <h1 className="text-white text-2xl font-extrabold tracking-tight">Jakson Solar</h1>
+        <h1 className="text-white text-2xl font-extrabold tracking-tight">Luminos Energy</h1>
         <p className="text-white/70 text-sm mt-1 font-medium">Smart Solar Investment</p>
       </div>
 

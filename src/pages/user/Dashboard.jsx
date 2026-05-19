@@ -65,7 +65,7 @@ const NEWS = [
     iconColor: '#f97316',
     iconBg: '#fff4ed',
     title: 'Beware of Fraud!',
-    body: 'Jakson Solar will never ask for your password or PIN via call or message. Stay safe.',
+    body: 'Luminos Energy will never ask for your password or PIN via call or message. Stay safe.',
     time: 'Recently',
   },
   {
@@ -73,8 +73,8 @@ const NEWS = [
     icon: Megaphone,
     iconColor: '#1a9fd4',
     iconBg: '#e0f4fc',
-    title: '"Jakson Solar" Operating Model',
-    body: 'Why choose Jakson Solar? Proven market experience, global solar manufacturing excellence and financial stability.',
+    title: '"Luminos Energy" Operating Model',
+    body: 'Why choose Luminos Energy? Proven market experience, global solar manufacturing excellence and financial stability.',
     time: 'Recently',
   },
 ]
@@ -219,7 +219,7 @@ const Dashboard = () => {
                 <span className="text-lg leading-none">☀️</span>
               </div>
               <div>
-                <p className="text-white font-extrabold text-sm leading-tight">Jakson Solar</p>
+                <p className="text-white font-extrabold text-sm leading-tight">Luminos Energy</p>
                 <p className="text-surface text-[10px] font-medium">Investment Platform</p>
               </div>
             </div>
@@ -293,7 +293,7 @@ const Dashboard = () => {
             <span className="text-lg leading-none">📢</span>
           </div>
           <div className="flex-1 text-left">
-            <p className="text-sm font-bold text-gray-800">Jakson Solar Company Profile</p>
+            <p className="text-sm font-bold text-gray-800">Luminos Energy Company Profile</p>
             <p className="text-xs text-gray-400 mt-0.5">Learn about our mission & global network</p>
           </div>
           <ChevronRight size={15} className="text-gray-300" />

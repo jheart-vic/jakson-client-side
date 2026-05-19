@@ -144,7 +144,7 @@ export default function AdminSettings() {
           {[
             { field: 'bankName',      label: 'Bank Name',      placeholder: 'e.g. OTPay'              },
             { field: 'accountNumber', label: 'Account Number', placeholder: '10-digit account number' },
-            { field: 'accountName',   label: 'Account Name',   placeholder: 'Jakson Solar'             },
+            { field: 'accountName',   label: 'Account Name',   placeholder: 'Luminos Energy'             },
           ].map(({ field, label, placeholder }) => (
             <div key={field}>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
