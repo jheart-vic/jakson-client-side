@@ -4,7 +4,7 @@ import {
   QrCode, ArrowDownCircle, ArrowUpCircle,
   Gift, Calendar, BarChart2, Users,
   ChevronRight, Copy, Megaphone,
-  ShieldAlert
+  ShieldAlert, Eye, EyeOff
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/AuthContext'
@@ -145,6 +145,7 @@ const BannerCarousel = ({ banners, onCta }) => {
 const Dashboard = () => {
   const navigate = useNavigate()
   const { user, refreshUser } = useAuth()
+  const [showBalance, setShowBalance] = useState(false)
 
   const [bal, setBal] = useState({ balance: 0, todayEarnings: 0, yesterdayEarnings: 0, totalEarnings: 0 })
   const [loading, setLoading] = useState(true)
@@ -206,10 +207,20 @@ const Dashboard = () => {
       .catch(() => toast.error('Could not copy'))
   }
 
+  const maskedBalance = () => {
+    if (showBalance) return fmtUSD(bal.balance)
+    return '*****'
+  }
+
+  const maskedNGN = () => {
+    if (showBalance) return fmtNGN(bal.balance * 1365)
+    return '*****'
+  }
+
   return (
     <div className="min-h-dvh bg-surface pb-24">
 
-      {/* Top bar (unchanged) */}
+      {/* Top bar */}
       <div style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}>
         <div className="h-safe-top" />
         <div className="px-4 pt-3 pb-1 animate-slide-down">
@@ -233,19 +244,37 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Balance card */}
+          {/* Balance card with eye icon next to balance */}
           <div className="bg-white/12 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20 animate-slide-up">
-            <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">Funding Account</p>
+            <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">
+              Funding Account
+            </p>
+
             {loading ? (
               <div className="h-8 w-28 skeleton rounded-lg bg-white/20" />
             ) : (
-              <p className="text-white text-3xl font-extrabold tracking-tight leading-none">{fmtUSD(bal.balance)}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-white text-2xl font-bold tracking-tight leading-none">
+                  {maskedBalance()}
+                </p>
+                <button
+                  onClick={() => setShowBalance(!showBalance)}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  {showBalance ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             )}
-            <p className="text-surface text-xs mt-1 mb-3">≈ {fmtNGN(bal.balance * 1365)}</p>
+
+            <p className="text-surface text-xs mt-1 mb-3">
+              {showBalance ? `≈ ${maskedNGN()}` : maskedNGN()}
+            </p>
+
             <div className="flex gap-2.5 mb-3">
               <button onClick={() => navigate('/main/deposit')} className="flex-1 bg-white text-primary text-xs font-bold py-2.5 rounded-xl active:scale-95 transition-transform">Recharge</button>
               <button onClick={() => navigate('/main/withdraw')} className="flex-1 bg-white/20 border border-white/30 text-white text-xs font-bold py-2.5 rounded-xl active:scale-95 transition-transform">Withdraw</button>
             </div>
+
             <div className="grid grid-cols-3 gap-2 pt-3 border-t text-surface">
               {[
                 { label: 'Today', val: bal.todayEarnings },
@@ -262,31 +291,31 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* ── Quick Actions (UPDATED: each action has its own background box) ── */}
+      {/* ── Quick Actions ── */}
       <div className="px-4 mt-4 animate-slide-up delay-100">
         <div className="grid grid-cols-3 gap-3">
           {ACTIONS.map((a, i) => (
             <button
               key={a.label}
               onClick={() => handleAction(a)}
-              className="flex flex-col items-center justify-center gap-2 py-3 px-2 rounded-2xl bg shadow-sm border bg-primary-dark border-gray-100 active:scale-95 transition-all"
+              className="flex flex-col items-center justify-center gap-2 py-3 px-2 rounded-2xl bg-white shadow-sm border border-gray-100 active:scale-95 transition-all"
               style={{ animationDelay: `${i * 0.04 + 0.12}s` }}
             >
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: a.bg }}>
                 <a.icon size={20} style={{ color: a.color }} strokeWidth={1.8} />
               </div>
-              <span className="text-[11px] font-semibold text-primary-light text-center wrap-break-word max-w-full">{a.label}</span>
+              <span className="text-[11px] font-semibold text-gray-700 text-center break-words max-w-full">{a.label}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Banner carousel (unchanged) */}
+      {/* Banner carousel */}
       <div className="px-4 mt-4 animate-slide-up delay-150">
         <BannerCarousel banners={BANNERS} onCta={(path) => navigate(path)} />
       </div>
 
-      {/* Company profile link (unchanged) */}
+      {/* Company profile link */}
       <div className="px-4 mt-3 animate-slide-up delay-200">
         <button className="w-full flex items-center gap-3 bg-white rounded-2xl p-4 shadow-card active:scale-[0.99] transition-transform border border-gray-100">
           <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center shrink-0">
@@ -300,7 +329,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Invite banner (unchanged) */}
+      {/* Invite banner */}
       <div className="px-4 mt-3 animate-slide-up delay-200">
         <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg,#f97316,#fb923c)' }}>
           <div className="flex items-center gap-3 p-4">
@@ -318,7 +347,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* News feed (unchanged) */}
+      {/* News feed */}
       <div className="px-4 mt-4 mb-2 animate-slide-up delay-250">
         <p className="text-sm font-extrabold text-gray-700 mb-3">Announcements</p>
         <div className="space-y-3">
