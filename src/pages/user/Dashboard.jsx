@@ -298,13 +298,13 @@ const Dashboard = () => {
             <button
               key={a.label}
               onClick={() => handleAction(a)}
-              className="flex flex-col items-center justify-center gap-2 py-3 px-2 rounded-2xl bg-white shadow-sm border border-gray-100 active:scale-95 transition-all"
+              className="flex flex-col items-center justify-center gap-2 py-3 px-2 rounded-2xl bg-primary/40 shadow-sm border border-gray-100 active:scale-95 transition-all"
               style={{ animationDelay: `${i * 0.04 + 0.12}s` }}
             >
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: a.bg }}>
                 <a.icon size={20} style={{ color: a.color }} strokeWidth={1.8} />
               </div>
-              <span className="text-[11px] font-semibold text-gray-700 text-center break-words max-w-full">{a.label}</span>
+              <span className="text-[11px] font-semibold text-primary text-center wrap-break-word max-w-full">{a.label}</span>
             </button>
           ))}
         </div>

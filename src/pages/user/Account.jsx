@@ -70,12 +70,10 @@ const Account = () => {
         </div>
       </div>
 
-      {/* Balance card with eye icon next to balance */}
+      {/* Balance card with eye icon */}
       <div className="px-4 -mt-8">
         <div className="card card-p shadow-float animate-slide-up">
           <p className="text-xs text-primary font-medium uppercase tracking-wide">Funding Account</p>
-
-          {/* Balance row with inline eye icon */}
           <div className="flex items-center gap-2 mt-1">
             <p className="text-2xl font-bold text-primary">{maskedBalance()}</p>
             <button
@@ -85,12 +83,9 @@ const Account = () => {
               {showBalance ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-
-          {/* NGN equivalent – hide the "≈" when balance is hidden */}
           <p className="text-xs text-primary mt-0.5 mb-4">
             {showBalance ? `≈ ${maskedNGN()}` : maskedNGN()}
           </p>
-
           <div className="flex gap-2.5">
             <button onClick={() => navigate('/main/deposit')}
               className="flex-1 py-2.5 bg-primary text-white text-xs font-bold rounded-xl
@@ -106,27 +101,25 @@ const Account = () => {
         </div>
       </div>
 
-      {/* Actions grid */}
+      {/* Actions grid — now with bg-primary-deep and proper separation */}
       <div className="px-4 mt-4">
-        <div className="card overflow-hidden">
-          <div className="grid grid-cols-3">
-            {GRID.map((item, i) => {
-              const isLastRow  = i >= GRID.length - (GRID.length % 3 || 3)
-              const isLastCol  = (i + 1) % 3 === 0
-              return (
-                <button key={item.label} onClick={() => handleTap(item)}
-                  className={`flex flex-col items-center gap-2 p-4 active:bg-gray-50 transition-colors
-                    ${!isLastRow ? 'border-b border-gray-50' : ''}
-                    ${!isLastCol ? 'border-r border-gray-50' : ''}`}>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                    style={{ backgroundColor: item.bg }}>
-                    <item.icon size={18} style={{ color: item.color }} strokeWidth={2} />
-                  </div>
-                  <p className="text-[10px] font-bold text-gray-600 text-center leading-tight">{item.label}</p>
-                </button>
-              )
-            })}
-          </div>
+        <div className="grid grid-cols-3 gap-3">
+          {GRID.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => handleTap(item)}
+              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl
+                         bg-primary-deep/10 backdrop-blur-sm border border-primary/20
+                         active:scale-95 transition-all hover:bg-primary-deep/20"
+            >
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white/20">
+                <item.icon size={18} style={{ color: item.color }} strokeWidth={2} />
+              </div>
+              <p className="text-[10px] font-bold text-primary text-center leading-tight">
+                {item.label}
+              </p>
+            </button>
+          ))}
         </div>
       </div>
     </div>
