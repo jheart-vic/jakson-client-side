@@ -101,19 +101,19 @@ const Account = () => {
         </div>
       </div>
 
-      {/* Actions grid — now with bg-primary-deep and proper separation */}
+      {/* Actions grid — smaller buttons */}
       <div className="px-4 mt-4">
         <div className="grid grid-cols-3 gap-3">
           {GRID.map((item) => (
             <button
               key={item.label}
               onClick={() => handleTap(item)}
-              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl
+              className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl
                          bg-primary-deep/10 backdrop-blur-sm border border-primary/20
                          active:scale-95 transition-all hover:bg-primary-deep/20"
             >
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white/20">
-                <item.icon size={18} style={{ color: item.color }} strokeWidth={2} />
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/20">
+                <item.icon size={16} style={{ color: item.color }} strokeWidth={2} />
               </div>
               <p className="text-[10px] font-bold text-primary text-center leading-tight">
                 {item.label}
