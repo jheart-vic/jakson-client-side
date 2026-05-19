@@ -55,8 +55,18 @@ const Withdraw = () => {
       const { data } = await createWithdrawal({ amountUSD: amountVal, withdrawPassword: pin })
       setReceipt(data.withdrawal)
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Withdrawal failed')
-    } finally { setSubmitting(false) }
+      const message = err.response?.data?.message || 'Withdrawal failed'
+      // Check if the error indicates missing withdrawal PIN
+      if (message.toLowerCase().includes('withdrawal password') ||
+          message.toLowerCase().includes('set your withdrawal password')) {
+        toast.error('Please set your withdrawal PIN first')
+        navigate('/main/change-withdraw-pin')
+      } else {
+        toast.error(message)
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
