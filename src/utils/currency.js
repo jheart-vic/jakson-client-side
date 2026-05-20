@@ -19,5 +19,5 @@ export const fmtNGN = (amount = 0) =>
 /**
  * Convert USD → NGN using a given rate
  */
-export const toNGN = (usd = 0, rate = 1365) =>
+export const toNGN = (usd = 0, rate = 1560) =>
   +(usd * rate).toFixed(2)
