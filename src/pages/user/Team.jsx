@@ -10,8 +10,8 @@ import EmptyState from '../../components/common/EmptyState'
 import Modal from '../../components/common/Modal'
 
 const TIERS = [
-  { level: 1, label: 'Tier 1 Membership', commission: '3%', color: '#1a9fd4', bg: '#e0f4fc' },
-  { level: 2, label: 'Tier 2 Membership', commission: '2%', color: '#10b981', bg: '#ecfdf5' },
+  { level: 1, label: 'Tier 1 Membership', commission: '8%', color: '#1a9fd4', bg: '#e0f4fc' },
+  { level: 2, label: 'Tier 2 Membership', commission: '3%', color: '#10b981', bg: '#ecfdf5' },
   { level: 3, label: 'Tier 3 Membership', commission: '1%', color: '#f97316', bg: '#fff4ed' },
 ]
 
