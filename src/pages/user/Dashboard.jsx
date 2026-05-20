@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-assignment */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -11,43 +12,10 @@ import { useAuth } from '../../context/AuthContext'
 import { getBalance } from '../../api/wallet'
 import { redeemCode, dailyCheckin } from '../../api/rewards'
 import { fmtUSD, fmtNGN } from '../../utils/currency'
+import { getWealthFunds } from '../../api/wealthFund'
 import Modal from '../../components/common/Modal'
 
-// ── Banners (unchanged) ────────────────────────────────────
-const BANNERS = [
-  {
-    id: 1,
-    tag: '✦ Latest',
-    title: 'TOPCon Technology',
-    sub: 'Powering the Next Gen of Solar',
-    cta: 'Invest Now',
-    path: '/main/invest',
-    gradient: 'linear-gradient(135deg,#0e6a8f 0%,#1a9fd4 60%,#38bdf8 100%)',
-    emoji: '⚡',
-  },
-  {
-    id: 2,
-    tag: '✦ New Product',
-    title: 'Helia NXT Bifacial',
-    sub: '$7 · 35 days · $0.40/day',
-    cta: 'View Product',
-    path: '/main/invest',
-    gradient: 'linear-gradient(135deg,#065f46 0%,#10b981 60%,#34d399 100%)',
-    emoji: '🌿',
-  },
-  {
-    id: 3,
-    tag: '✦ Earn More',
-    title: 'Refer & Earn 8%',
-    sub: 'Invite friends and earn on every investment they make',
-    cta: 'Invite Now',
-    path: '/main/team',
-    gradient: 'linear-gradient(135deg,#7c2d12 0%,#f97316 60%,#fb923c 100%)',
-    emoji: '🎁',
-  },
-]
-
-// ── Quick actions (updated with distinct background per button) ──
+// ── Quick actions ──
 const ACTIONS = [
   { label: 'Recharge',  icon: ArrowDownCircle, color: '#1a9fd4', bg: '#e0f4fc', path: '/main/deposit'  },
   { label: 'Withdraw',  icon: ArrowUpCircle,   color: '#f97316', bg: '#fff4ed', path: '/main/withdraw' },
@@ -57,7 +25,7 @@ const ACTIONS = [
   { label: 'Team',      icon: Users,           color: '#ec4899', bg: '#fdf2f8', path: '/main/team'     },
 ]
 
-// ── News (unchanged) ───────────────────────────────────────
+// ── News ──
 const NEWS = [
   {
     id: 1,
@@ -79,61 +47,142 @@ const NEWS = [
   },
 ]
 
-// ── Carousel (unchanged) ───────────────────────────────────
-const BannerCarousel = ({ banners, onCta }) => {
+// ── Wealth Carousel Component (replaces the old banner carousel) ──
+const WealthCarousel = ({ onInvest, onRefer }) => {
+  const [wealthFunds, setWealthFunds] = useState([])
   const [active, setActive] = useState(0)
   const timerRef = useRef(null)
 
-  const next = useCallback(() => setActive(a => (a + 1) % banners.length), [banners.length])
+  // Fetch wealth funds on mount
+  useEffect(() => {
+    const fetchFunds = async () => {
+      try {
+        const res = await getWealthFunds()
+        let funds = res?.funds || res?.data?.funds || res || []
+        setWealthFunds(funds)
+      } catch (err) {
+        console.error('Failed to load wealth funds for carousel', err)
+        setWealthFunds([])
+      }
+    }
+    fetchFunds()
+  }, [])
+
+  const slides = [
+    ...wealthFunds.map(fund => ({ type: 'fund', data: fund })),
+    { type: 'refer', data: { title: 'Invite & Earn 3%', sub: 'Share with friends and earn on every investment they make' } }
+  ]
+
+  const next = useCallback(() => setActive(a => (a + 1) % slides.length), [slides.length])
 
   useEffect(() => {
+    if (slides.length === 0) return
     timerRef.current = setInterval(next, 3500)
     return () => clearInterval(timerRef.current)
-  }, [next])
+  }, [next, slides.length])
 
-  const go = (i) => {
+  const goTo = (i) => {
     clearInterval(timerRef.current)
     setActive(i)
     timerRef.current = setInterval(next, 3500)
   }
 
+  if (slides.length === 0) return null
+
+  const gradients = [
+    'linear-gradient(135deg,#065f46 0%,#10b981 60%,#34d399 100%)',
+    'linear-gradient(135deg,#0e6a8f 0%,#1a9fd4 60%,#38bdf8 100%)',
+    'linear-gradient(135deg,#7c2d12 0%,#f97316 60%,#fb923c 100%)',
+    'linear-gradient(135deg,#4c1d95 0%,#8b5cf6 60%,#a78bfa 100%)',
+  ]
+
   return (
-    <div className="relative overflow-hidden rounded-2xl">
-      <div className="relative" style={{ height: 148 }}>
-        {banners.map((b, i) => (
-          <div
-            key={b.id}
-            className="absolute inset-0 transition-all duration-500"
-            style={{
-              background: b.gradient,
-              opacity: i === active ? 1 : 0,
-              transform: `translateX(${(i - active) * 100}%)`,
-            }}
-          >
-            <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
-            <div className="absolute right-4 bottom-4 text-5xl select-none">{b.emoji}</div>
-            <div className="relative p-5 h-full flex flex-col justify-between">
-              <div>
-                <span className="text-yellow-300 text-[10px] font-bold uppercase tracking-widest">{b.tag}</span>
-                <p className="text-white text-lg font-extrabold mt-1 leading-tight">{b.title}</p>
-                <p className="text-white/70 text-xs mt-0.5">{b.sub}</p>
-              </div>
-              <button
-                onClick={() => onCta(b.path)}
-                className="self-start bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-bold px-4 py-2 rounded-full active:scale-95 transition-transform flex items-center gap-1"
-              >
-                {b.cta} <ChevronRight size={11} />
-              </button>
+    <div className="px-4 mt-4 animate-slide-up delay-150">
+      <div className="relative overflow-hidden rounded-2xl" style={{ height: 170 }}>
+        {slides.map((slide, i) => {
+          const isActiveSlide = i === active
+          let bgGradient = ''
+          let content = null
+
+          if (slide.type === 'fund') {
+            const fund = slide.data
+            bgGradient = gradients[i % gradients.length]
+            content = (
+              <>
+                <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
+                <div className="absolute right-3 bottom-3 text-4xl select-none">💰</div>
+                <div className="relative p-4 h-full flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <span className="text-yellow-300 text-[10px] font-bold uppercase tracking-wider">
+                        {fund.isActive ? '⚡ Active' : '🔜 Coming Soon'}
+                      </span>
+                      {fund.image && (
+                        <img src={fund.image} alt="" className="w-8 h-8 rounded-full bg-white/20 object-cover" />
+                      )}
+                    </div>
+                    <p className="text-white text-base font-extrabold mt-1 leading-tight">{fund.name}</p>
+                    <p className="text-white/70 text-[11px] mt-0.5">
+                      ${fund.amount} · {fund.durationDays}d · Maturity ${fund.maturityAmount}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => onInvest('/main/wealth-fund')}
+                    className="self-start bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-1"
+                  >
+                    View Product <ChevronRight size={11} />
+                  </button>
+                </div>
+              </>
+            )
+          } else {
+            // Refer card
+            bgGradient = 'linear-gradient(135deg,#f97316,#fb923c)'
+            content = (
+              <>
+                <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
+                <div className="absolute right-3 bottom-3 text-4xl select-none">🎁</div>
+                <div className="relative p-4 h-full flex flex-col justify-between">
+                  <div>
+                    <span className="text-yellow-300 text-[10px] font-bold uppercase tracking-wider">✦ Referral</span>
+                    <p className="text-white text-base font-extrabold mt-1 leading-tight">{slide.data.title}</p>
+                    <p className="text-white/70 text-[11px] mt-0.5">{slide.data.sub}</p>
+                  </div>
+                  <button
+                    onClick={() => onRefer()}
+                    className="self-start bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-1"
+                  >
+                    Invite Now <ChevronRight size={11} />
+                  </button>
+                </div>
+              </>
+            )
+          }
+
+          return (
+            <div
+              key={i}
+              className="absolute inset-0 transition-all duration-500"
+              style={{
+                background: bgGradient,
+                opacity: isActiveSlide ? 1 : 0,
+                transform: `translateX(${(i - active) * 100}%)`,
+              }}
+            >
+              {content}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-        {banners.map((_, i) => (
+      {/* Dots */}
+      <div className="flex justify-center gap-1.5 mt-2">
+        {slides.map((_, i) => (
           <button
             key={i}
-            onClick={() => go(i)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${i === active ? 'w-5 bg-white' : 'w-1.5 bg-white/40'}`}
+            onClick={() => goTo(i)}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i === active ? 'w-5 bg-primary' : 'w-1.5 bg-primary/30'
+            }`}
           />
         ))}
       </div>
@@ -141,7 +190,7 @@ const BannerCarousel = ({ banners, onCta }) => {
   )
 }
 
-// ── Main component ─────────────────────────────────────────
+// ── Main Dashboard component ──
 const Dashboard = () => {
   const navigate = useNavigate()
   const { user, refreshUser } = useAuth()
@@ -244,7 +293,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Balance card with eye icon next to balance */}
+          {/* Balance card */}
           <div className="bg-white/12 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20 animate-slide-up">
             <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">
               Funding Account
@@ -291,7 +340,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* ── Quick Actions ── */}
+      {/* Quick Actions */}
       <div className="px-4 mt-4 animate-slide-up delay-100">
         <div className="grid grid-cols-3 gap-3">
           {ACTIONS.map((a, i) => (
@@ -310,10 +359,11 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Banner carousel */}
-      <div className="px-4 mt-4 animate-slide-up delay-150">
-        <BannerCarousel banners={BANNERS} onCta={(path) => navigate(path)} />
-      </div>
+      {/* Wealth Carousel */}
+      <WealthCarousel
+        onInvest={(path) => navigate(path)}
+        onRefer={copyInvite}
+      />
 
       {/* Company profile link */}
       <div className="px-4 mt-3 animate-slide-up delay-200">
@@ -329,7 +379,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Invite banner */}
+      {/* Invite banner (updated to 3%) */}
       <div className="px-4 mt-3 animate-slide-up delay-200">
         <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg,#f97316,#fb923c)' }}>
           <div className="flex items-center gap-3 p-4">
@@ -337,7 +387,7 @@ const Dashboard = () => {
               <span className="text-2xl leading-none">🎁</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-extrabold text-sm">Invite & Earn 8%</p>
+              <p className="text-white font-extrabold text-sm">Invite & Earn 3%</p>
               <p className="text-white/75 text-xs mt-0.5 truncate">Code: <span className="font-bold">{user?.referralCode || '—'}</span></p>
             </div>
             <button onClick={copyInvite} className="bg-white rounded-xl px-3 py-2 flex items-center gap-1.5 text-accent text-xs font-bold active:scale-95 transition-transform shrink-0">
@@ -368,7 +418,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Modals (unchanged) */}
+      {/* Modals */}
       <Modal isOpen={modal === 'telegram'} onClose={() => setModal(null)}>
         <div className="text-center space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-[#e8f4fb] flex items-center justify-center mx-auto"><span className="text-3xl">💬</span></div>
