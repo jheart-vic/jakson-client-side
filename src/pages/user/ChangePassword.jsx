@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { changePassword } from '../../api/auth'
 import PageHeader from '../../components/layout/PageHeader'
 import PasswordRules, { validatePassword } from '../../components/common/passwordRules'
+import { handleApiError } from '../../utils/errorHandler'
 
 
 // ✅ Declare OUTSIDE
@@ -96,10 +97,8 @@ const ChangePassword = () => {
       toast.success('Password changed successfully!')
       navigate(-1)
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || 'Failed to change password'
-      )
-    } finally {
+            handleApiError(err, 'Failed to load notifications')
+        } finally {
       setLoading(false)
     }
   }

@@ -1,10 +1,15 @@
-import { useLoading } from '../../context/LoadingContext'
-import Spinner from './Spinner'
+import { useDebounce } from '../../hooks/useDebounce';
+import { useLoading } from '../../context/LoadingContext';
+import Spinner from './Spinner';
+
+const MIN_LOADER_DELAY = 300;
 
 export default function GlobalLoader() {
-  const { activeRequests } = useLoading()
+  const { activeRequests } = useLoading();
+  const debouncedActive = useDebounce(activeRequests, MIN_LOADER_DELAY);
+  const showLoader = debouncedActive > 0;
 
-  if (activeRequests === 0) return null
+  if (!showLoader) return null;
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/30 backdrop-blur-sm">
@@ -14,5 +19,5 @@ export default function GlobalLoader() {
         <p className="text-xs text-gray-400">Please wait, this may take a moment</p>
       </div>
     </div>
-  )
+  );
 }

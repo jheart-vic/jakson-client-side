@@ -7,6 +7,7 @@ import { fmtDateTime, daysRemaining } from '../../utils/date'
 import PageHeader from '../../components/layout/PageHeader'
 import Spinner from '../../components/common/Spinner'
 import EmptyState from '../../components/common/EmptyState'
+import { handleApiError } from '../../utils/errorHandler'
 
 const STATUS_MAP = {
   in_progress: { label: 'In Progress', color: 'text-primary',  bg: 'bg-primary-light',  icon: Clock },
@@ -21,7 +22,7 @@ const InvestLog = () => {
   const load = useCallback(async () => {
     try { const { data } = await getMyInvestments(); setItems(data.investments) }
     catch (err) {
-      console.error(err)
+      handleApiError(err, 'Failed to load investment records')
     } finally { setLoading(false) }
   }, [])
 

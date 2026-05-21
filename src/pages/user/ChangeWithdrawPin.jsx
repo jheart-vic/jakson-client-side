@@ -4,6 +4,7 @@ import { Lock, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { changeWithdrawPassword } from '../../api/auth'
 import PageHeader from '../../components/layout/PageHeader'
+import { handleApiError } from '../../utils/errorHandler'
 
 // ── PIN Box ─────────────────────────────────────────────────
 // inputRef is forwarded so the parent can call .focus() on mount
@@ -102,9 +103,9 @@ const ChangeWithdrawPin = () => {
       toast.success('Withdrawal PIN updated!')
       navigate(-1)
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update PIN')
-      setStep(0); setPin(''); setConfirm('')
-    } finally {
+                handleApiError(err, 'Failed to update PIN')
+                setStep(0); setPin(''); setConfirm('')
+            }finally {
       setLoading(false)
     }
   }

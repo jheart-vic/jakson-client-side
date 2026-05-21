@@ -8,6 +8,7 @@ import PageHeader from '../../components/layout/PageHeader'
 import Spinner from '../../components/common/Spinner'
 import EmptyState from '../../components/common/EmptyState'
 import Modal from '../../components/common/Modal'
+import { handleApiError } from '../../utils/errorHandler'
 
 const TIERS = [
   { level: 1, label: 'Tier 1 Membership', commission: '8%', color: '#1a9fd4', bg: '#e0f4fc' },
@@ -24,7 +25,7 @@ const Team = () => {
 
   const load = useCallback(async () => {
     try { const { data } = await getTeamStats(); setStats(data) }
-    catch (err) { console.error('Failed to load team stats:', err) }
+    catch (err) { handleApiError(err, 'Failed to load team stats') }
     finally { setLoading(false) }
   }, [])
 
@@ -34,7 +35,7 @@ const Team = () => {
     setTierModal(tier)
     setML(true)
     try { const { data } = await getTierMembers(tier.level); setMembers(data.members) }
-    catch (err) { toast.error('Failed to load tier members'); console.error(err) }
+    catch (err) { handleApiError(err, 'Failed to load tier members') }
     finally { setML(false) }
   }
 

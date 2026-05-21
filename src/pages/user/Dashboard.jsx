@@ -5,15 +5,20 @@ import {
   QrCode, ArrowDownCircle, ArrowUpCircle,
   Gift, Calendar, BarChart2, Users,
   ChevronRight, Copy, Megaphone,
-  ShieldAlert, Eye, EyeOff
+  Eye, EyeOff, Bell,
+  Info, AlertTriangle, CheckCircle2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/AuthContext'
 import { getBalance } from '../../api/wallet'
 import { redeemCode, dailyCheckin } from '../../api/rewards'
-import { fmtUSD, fmtNGN } from '../../utils/currency'
+import { fmtUSD, fmtNGN, toNGN } from '../../utils/currency'
+import { usePublicSettings } from '../../hooks/usePublicSettings'
+import { getAnnouncements,  } from '../../api/settings'
+import { getUnreadCount } from '../../api/notification'
 import { getWealthFunds } from '../../api/wealthFund'
 import Modal from '../../components/common/Modal'
+import { handleApiError } from '../../utils/errorHandler'
 
 // ── Quick actions ──
 const ACTIONS = [
@@ -23,28 +28,6 @@ const ACTIONS = [
   { label: 'Check-in',  icon: Calendar,        color: '#f59e0b', bg: '#fffbeb', modal: 'checkin'       },
   { label: 'Invest',    icon: BarChart2,       color: '#8b5cf6', bg: '#ede9fe', path: '/main/invest'   },
   { label: 'Team',      icon: Users,           color: '#ec4899', bg: '#fdf2f8', path: '/main/team'     },
-]
-
-// ── News ──
-const NEWS = [
-  {
-    id: 1,
-    icon: ShieldAlert,
-    iconColor: '#f97316',
-    iconBg: '#fff4ed',
-    title: 'Beware of Fraud!',
-    body: 'Luminos Energy will never ask for your password or PIN via call or message. Stay safe.',
-    time: 'Recently',
-  },
-  {
-    id: 2,
-    icon: Megaphone,
-    iconColor: '#1a9fd4',
-    iconBg: '#e0f4fc',
-    title: '"Luminos Energy" Operating Model',
-    body: 'Why choose Luminos Energy? Proven market experience, global solar manufacturing excellence and financial stability.',
-    time: 'Recently',
-  },
 ]
 
 // ── Wealth Carousel Component (replaces the old banner carousel) ──
@@ -61,7 +44,8 @@ const WealthCarousel = ({ onInvest, onRefer }) => {
         let funds = res?.funds || res?.data?.funds || res || []
         setWealthFunds(funds)
       } catch (err) {
-        console.error('Failed to load wealth funds for carousel', err)
+        // console.error('Failed to load wealth funds for carousel', err)
+        handleApiError(err, 'Failed to load wealth funds')
         setWealthFunds([])
       }
     }
@@ -196,7 +180,12 @@ const Dashboard = () => {
   const { user, refreshUser } = useAuth()
   const [showBalance, setShowBalance] = useState(false)
 
+  const { usd_to_ngn_rate } = usePublicSettings()
+  const safeRate = usd_to_ngn_rate ?? 1560
+
   const [bal, setBal] = useState({ balance: 0, todayEarnings: 0, yesterdayEarnings: 0, totalEarnings: 0 })
+  const [announcements, setAnnouncements] = useState([])
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
   const [rewardCode, setRewardCode] = useState('')
@@ -209,8 +198,22 @@ const Dashboard = () => {
     finally { setLoading(false) }
   }, [])
 
+  const loadAnnouncements = useCallback(async () => {
+    try {
+      const { data } = await getAnnouncements()
+      setAnnouncements((data?.notifications || []).slice(0, 3))
+    } catch { /* silent */ }
+  }, [])
+
+  const loadUnreadCount = useCallback(async () => {
+    try {
+      const { data } = await getUnreadCount()
+      setUnreadNotifCount(data?.count ?? 0)
+    } catch { /* silent */ }
+  }, [])
+
   useEffect(() => {
-    (async () => { await loadBal() })()
+    ;(async () => { await Promise.all([loadBal(), loadAnnouncements(), loadUnreadCount()]) })()
     let t
     if (!sessionStorage.getItem('tg_shown')) {
       t = setTimeout(() => {
@@ -219,7 +222,7 @@ const Dashboard = () => {
       }, 900)
     }
     return () => { if (t) clearTimeout(t) }
-  }, [loadBal])
+  }, [loadBal, loadAnnouncements, loadUnreadCount])
 
   const handleAction = (a) => {
     if (a.modal) { setModal(a.modal); return }
@@ -262,7 +265,7 @@ const Dashboard = () => {
   }
 
   const maskedNGN = () => {
-    if (showBalance) return fmtNGN(bal.balance * 1365)
+    if (showBalance) return fmtNGN(toNGN(bal.balance, safeRate))
     return '*****'
   }
 
@@ -284,6 +287,17 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('/main/notifications')}
+                className="relative w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform"
+              >
+                <Bell size={16} />
+                {unreadNotifCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-4 h-4 bg-red-500 text-white text-[9px] font-extrabold rounded-full flex items-center justify-center px-0.5">
+                    {unreadNotifCount > 99 ? '99+' : unreadNotifCount}
+                  </span>
+                )}
+              </button>
               <button className="w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform">
                 <QrCode size={16} />
               </button>
@@ -320,8 +334,8 @@ const Dashboard = () => {
             </p>
 
             <div className="flex gap-2.5 mb-3">
-              <button onClick={() => navigate('/main/deposit')} className="flex-1 bg-white text-primary text-xs font-bold py-2.5 rounded-xl active:scale-95 transition-transform">Recharge</button>
-              <button onClick={() => navigate('/main/withdraw')} className="flex-1 bg-white/20 border border-white/30 text-white text-xs font-bold py-2.5 rounded-xl active:scale-95 transition-transform">Withdraw</button>
+              <button onClick={() => navigate('/main/deposit')} className="flex-1 bg-white text-primary cursor-pointer text-xs font-bold py-2.5 rounded-xl active:scale-95 transition-transform">Recharge</button>
+              <button onClick={() => navigate('/main/withdraw')} className="flex-1 bg-white/20 border cursor-pointer border-white/30 text-white text-xs font-bold py-2.5 rounded-xl active:scale-95 transition-transform">Withdraw</button>
             </div>
 
             <div className="grid grid-cols-3 gap-2 pt-3 border-t text-surface">
@@ -347,7 +361,7 @@ const Dashboard = () => {
             <button
               key={a.label}
               onClick={() => handleAction(a)}
-              className="flex flex-col items-center justify-center gap-2 py-3 px-2 rounded-2xl bg-primary/40 shadow-sm border border-gray-100 active:scale-95 transition-all"
+              className="flex flex-col items-center justify-center gap-2 py-3 px-2 cursor-pointer rounded-2xl bg-primary/40 shadow-sm border border-gray-100 active:scale-95 transition-all"
               style={{ animationDelay: `${i * 0.04 + 0.12}s` }}
             >
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: a.bg }}>
@@ -390,33 +404,58 @@ const Dashboard = () => {
               <p className="text-white font-extrabold text-sm">Invite & Earn 3%</p>
               <p className="text-white/75 text-xs mt-0.5 truncate">Code: <span className="font-bold">{user?.referralCode || '—'}</span></p>
             </div>
-            <button onClick={copyInvite} className="bg-white rounded-xl px-3 py-2 flex items-center gap-1.5 text-accent text-xs font-bold active:scale-95 transition-transform shrink-0">
+            <button onClick={copyInvite} className="bg-white rounded-xl px-3 py-2 flex items-center cursor-pointer gap-1.5 text-accent text-xs font-bold active:scale-95 transition-transform shrink-0">
               <Copy size={11} /> Copy
             </button>
           </div>
         </div>
       </div>
 
-      {/* News feed */}
-      <div className="px-4 mt-4 mb-2 animate-slide-up delay-250">
-        <p className="text-sm font-extrabold text-gray-700 mb-3">Announcements</p>
-        <div className="space-y-3">
-          {NEWS.map(n => (
-            <div key={n.id} className="bg-white rounded-2xl p-4 flex gap-3 shadow-card active:scale-[0.99] transition-transform border border-gray-50">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: n.iconBg }}>
-                <n.icon size={18} style={{ color: n.iconColor }} strokeWidth={2} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <p className="text-sm font-bold text-gray-800 leading-tight">{n.title}</p>
-                  <span className="text-[10px] text-gray-400 font-medium shrink-0">{n.time}</span>
+      {/* Announcements feed — dynamic, first 3, no bonus codes */}
+      {announcements.length > 0 && (
+        <div className="px-4 mt-4 mb-2 animate-slide-up delay-250">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-extrabold text-gray-700">Announcements</p>
+            <button
+              onClick={() => navigate('/main/notifications')}
+              className="text-xs text-primary font-bold cursor-pointer"
+            >
+              View all
+            </button>
+          </div>
+          <div className="space-y-3">
+            {announcements.map(n => {
+              const iconMap = { info: Info, success: CheckCircle2, warning: AlertTriangle, bonus: Gift }
+              const colorMap = { info: '#1a9fd4', success: '#10b981', warning: '#f97316', bonus: '#8b5cf6' }
+              const bgMap    = { info: '#e0f4fc', success: '#ecfdf5', warning: '#fff4ed', bonus: '#ede9fe' }
+              const Icon = iconMap[n.type] || Megaphone
+              const timeAgo = (() => {
+                const diff = Date.now() - new Date(n.createdAt).getTime()
+                const days = Math.floor(diff / 86400000)
+                const hours = Math.floor(diff / 3600000)
+                if (days > 0) return `${days}d ago`
+                if (hours > 0) return `${hours}h ago`
+                return 'Recently'
+              })()
+              return (
+                <div key={n._id} className="bg-white rounded-2xl p-4 flex gap-3 shadow-card border border-gray-50">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: bgMap[n.type] || '#f3f4f6' }}>
+                    <Icon size={18} style={{ color: colorMap[n.type] || '#6b7280' }} strokeWidth={2} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="text-sm font-bold text-gray-800 leading-tight">{n.title}</p>
+                      <span className="text-[10px] text-gray-400 font-medium shrink-0">{timeAgo}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{n.body}</p>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{n.body}</p>
-              </div>
-            </div>
-          ))}
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Modals */}
       <Modal isOpen={modal === 'telegram'} onClose={() => setModal(null)}>

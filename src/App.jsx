@@ -44,6 +44,9 @@ import AdminWithdrawals from './pages/admin/AdminWithdrawals'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminWealthFunds from './pages/admin/AdminWealthFunds'
+import AdminBonusCodes from './pages/admin/AdminBonusCode'
+import AdminNotifications from './pages/admin/AdminNotifications'
+import Notifications from './pages/user/Notification'
 
 const App = () => (
     <Routes>
@@ -114,6 +117,7 @@ const App = () => (
             <Route path='change-withdraw-pin' element={<ChangeWithdrawPin />} />
             <Route path='wealth-fund' element={<WealthFunds />} />
             <Route path='wealth-fund/me' element={<MyWealthFunds />} />
+            <Route path="/main/notifications" element={<Notifications />} />
         </Route>
 
         {/* ── Admin routes (admin or superadmin only) ─────── */}
@@ -134,6 +138,8 @@ const App = () => (
             <Route path='withdrawals' element={<AdminWithdrawals />} />
             <Route path='settings' element={<AdminSettings />} />
             <Route path="wealth-funds" element={<AdminWealthFunds />} />
+            <Route path="/admin/bonus-codes"   element={<AdminBonusCodes />} />
+            <Route path="/admin/notifications" element={<AdminNotifications />} />
         </Route>
 
         {/* ── 404 ─────────────────────────────────────────── */}

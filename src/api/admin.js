@@ -39,3 +39,15 @@ export const adminGetWealthFunds = (params) => api.get('/admin/wealth-funds', { 
 export const adminCreateWealthFund = (data) => api.post('/admin/wealth-funds', data)
 export const adminUpdateWealthFund = (id, data) => api.put(`/admin/wealth-funds/${id}`, data)
 export const adminDeleteWealthFund = (id) => api.delete(`/admin/wealth-funds/${id}`)
+
+// ── Bonus Codes ────────────────────────────────────────────
+export const adminGetBonusCodes    = ()        => api.get('/admin/bonus-codes')
+export const adminCreateBonusCode  = (data)    => api.post('/admin/bonus-codes', data)
+export const adminToggleBonusCode  = (id)      => api.put(`/admin/bonus-codes/${id}/toggle`)
+export const adminDeleteBonusCode  = (id)      => api.delete(`/admin/bonus-codes/${id}`)
+
+// ── Notifications / Announcements ─────────────────────────
+export const adminGetNotifications    = ()          => api.get('/admin/notifications')
+export const adminCreateNotification  = (data)      => api.post('/admin/notifications', data)
+export const adminUpdateNotification  = (id, data)  => api.put(`/admin/notifications/${id}`, data)
+export const adminDeleteNotification  = (id)        => api.delete(`/admin/notifications/${id}`)

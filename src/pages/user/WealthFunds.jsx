@@ -7,6 +7,7 @@ import { getWealthFunds, buyWealthFund, getMyWealthFunds } from '../../api/wealt
 import { fmtUSD } from '../../utils/currency'
 import Spinner from '../../components/common/Spinner'
 import { useAuth } from '../../context/AuthContext'
+import { handleApiError } from '../../utils/errorHandler'
 
 export default function WealthFunds() {
   const navigate = useNavigate()
@@ -28,7 +29,7 @@ export default function WealthFunds() {
       setUserInvestments(myArray || [])
     } catch (err) {
       console.error(err)
-      toast.error('Failed to load wealth funds')
+      handleApiError(err, 'Failed to load wealth funds')
     } finally {
       setLoading(false)
     }

@@ -78,18 +78,20 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Package, Users, ArrowDownCircle,
   ArrowUpCircle, Settings, LogOut, Menu, X,
-  Landmark,
+  Landmark, Tag, Bell,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const links = [
-  { to: '/admin/dashboard',   label: 'Dashboard',   icon: LayoutDashboard },
-  { to: '/admin/products',    label: 'Products',    icon: Package         },
-  { to: '/admin/users',       label: 'Users',       icon: Users           },
-  { to: '/admin/deposits',    label: 'Deposits',    icon: ArrowDownCircle },
-  { to: '/admin/withdrawals', label: 'Withdrawals', icon: ArrowUpCircle   },
-  { to: '/admin/settings',    label: 'Settings',    icon: Settings        },
-  { to: '/admin/wealth-funds', label: 'Wealth Funds', icon: Landmark }
+  { to: '/admin/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
+  { to: '/admin/products',     label: 'Products',     icon: Package         },
+  { to: '/admin/users',        label: 'Users',        icon: Users           },
+  { to: '/admin/deposits',     label: 'Deposits',     icon: ArrowDownCircle },
+  { to: '/admin/withdrawals',  label: 'Withdrawals',  icon: ArrowUpCircle   },
+  { to: '/admin/wealth-funds', label: 'Wealth Funds', icon: Landmark        },
+  { to: '/admin/bonus-codes',  label: 'Bonus Codes',  icon: Tag             },
+  { to: '/admin/notifications',label: 'Announcements',icon: Bell            },
+  { to: '/admin/settings',     label: 'Settings',     icon: Settings        },
 ]
 
 const AdminLayout = () => {

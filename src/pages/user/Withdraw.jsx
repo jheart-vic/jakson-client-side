@@ -20,43 +20,45 @@ const Withdraw = () => {
   const [submitting, setSubmitting] = useState(false)
   const [receipt, setReceipt] = useState(null)
 
-  // Public settings from backend (admin configurable)
+  // ── Public settings (all admin-configurable) ─────────────
   const {
     usd_to_ngn_rate,
     min_withdrawal,
-    withdrawal_fee_low,
-    withdrawal_fee_high,
+    withdrawal_fee_below,   // % fee when amount < threshold
+    withdrawal_fee_above,   // % fee when amount >= threshold
     withdrawal_fee_threshold,
     withdrawal_days,
     withdrawal_hours,
     loading: settingsLoading,
   } = usePublicSettings()
 
-  // Provide fallback defaults while loading or if settings missing
-  const safeMinWithdrawal = min_withdrawal ?? 2
-  const safeFeeLow = withdrawal_fee_low ?? 10
-  const safeFeeHigh = withdrawal_fee_high ?? 20
-  const safeThreshold = withdrawal_fee_threshold ?? 500
-  const safeRate = usd_to_ngn_rate ?? 1365
-  const safeDays = withdrawal_days ?? 'Monday to Friday'
-  const safeHours = withdrawal_hours ?? '10:00 AM – 06:00 PM'
+  // Safe fallbacks while loading
+  const safeMinWithdrawal = min_withdrawal       ?? 11.5
+  const safeFeeBelow      = withdrawal_fee_below  ?? 16
+  const safeFeeAbove      = withdrawal_fee_above  ?? 10
+  const safeThreshold     = withdrawal_fee_threshold ?? 100
+  const safeRate          = usd_to_ngn_rate       ?? 1560
+  const safeDays          = withdrawal_days        ?? 'Monday to Sunday'
+  const safeHours         = withdrawal_hours       ?? '10:00 AM – 05:00 PM'
 
-  const amountVal = parseFloat(amount) || 0
-  const feePercent = amountVal >= safeThreshold ? safeFeeHigh : safeFeeLow
-  const feeAmt = +(amountVal * feePercent / 100).toFixed(4)
-  const netAmt = +(amountVal - feeAmt).toFixed(4)
+  // ── Fee calculation ───────────────────────────────────────
+  const amountVal  = parseFloat(amount) || 0
+  // Below threshold → higher fee (safeFeeBelow); at/above → lower fee (safeFeeAbove)
+  const feePercent = amountVal < safeThreshold ? safeFeeBelow : safeFeeAbove
+  const feeAmt     = +(amountVal * feePercent / 100).toFixed(4)
+  const netAmt     = +(amountVal - feeAmt).toFixed(4)
 
-  // Dynamic rules based on admin settings
+  // ── Dynamic rules (driven by backend values) ─────────────
   const dynamicRules = [
-    `Withdrawal time: ${safeDays} ${safeHours}`,
+    `Withdrawal time: ${safeDays}, ${safeHours}`,
     'Daily withdrawal: 1 time only',
     `Minimum withdrawal amount: $${safeMinWithdrawal.toFixed(2)}`,
-    `Below $${safeThreshold} handling fee: ${safeFeeLow}%`,
-    `$${safeThreshold} or more handling fee: ${safeFeeHigh}%`,
+    `Below $${safeThreshold} handling fee: ${safeFeeBelow}%`,
+    `$${safeThreshold} and above handling fee: ${safeFeeAbove}%`,
     'Estimated arrival: 5 minutes to 48 hours',
   ]
 
-  // Load user data (balance & bank account)
+  // ── Load user data ────────────────────────────────────────
   const load = useCallback(async () => {
     try {
       const [balRes, accRes] = await Promise.all([getBalance(), getBankAccounts()])
@@ -70,23 +72,17 @@ const Withdraw = () => {
   }, [])
 
   useEffect(() => {
-    ;(async () => {
-      await load()
-    })()
+    ;(async () => { await load() })()
   }, [load])
 
+  // ── Submit ────────────────────────────────────────────────
   const handleSubmit = async () => {
-    // Validate bank account
     if (!account) return toast.error('Please bind a bank account first')
-
-    // Validate amount against dynamic minimum
     if (amountVal < safeMinWithdrawal) {
       return toast.error(`Minimum withdrawal is $${safeMinWithdrawal.toFixed(2)}`)
     }
     if (amountVal > balance) return toast.error('Insufficient balance')
-
-    // Validate PIN
-    if (pin.length !== 6) return toast.error('Enter your 6-digit withdrawal PIN')
+    if (pin.length !== 6)   return toast.error('Enter your 6-digit withdrawal PIN')
 
     setSubmitting(true)
     try {
@@ -108,7 +104,7 @@ const Withdraw = () => {
     }
   }
 
-  // Show loading spinner while fetching user data or settings
+  // ── Loading state ─────────────────────────────────────────
   if (loading || settingsLoading) {
     return (
       <div className="min-h-dvh bg-surface flex items-center justify-center">
@@ -132,6 +128,7 @@ const Withdraw = () => {
       />
 
       <div className="px-4 mt-4 space-y-4">
+
         {/* Balance Card */}
         <div className="card card-p text-center">
           <div className="w-14 h-14 rounded-2xl bg-primary-light flex items-center justify-center mx-auto mb-3">
@@ -141,6 +138,7 @@ const Withdraw = () => {
             Available Balance
           </p>
           <p className="text-3xl font-extrabold text-gray-800 mt-1">{fmtUSD(balance)}</p>
+          <p className="text-xs text-gray-400 mt-1">≈ {fmtNGN(toNGN(balance, safeRate))}</p>
         </div>
 
         {/* Bank Account Card */}
@@ -159,10 +157,7 @@ const Withdraw = () => {
                   {account.accountName} · {account.accountNumber}
                 </p>
               </div>
-              <button
-                onClick={() => navigate('/main/bank/accounts')}
-                className="text-primary"
-              >
+              <button onClick={() => navigate('/main/bank/accounts')} className="text-primary">
                 <ChevronRight size={16} />
               </button>
             </div>
@@ -173,9 +168,7 @@ const Withdraw = () => {
             >
               <div className="flex items-center gap-2">
                 <AlertCircle size={16} className="text-orange-500" />
-                <span className="text-sm font-semibold text-orange-600">
-                  No account bound
-                </span>
+                <span className="text-sm font-semibold text-orange-600">No account bound</span>
               </div>
               <span className="text-xs text-primary font-bold">Bind Now →</span>
             </button>
@@ -190,10 +183,8 @@ const Withdraw = () => {
               ≈ {fmtNGN(toNGN(amountVal, safeRate))}
             </span>
           </p>
-          <div
-            className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
-                        focus-within:border-primary focus-within:shadow-input transition-all"
-          >
+          <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
+                          focus-within:border-primary focus-within:shadow-input transition-all">
             <span className="text-gray-500 font-bold text-sm shrink-0">$</span>
             <input
               type="number"
@@ -211,13 +202,14 @@ const Withdraw = () => {
             </button>
           </div>
 
-          {/* Fee Breakdown (only if amount meets minimum) */}
+          {/* Fee breakdown — visible once amount >= minimum */}
           {amountVal >= safeMinWithdrawal && (
             <div className="mt-3 space-y-1.5 bg-gray-50 rounded-2xl p-3">
               {[
-                { label: 'Gross amount', val: fmtUSD(amountVal) },
+                { label: 'Gross amount',       val: fmtUSD(amountVal) },
                 { label: `Fee (${feePercent}%)`, val: `- ${fmtUSD(feeAmt)}`, color: 'text-danger' },
-                { label: 'You receive', val: fmtUSD(netAmt), color: 'text-success font-extrabold' },
+                { label: 'You receive',        val: fmtUSD(netAmt),   color: 'text-success font-extrabold' },
+                { label: '≈ NGN',              val: fmtNGN(toNGN(netAmt, safeRate)), color: 'text-gray-500' },
               ].map(({ label, val, color }) => (
                 <div key={label} className="flex justify-between text-xs">
                   <span className="text-gray-400 font-medium">{label}</span>
@@ -233,10 +225,8 @@ const Withdraw = () => {
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
             Withdrawal PIN
           </p>
-          <div
-            className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
-                        focus-within:border-primary focus-within:shadow-input transition-all"
-          >
+          <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
+                          focus-within:border-primary focus-within:shadow-input transition-all">
             <Lock size={15} className="text-gray-400 shrink-0" />
             <input
               type="password"
@@ -276,10 +266,7 @@ const Withdraw = () => {
       {/* Success Modal */}
       <Modal
         isOpen={!!receipt}
-        onClose={() => {
-          setReceipt(null)
-          navigate('/main/withdraw/log')
-        }}
+        onClose={() => { setReceipt(null); navigate('/main/withdraw/log') }}
         title="Withdrawal Submitted"
       >
         {receipt && (
@@ -292,12 +279,13 @@ const Withdraw = () => {
             </p>
             <div className="bg-gray-50 rounded-2xl p-4 text-left space-y-2">
               {[
-                { label: 'Amount', val: fmtUSD(receipt.amountUSD) },
-                { label: 'Fee', val: `${receipt.feePercent}% = ${fmtUSD(receipt.feeAmountUSD)}` },
-                { label: 'You get', val: fmtUSD(receipt.netAmountUSD) },
-                { label: 'Bank', val: receipt.bankName },
-                { label: 'Account', val: receipt.accountNumber },
-                { label: 'Status', val: 'Pending review' },
+                { label: 'Amount',   val: fmtUSD(receipt.amountUSD) },
+                { label: 'Fee',      val: `${receipt.feePercent}% = ${fmtUSD(receipt.feeAmountUSD)}` },
+                { label: 'You get',  val: fmtUSD(receipt.netAmountUSD) },
+                { label: '≈ NGN',    val: fmtNGN(receipt.netAmountNGN) },
+                { label: 'Bank',     val: receipt.bankName },
+                { label: 'Account',  val: receipt.accountNumber },
+                { label: 'Status',   val: 'Pending review' },
               ].map(({ label, val }) => (
                 <div key={label} className="flex justify-between text-xs">
                   <span className="text-gray-400 font-medium">{label}</span>
@@ -306,10 +294,7 @@ const Withdraw = () => {
               ))}
             </div>
             <button
-              onClick={() => {
-                setReceipt(null)
-                navigate('/main/withdraw/log')
-              }}
+              onClick={() => { setReceipt(null); navigate('/main/withdraw/log') }}
               className="btn btn-primary rounded-2xl h-12 text-sm"
             >
               View Records

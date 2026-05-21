@@ -15,6 +15,7 @@ import { getMyInvestments } from '../../api/invest'
 import { fmtUSD } from '../../utils/currency'
 import Modal from '../../components/common/Modal'
 import Spinner from '../../components/common/Spinner'
+import { handleApiError } from '../../utils/errorHandler'
 
 const Invest = () => {
     const navigate = useNavigate()
@@ -70,7 +71,8 @@ const Invest = () => {
             setSelected(null)
             load()
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Investment failed')
+
+        handleApiError(err, 'Investment failed')
         } finally {
             setBuying(false)
         }

@@ -7,6 +7,7 @@ import { fmtUSD } from '../../utils/currency'
 import Spinner from '../../components/common/Spinner'
 import EmptyState from '../../components/common/EmptyState'
 import { useAuth } from '../../context/AuthContext'
+import { handleApiError } from '../../utils/errorHandler'
 
 export default function MyWealthFunds() {
   const [funds, setFunds] = useState([])
@@ -26,7 +27,8 @@ export default function MyWealthFunds() {
       setFunds(fundsArray || [])
     } catch (err) {
       console.error(err)
-      toast.error('Failed to load your wealth funds')
+  handleApiError(err, 'Failed to load your wealth funds')
+
     } finally {
       setLoading(false)
     }
@@ -42,7 +44,7 @@ useEffect(() => { ;(async () => { await loadFunds() })() }, [loadFunds])
       await refreshUser()
       await loadFunds()
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Claim failed')
+      handleApiError(err, 'Claim failed')
     } finally {
       setClaimingId(null)
     }

@@ -7,12 +7,17 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/AuthContext'
-import { fmtUSD, fmtNGN } from '../../utils/currency'
+import { fmtUSD, fmtNGN, toNGN } from '../../utils/currency'
+import { usePublicSettings } from '../../hooks/usePublicSettings'
 
 const Account = () => {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const [showBalance, setShowBalance] = useState(false)
+
+  // Pull live exchange rate from backend instead of hardcoding
+  const { usd_to_ngn_rate } = usePublicSettings()
+  const safeRate = usd_to_ngn_rate ?? 1560
 
   const handleLogout = () => {
     logout()
@@ -21,36 +26,32 @@ const Account = () => {
   }
 
   const GRID = [
-    { icon: BarChart2,      label: 'My Invests',              path: '/main/invest-log',              color: '#1a9fd4', bg: '#e0f4fc' },
-    { icon: History,        label: 'Account History',         path: '/main/funding',                  color: '#8b5cf6', bg: '#ede9fe' },
-    { icon: Headphones,     label: 'Online Service',          path: null, action: 'support',           color: '#10b981', bg: '#ecfdf5' },
-    { icon: Sun,            label: 'Solar Panel',             path: '/main/solar-panel',              color: '#f97316', bg: '#fff4ed' },
-    { icon: ArrowDownCircle,label: 'Recharge Record',         path: '/main/deposit/log',              color: '#06b6d4', bg: '#ecfeff' },
-    { icon: ArrowUpCircle,  label: 'Withdrawal Record',       path: '/main/withdraw/log',             color: '#f43f5e', bg: '#fff1f2' },
-    { icon: Landmark,       label: 'Withdrawal Account',      path: '/main/bank/accounts',            color: '#d97706', bg: '#fffbeb' },
-    { icon: Landmark,       label: 'Wealth Funds',            path: '/main/wealth-fund',              color: '#b8860b', bg: '#fff8e7' },
-    { icon: Lock,           label: 'Modify Login Password',   path: '/main/change-password',          color: '#0284c7', bg: '#f0f9ff' },
-    { icon: KeyRound,       label: 'Modify Withdraw PIN',     path: '/main/change-withdraw-pin',      color: '#0f766e', bg: '#f0fdfa' },
-    { icon: Smartphone,     label: 'Download App',            path: null, action: 'app',              color: '#4f46e5', bg: '#eef2ff' },
-    { icon: LogOut,         label: 'Log out',                 path: null, action: 'logout',           color: '#ef4444', bg: '#fef2f2' },
+    { icon: BarChart2,       label: 'My Invests',            path: '/main/invest-log',           color: '#1a9fd4', bg: '#e0f4fc' },
+    { icon: History,         label: 'Account History',        path: '/main/funding',              color: '#8b5cf6', bg: '#ede9fe' },
+    { icon: Headphones,      label: 'Online Service',         path: null, action: 'support',      color: '#10b981', bg: '#ecfdf5' },
+    { icon: Sun,             label: 'Solar Panel',            path: '/main/solar-panel',          color: '#f97316', bg: '#fff4ed' },
+    { icon: ArrowDownCircle, label: 'Recharge Record',        path: '/main/deposit/log',          color: '#06b6d4', bg: '#ecfeff' },
+    { icon: ArrowUpCircle,   label: 'Withdrawal Record',      path: '/main/withdraw/log',         color: '#f43f5e', bg: '#fff1f2' },
+    { icon: Landmark,        label: 'Withdrawal Account',     path: '/main/bank/accounts',        color: '#d97706', bg: '#fffbeb' },
+    { icon: Landmark,        label: 'Wealth Funds',           path: '/main/wealth-fund',          color: '#b8860b', bg: '#fff8e7' },
+    { icon: Lock,            label: 'Modify Login Password',  path: '/main/change-password',      color: '#0284c7', bg: '#f0f9ff' },
+    { icon: KeyRound,        label: 'Modify Withdraw PIN',    path: '/main/change-withdraw-pin',  color: '#0f766e', bg: '#f0fdfa' },
+    { icon: Smartphone,      label: 'Download App',           path: null, action: 'app',          color: '#4f46e5', bg: '#eef2ff' },
+    { icon: LogOut,          label: 'Log out',                path: null, action: 'logout',       color: '#ef4444', bg: '#fef2f2' },
   ]
 
   const handleTap = (item) => {
-    if (item.path)                 return navigate(item.path)
-    if (item.action === 'logout')  return handleLogout()
-    if (item.action === 'support') return toast('Contact support via Telegram')
-    if (item.action === 'app')     return toast('App coming soon')
+    if (item.path)                  return navigate(item.path)
+    if (item.action === 'logout')   return handleLogout()
+    if (item.action === 'support')  return toast('Contact support via Telegram')
+    if (item.action === 'app')      return toast('App coming soon')
   }
 
-  const maskedBalance = () => {
-    if (showBalance) return fmtUSD(user?.balance || 0)
-    return '*****'
-  }
+  const maskedBalance = () =>
+    showBalance ? fmtUSD(user?.balance || 0) : '*****'
 
-  const maskedNGN = () => {
-    if (showBalance) return fmtNGN((user?.balance || 0) * 1365)
-    return '*****'
-  }
+  const maskedNGN = () =>
+    showBalance ? fmtNGN(toNGN(user?.balance || 0, safeRate)) : '*****'
 
   return (
     <div className="min-h-dvh bg-surface pb-24">
@@ -70,7 +71,7 @@ const Account = () => {
         </div>
       </div>
 
-      {/* Balance card with eye icon */}
+      {/* Balance card */}
       <div className="px-4 -mt-8">
         <div className="card card-p shadow-float animate-slide-up">
           <p className="text-xs text-primary font-medium uppercase tracking-wide">Funding Account</p>
@@ -101,7 +102,7 @@ const Account = () => {
         </div>
       </div>
 
-      {/* Actions grid — smaller buttons */}
+      {/* Actions grid */}
       <div className="px-4 mt-4">
         <div className="grid grid-cols-3 gap-3">
           {GRID.map((item) => (
