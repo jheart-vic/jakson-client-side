@@ -64,7 +64,7 @@ useEffect(() => { ;(async () => { await loadData() })() }, [loadData])
       await refreshUser()
       navigate('/main/wealth-fund/me')
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Purchase failed')
+      handleApiError(err, 'Purchase failed')
     } finally {
       setBuyingId(null)
     }

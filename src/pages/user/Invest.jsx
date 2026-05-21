@@ -49,7 +49,7 @@ const Invest = () => {
 
         } catch (err) {
             console.error(err)
-            toast.error('Failed to load products')
+            handleApiError(err, 'Failed to load products')
         } finally {
             setLoading(false)
         }

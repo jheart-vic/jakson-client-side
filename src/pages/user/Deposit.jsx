@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { History, Copy, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createDeposit } from '../../api/deposit'
+import { handleApiError } from '../../utils/errorHandler'
 import { fmtUSD, fmtNGN, toNGN } from '../../utils/currency'
 import PageHeader from '../../components/layout/PageHeader'
 import Modal from '../../components/common/Modal'
@@ -51,7 +52,7 @@ const Deposit = () => {
       const { data } = await createDeposit({ amountUSD: amountVal })
       setReceipt(data.deposit)
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to initiate deposit')
+      handleApiError(err, 'Failed to initiate deposit')
     } finally {
       setLoading(false)
     }

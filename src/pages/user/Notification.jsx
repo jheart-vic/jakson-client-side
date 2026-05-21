@@ -122,9 +122,7 @@ const Notifications = () => {
             if (filter === 'unread') params.filter = 'unread'
             else if (filter !== 'all') params.type = filter
 
-            const { data } = await getNotifications(params, {
-                skipGlobalLoader: true,
-            })
+            const { data } = await getNotifications(params)
             setNotifications(data?.notifications || [])
             setUnreadCount(data?.unreadCount ?? 0)
         } catch (err) {
