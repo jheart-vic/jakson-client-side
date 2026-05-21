@@ -229,7 +229,7 @@ const AdminLayout = () => {
       )}
 
       {/* Main column – responsive margin using CSS variable */}
-      <div className="flex-1 flex flex-col min-h-screen lg:ml-[var(--admin-sidebar-w,224px)] transition-all duration-300">
+      <div className="flex-1 flex flex-col min-h-screen lg:ml-(--admin-sidebar-w,224px) transition-all duration-300">
         {/* Top bar (mobile menu button + page title) */}
         <header className="sticky top-0 z-30 bg-white border-b border-gray-100 h-14 flex items-center justify-between px-4 lg:px-6 w-full"
           style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
