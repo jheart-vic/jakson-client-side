@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { getBankList, bindBankAccount } from '../../api/bank'
+import { handleApiError } from '../../utils/errorHandler'
 import PageHeader from '../../components/layout/PageHeader'
 import Spinner from '../../components/common/Spinner'
 
@@ -41,7 +42,7 @@ const BindBank = () => {
       toast.success('Bank account bound successfully!')
       navigate(-1)
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to bind account')
+      handleApiError(err, 'Failed to bind account')
     } finally { setSubmitting(false) }
   }
 

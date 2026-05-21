@@ -8,6 +8,7 @@ import { getBalance } from '../../api/wallet'
 import { fmtUSD, fmtNGN, toNGN } from '../../utils/currency'
 import PageHeader from '../../components/layout/PageHeader'
 import Modal from '../../components/common/Modal'
+import { handleApiError } from '../../utils/errorHandler'
 import { usePublicSettings } from '../../hooks/usePublicSettings'
 
 const Withdraw = () => {
@@ -89,15 +90,15 @@ const Withdraw = () => {
       const { data } = await createWithdrawal({ amountUSD: amountVal, withdrawPassword: pin })
       setReceipt(data.withdrawal)
     } catch (err) {
-      const message = err.response?.data?.message || 'Withdrawal failed'
+      const message = err.response?.data?.message || ''
       if (
         message.toLowerCase().includes('withdrawal password') ||
         message.toLowerCase().includes('set your withdrawal password')
       ) {
-        toast.error('Please set your withdrawal PIN first')
+        // axios already toasted the server message; add navigation
         navigate('/main/change-withdraw-pin')
       } else {
-        toast.error(message)
+        handleApiError(err, 'Withdrawal failed')
       }
     } finally {
       setSubmitting(false)

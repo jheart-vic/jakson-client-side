@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   QrCode, ArrowDownCircle, ArrowUpCircle,
   Gift, Calendar, BarChart2, Users,
-  ChevronRight, Copy, Megaphone,
+  ChevronRight, ChevronDown, ChevronUp, Copy, Megaphone,
   Eye, EyeOff, Bell,
   Info, AlertTriangle, CheckCircle2,
 } from 'lucide-react'
@@ -174,6 +174,76 @@ const WealthCarousel = ({ onInvest, onRefer }) => {
   )
 }
 
+// ── FAQ data ──
+const FAQS = [
+  {
+    q: 'What is solar investment on this platform?',
+    a: "It's a simple way to grow your money by funding real solar energy projects. Your capital is deployed into clean energy infrastructure that generates consistent returns—no technical knowledge or equipment required.",
+  },
+  {
+    q: 'How do I make money from solar investments?',
+    a: 'You earn passive income from the electricity produced by solar projects you fund. As the system generates energy, returns are calculated and distributed to you based on your investment plan.',
+  },
+  {
+    q: 'Why should I invest in solar energy?',
+    a: 'Solar energy is one of the fastest-growing and most stable renewable markets. It delivers predictable performance, long-term demand, and steady cash flow potential—making it a strong option for building sustainable income.',
+  },
+  {
+    q: 'How secure is my investment?',
+    a: 'Your funds are backed by real, asset-based solar infrastructure managed by experienced operators. Every project is monitored, and performance data is transparently available in your dashboard for full visibility.',
+  },
+  {
+    q: 'When do I start earning returns?',
+    a: 'Earnings begin once the solar project becomes operational. Depending on the project timeline, this can start shortly after activation, with returns credited automatically according to your investment cycle.',
+  },
+]
+
+// ── FAQ Accordion ──
+const FAQSection = () => {
+  const [open, setOpen] = useState(null)
+
+  return (
+    <div className="px-4 mt-4 mb-2 animate-slide-up delay-300">
+      <p className="text-sm font-extrabold text-gray-700 mb-3">
+        FAQs – Solar Investment
+      </p>
+      <div className="space-y-2">
+        {FAQS.map((item, i) => {
+          const isOpen = open === i
+          return (
+            <div
+              key={i}
+              className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden"
+            >
+              <button
+                onClick={() => setOpen(isOpen ? null : i)}
+                className="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left"
+              >
+                <span className="text-sm font-semibold text-gray-800 leading-snug flex-1">
+                  {item.q}
+                </span>
+                <span className="shrink-0 text-primary transition-transform duration-200">
+                  {isOpen
+                    ? <ChevronUp size={17} strokeWidth={2.2} />
+                    : <ChevronDown size={17} strokeWidth={2.2} />
+                  }
+                </span>
+              </button>
+
+              {isOpen && (
+                <div className="px-4 pb-4">
+                  <div className="h-px bg-gray-100 mb-3" />
+                  <p className="text-xs text-gray-500 leading-relaxed">{item.a}</p>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── Main Dashboard component ──
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -236,7 +306,7 @@ const Dashboard = () => {
       const { data } = await redeemCode(rewardCode.trim())
       toast.success(data.message)
       setModal(null); setRewardCode(''); loadBal(); refreshUser()
-    } catch (err) { toast.error(err.response?.data?.message || 'Invalid code') }
+    } catch (err) { handleApiError(err, 'Invalid code') }
     finally { setRedeeming(false) }
   }
 
@@ -247,7 +317,7 @@ const Dashboard = () => {
       toast.success(`Checked in! +${fmtUSD(data.reward)} 🎉`)
       setModal(null); loadBal(); refreshUser()
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Already checked in today')
+      handleApiError(err, 'Already checked in today')
       setModal(null)
     } finally { setCheckingIn(false) }
   }
@@ -308,7 +378,7 @@ const Dashboard = () => {
           </div>
 
           {/* Balance card */}
-          <div className="bg-white/12 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20 animate-slide-up">
+          <div data-tour="balance-card" className="bg-white/12 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20 animate-slide-up">
             <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">
               Funding Account
             </p>
@@ -355,7 +425,7 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="px-4 mt-4 animate-slide-up delay-100">
+      <div data-tour="quick-actions" className="px-4 mt-4 animate-slide-up delay-100">
         <div className="grid grid-cols-3 gap-3">
           {ACTIONS.map((a, i) => (
             <button
@@ -374,10 +444,12 @@ const Dashboard = () => {
       </div>
 
       {/* Wealth Carousel */}
-      <WealthCarousel
-        onInvest={(path) => navigate(path)}
-        onRefer={copyInvite}
-      />
+      <div data-tour="wealth-carousel">
+        <WealthCarousel
+          onInvest={(path) => navigate(path)}
+          onRefer={copyInvite}
+        />
+      </div>
 
       {/* Company profile link */}
       <div className="px-4 mt-3 animate-slide-up delay-200">
@@ -394,7 +466,7 @@ const Dashboard = () => {
       </div>
 
       {/* Invite banner (updated to 3%) */}
-      <div className="px-4 mt-3 animate-slide-up delay-200">
+      <div data-tour="invite-banner" className="px-4 mt-3 animate-slide-up delay-200">
         <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg,#f97316,#fb923c)' }}>
           <div className="flex items-center gap-3 p-4">
             <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
@@ -416,12 +488,6 @@ const Dashboard = () => {
         <div className="px-4 mt-4 mb-2 animate-slide-up delay-250">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-extrabold text-gray-700">Announcements</p>
-            <button
-              onClick={() => navigate('/main/notifications')}
-              className="text-xs text-primary font-bold cursor-pointer"
-            >
-              View all
-            </button>
           </div>
           <div className="space-y-3">
             {announcements.map(n => {
@@ -456,6 +522,9 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* Modals */}
       <Modal isOpen={modal === 'telegram'} onClose={() => setModal(null)}>
