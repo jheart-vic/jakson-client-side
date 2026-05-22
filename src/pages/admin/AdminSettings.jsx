@@ -91,7 +91,7 @@ export default function AdminSettings() {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-x-hidden">
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -120,7 +120,7 @@ export default function AdminSettings() {
       <div className="bg-white rounded-2xl shadow-card p-5">
         <h2 className="font-extrabold text-gray-800 mb-1">USD → NGN Exchange Rate</h2>
         <p className="text-xs text-gray-400 mb-4">Used for all NGN conversions on deposits and withdrawals</p>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
             <span className="text-gray-400 font-bold text-sm shrink-0">₦</span>
             <input
@@ -178,8 +178,8 @@ export default function AdminSettings() {
         <p className="text-xs text-gray-400 mb-4">Each field saves independently</p>
         <div className="space-y-4">
 
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-0">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
                 Fee below threshold (%)
               </label>
@@ -197,8 +197,8 @@ export default function AdminSettings() {
             <SaveBtn keyName="withdrawal_fee_low" value={fields.withdrawal_fee_low} onSave={save} saving={saving} />
           </div>
 
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-0">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
                 Fee above threshold (%)
               </label>
@@ -216,8 +216,8 @@ export default function AdminSettings() {
             <SaveBtn keyName="withdrawal_fee_high" value={fields.withdrawal_fee_high} onSave={save} saving={saving} />
           </div>
 
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-0">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
                 Threshold amount (USD)
               </label>
@@ -250,8 +250,8 @@ export default function AdminSettings() {
         <h2 className="font-extrabold text-gray-800 mb-4">Transaction Minimums</h2>
         <div className="space-y-4">
 
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-0">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
                 Min Deposit (USD)
               </label>
@@ -269,8 +269,8 @@ export default function AdminSettings() {
             <SaveBtn keyName="min_deposit" value={fields.min_deposit} onSave={save} saving={saving} />
           </div>
 
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-0">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
                 Min Withdrawal (USD)
               </label>
@@ -295,8 +295,8 @@ export default function AdminSettings() {
         <h2 className="font-extrabold text-gray-800 mb-4">Withdrawal Schedule</h2>
         <div className="space-y-4">
 
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-0">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
                 Allowed Days
               </label>
@@ -312,8 +312,8 @@ export default function AdminSettings() {
             <SaveBtn keyName="withdrawal_days" value={fields.withdrawal_days} onSave={save} saving={saving} />
           </div>
 
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-0">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">
                 Allowed Hours
               </label>
