@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import {
   QrCode, ArrowDownCircle, ArrowUpCircle,
   Gift, Calendar, BarChart2, Users,
-  ChevronRight, ChevronDown, ChevronUp, Copy, Megaphone,
+  ChevronRight, Copy, Megaphone,
   Eye, EyeOff, Bell,
   Info, AlertTriangle, CheckCircle2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/AuthContext'
+import { useOnboarding } from '../../context/OnboardingContext'
 import { getBalance } from '../../api/wallet'
 import { redeemCode, dailyCheckin } from '../../api/rewards'
 import { fmtUSD, fmtNGN, toNGN } from '../../utils/currency'
@@ -174,80 +175,11 @@ const WealthCarousel = ({ onInvest, onRefer }) => {
   )
 }
 
-// ── FAQ data ──
-const FAQS = [
-  {
-    q: 'What is solar investment on this platform?',
-    a: "It's a simple way to grow your money by funding real solar energy projects. Your capital is deployed into clean energy infrastructure that generates consistent returns—no technical knowledge or equipment required.",
-  },
-  {
-    q: 'How do I make money from solar investments?',
-    a: 'You earn passive income from the electricity produced by solar projects you fund. As the system generates energy, returns are calculated and distributed to you based on your investment plan.',
-  },
-  {
-    q: 'Why should I invest in solar energy?',
-    a: 'Solar energy is one of the fastest-growing and most stable renewable markets. It delivers predictable performance, long-term demand, and steady cash flow potential—making it a strong option for building sustainable income.',
-  },
-  {
-    q: 'How secure is my investment?',
-    a: 'Your funds are backed by real, asset-based solar infrastructure managed by experienced operators. Every project is monitored, and performance data is transparently available in your dashboard for full visibility.',
-  },
-  {
-    q: 'When do I start earning returns?',
-    a: 'Earnings begin once the solar project becomes operational. Depending on the project timeline, this can start shortly after activation, with returns credited automatically according to your investment cycle.',
-  },
-]
-
-// ── FAQ Accordion ──
-const FAQSection = () => {
-  const [open, setOpen] = useState(null)
-
-  return (
-    <div className="px-4 mt-4 mb-2 animate-slide-up delay-300">
-      <p className="text-sm font-extrabold text-gray-700 mb-3">
-        FAQs – Solar Investment
-      </p>
-      <div className="space-y-2">
-        {FAQS.map((item, i) => {
-          const isOpen = open === i
-          return (
-            <div
-              key={i}
-              className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden"
-            >
-              <button
-                onClick={() => setOpen(isOpen ? null : i)}
-                className="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left"
-              >
-                <span className="text-sm font-semibold text-gray-800 leading-snug flex-1">
-                  {item.q}
-                </span>
-                <span className="shrink-0 text-primary transition-transform duration-200">
-                  {isOpen
-                    ? <ChevronUp size={17} strokeWidth={2.2} />
-                    : <ChevronDown size={17} strokeWidth={2.2} />
-                  }
-                </span>
-              </button>
-
-              {isOpen && (
-                <div className="px-4 pb-4">
-                  <div className="h-px bg-gray-100 mb-3" />
-                  <p className="text-xs text-gray-500 leading-relaxed">{item.a}</p>
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 // ── Main Dashboard component ──
 const Dashboard = () => {
   const navigate = useNavigate()
   const { user, refreshUser } = useAuth()
+  const { showWelcome } = useOnboarding()   // know when welcome modal is active
   const [showBalance, setShowBalance] = useState(false)
 
   const { usd_to_ngn_rate } = usePublicSettings()
@@ -284,15 +216,20 @@ const Dashboard = () => {
 
   useEffect(() => {
     ;(async () => { await Promise.all([loadBal(), loadAnnouncements(), loadUnreadCount()]) })()
-    let t
-    if (!sessionStorage.getItem('tg_shown')) {
-      t = setTimeout(() => {
-        setModal('telegram')
-        sessionStorage.setItem('tg_shown', '1')
-      }, 900)
-    }
-    return () => { if (t) clearTimeout(t) }
   }, [loadBal, loadAnnouncements, loadUnreadCount])
+
+  // Telegram modal — shown once per session, but only AFTER the welcome modal
+  // is gone. If both fire together the user sees two modals at once.
+  useEffect(() => {
+    // if (sessionStorage.getItem('tg_shown')) return  // already shown this session
+    if (showWelcome) return                          // welcome modal is open — wait
+
+    const t = setTimeout(() => {
+      setModal('telegram')
+      sessionStorage.setItem('tg_shown', '1')
+    }, 900)
+    return () => clearTimeout(t)
+  }, [showWelcome])
 
   const handleAction = (a) => {
     if (a.modal) { setModal(a.modal); return }
@@ -488,6 +425,12 @@ const Dashboard = () => {
         <div className="px-4 mt-4 mb-2 animate-slide-up delay-250">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-extrabold text-gray-700">Announcements</p>
+            <button
+              onClick={() => navigate('/main/notifications')}
+              className="text-xs text-primary font-bold cursor-pointer"
+            >
+              View all
+            </button>
           </div>
           <div className="space-y-3">
             {announcements.map(n => {
@@ -523,9 +466,6 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* FAQ Section */}
-      <FAQSection />
-
       {/* Modals */}
       <Modal isOpen={modal === 'telegram'} onClose={() => setModal(null)}>
         <div className="text-center space-y-4">
@@ -537,7 +477,7 @@ const Dashboard = () => {
           <a href="https://t.me/jaksonsolar" target="_blank" rel="noopener noreferrer" className="block">
             <button className="btn btn-primary rounded-2xl h-12 text-sm">🚀 Join Telegram Group</button>
           </a>
-          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-3 flex items-start gap-2 text-left">
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-3 flex items-start gap-2 text-left mt-2.5">
             <span className="text-orange-500 text-sm shrink-0">⚠️</span>
             <p className="text-orange-600 text-xs font-medium">Disruptive behavior or spam will result in an immediate ban.</p>
           </div>

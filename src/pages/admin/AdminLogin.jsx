@@ -167,7 +167,7 @@ const AdminLogin = () => {
     setLoading(true)
     try {
       const { data } = await adminLogin({ phone: form.phone.trim(), password: form.password })
-      login(data.token, data.user)
+      login( data.user)
       toast.success('Welcome back, Admin 👋')
       navigate('/admin/dashboard', { replace: true })
     } catch (err) {

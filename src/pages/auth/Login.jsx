@@ -57,7 +57,7 @@ const Login = () => {
     setLoading(true)
     try {
       const { data } = await login({ phone: form.phone.trim(), password: form.password, captchaId: captcha.id, captchaAnswer: form.captchaAnswer.trim() })
-      authLogin(data.token, data.user)
+      authLogin(data.user)
       toast.success('Welcome back!')
       const dest = data.user?.role === 'admin' || data.user?.role === 'superadmin' ? '/admin/dashboard' : from
       navigate(dest, { replace: true })
