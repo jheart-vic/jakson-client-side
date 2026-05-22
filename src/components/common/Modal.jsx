@@ -4,17 +4,19 @@ import { X } from 'lucide-react'
 const Modal = ({ isOpen, onClose, title, children, hideClose = false }) => {
   const panelRef = useRef(null)
 
-  // Lock body scroll
+  // Lock body scroll when open
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden'
-    else        document.body.style.overflow = ''
-    return ()  => { document.body.style.overflow = '' }
+    else document.body.style.overflow = ''
+    return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
-  // Close on Escape
+  // Close on Escape key
   useEffect(() => {
     if (!isOpen) return
-    const onKey = (e) => { if (e.key === 'Escape' && !hideClose) onClose() }
+    const onKey = (e) => {
+      if (e.key === 'Escape' && !hideClose) onClose()
+    }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [isOpen, onClose, hideClose])
@@ -28,19 +30,20 @@ const Modal = ({ isOpen, onClose, title, children, hideClose = false }) => {
         className="modal-backdrop absolute inset-0 bg-black/50 backdrop-blur-[2px]"
         onClick={!hideClose ? onClose : undefined}
       />
-      {/* Panel */}
+
+      {/* Panel – improved mobile spacing */}
       <div
         ref={panelRef}
-        className="modal-panel relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm mx-auto shadow-2xl"
-        style={{ maxHeight: '90dvh', overflowY: 'auto' }}
+        className="modal-panel relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm mx-auto shadow-2xl mb-12 sm:mb-0"
+        style={{ maxHeight: '85dvh', overflowY: 'auto' }}
       >
-        {/* Drag handle on mobile */}
+        {/* Drag handle (only visible on mobile) */}
         <div className="flex justify-center pt-3 pb-1 sm:hidden">
-          <div className="w-10 h-1 rounded-full bg-gray-200" />
+          <div className="w-12 h-1 rounded-full bg-gray-300" />
         </div>
 
-        <div className="px-6 pt-2 pb-6">
-          {/* Header */}
+        <div className="px-5 pt-2 pb-7 sm:px-6 sm:pb-6">
+          {/* Header section */}
           {(title || !hideClose) && (
             <div className="flex items-center justify-between mb-5">
               {title && (
@@ -58,6 +61,8 @@ const Modal = ({ isOpen, onClose, title, children, hideClose = false }) => {
               )}
             </div>
           )}
+
+          {/* Modal content */}
           {children}
         </div>
       </div>

@@ -16,10 +16,11 @@ const WelcomeModal = () => {
   if (!showWelcome) return null
 
   const firstName = user?.name?.split(' ')[0] || 'there'
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      className="fixed inset-0 z-200 flex items-center justify-center p-4"
       style={{ animation: 'backdropIn 0.3s ease both' }}
     >
       {/* Backdrop */}
@@ -121,7 +122,7 @@ const WelcomeModal = () => {
           {/* CTAs */}
           <div className="space-y-2.5">
             <button
-              onClick={startTour}
+              onClick={isDesktop ? startTour : dismissWelcome}
               className="w-full h-12 rounded-2xl font-bold text-sm flex items-center justify-center gap-2
                          text-white transition-all duration-200 active:scale-[0.97]"
               style={{
@@ -129,7 +130,7 @@ const WelcomeModal = () => {
                 boxShadow: '0 4px 20px rgba(198,123,44,0.4)',
               }}
             >
-              Start Quick Tour <ArrowRight size={16} />
+              {isDesktop ? <>Start Quick Tour <ArrowRight size={16} /></> : 'Get Started 🚀'}
             </button>
             <button
               onClick={dismissWelcome}

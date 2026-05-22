@@ -66,6 +66,9 @@ const TourOverlay = () => {
   const [rect,    setRect]    = useState(null)
   const [visible, setVisible] = useState(false)
 
+  // Tour is desktop-only — sidebar targets don't exist on mobile
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024
+
   const steps = TOUR_STEPS
   const step  = steps[tourStep]
 
@@ -88,7 +91,7 @@ const TourOverlay = () => {
     return () => window.removeEventListener('resize', measure)
   }, [showTour, measure])
 
-  if (!showTour) return null
+  if (!showTour || !isDesktop) return null
 
   const total = steps.length
   const vw    = window.innerWidth

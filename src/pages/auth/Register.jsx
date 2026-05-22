@@ -86,7 +86,7 @@ const Register = () => {
         captchaId: captcha.id, captchaAnswer: form.captchaAnswer.trim(),
         ...(form.referralCode && { referralCode: form.referralCode.trim().toUpperCase() }),
       })
-      authLogin(data.token, data.user)
+      authLogin(data.user)
       toast.success('Account created! Welcome 🎉')
       navigate('/main/dashboard', { replace: true })
     } catch (err) { handleApiError(err, 'Failed to create account'); fetchCaptcha() }

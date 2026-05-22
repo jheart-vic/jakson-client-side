@@ -3,6 +3,7 @@ import BottomNav from './BottomNav'
 import OfflineBanner from '../common/OfflineBanner'
 import DesktopSidebar from './DesktopSidebar'
 import DesktopHeader from './DesktopHeader'
+import MobileSupportButton from '../common/MobileSupportButton'
 
 const UserLayout = () => {
   const { pathname } = useLocation()
@@ -19,7 +20,7 @@ const UserLayout = () => {
         <main
           key={pathname}
           className="flex-1 pb-20 lg:pb-8 lg:bg-gray-50"
-          style={{ animation: 'slideUp 0.22s cubic-bezier(0,0,0.2,1) both' }}
+          style={{ animation: 'fadeIn 0.2s ease both' }}
         >
           <div className="lg:max-w-3xl lg:mx-auto lg:px-4 lg:py-6">
             <Outlet />
@@ -27,6 +28,7 @@ const UserLayout = () => {
         </main>
       </div>
 
+      <MobileSupportButton />
       <BottomNav />
       <OfflineBanner />
     </>
