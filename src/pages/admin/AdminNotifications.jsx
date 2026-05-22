@@ -84,7 +84,7 @@ const AdminNotifications = () => {
   const isExpired = (n) => n.expiresAt && new Date(n.expiresAt) < new Date()
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 w-full max-w-full overflow-x-hidden">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -150,7 +150,7 @@ const AdminNotifications = () => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Bonus code (optional)</label>
               <input
@@ -230,7 +230,7 @@ const AdminNotifications = () => {
             const expired = isExpired(n)
             return (
               <div key={n._id}
-                className={`bg-white rounded-2xl p-4 shadow-card border transition-opacity ${
+                className={`bg-white rounded-2xl p-4 shadow-card border transition-opacity overflow-hidden ${
                   !n.isActive || expired ? 'opacity-50' : ''
                 }`}
               >

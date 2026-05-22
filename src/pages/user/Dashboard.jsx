@@ -55,7 +55,7 @@ const WealthCarousel = ({ onInvest, onRefer }) => {
 
   const slides = [
     ...wealthFunds.map(fund => ({ type: 'fund', data: fund })),
-    { type: 'refer', data: { title: 'Invite & Earn 3%', sub: 'Share with friends and earn on every investment they make' } }
+    { type: 'refer', data: { title: 'Invite & Earn 8%', sub: 'Share with friends and earn on every investment they make' } }
   ]
 
   const next = useCallback(() => setActive(a => (a + 1) % slides.length), [slides.length])
@@ -403,7 +403,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Invite banner (updated to 3%) */}
+      {/* Invite banner (updated to 8%) */}
       <div data-tour="invite-banner" className="px-4 mt-3 animate-slide-up delay-200">
         <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg,#f97316,#fb923c)' }}>
           <div className="flex items-center gap-3 p-4">
@@ -411,7 +411,7 @@ const Dashboard = () => {
               <span className="text-2xl leading-none">🎁</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-extrabold text-sm">Invite & Earn 3%</p>
+              <p className="text-white font-extrabold text-sm">Invite & Earn 8%</p>
               <p className="text-white/75 text-xs mt-0.5 truncate">Code: <span className="font-bold">{user?.referralCode || '—'}</span></p>
             </div>
             <button onClick={copyInvite} className="bg-white rounded-xl px-3 py-2 flex items-center cursor-pointer gap-1.5 text-accent text-xs font-bold active:scale-95 transition-transform shrink-0">

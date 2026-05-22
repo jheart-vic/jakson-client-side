@@ -19,13 +19,14 @@ const links = [
   { to: '/admin/settings',      label: 'Settings',      icon: Settings        },
 ]
 
-const NavItem = ({ to, label, icon: Icon, collapsed }) => {
+const NavItem = ({ to, label, icon: Icon, collapsed, onClose }) => {
   const { pathname } = useLocation()
   const active = pathname === to || pathname.startsWith(to + '/')
 
   return (
     <NavLink
       to={to}
+      onClick={() => onClose?.()}
       className="flex items-center rounded-xl text-sm font-semibold transition-colors duration-150"
       style={{
         gap: collapsed ? 0 : '0.75rem',
@@ -47,7 +48,7 @@ const NavItem = ({ to, label, icon: Icon, collapsed }) => {
   )
 }
 
-const SidebarContent = ({ collapsed, onToggle, user, onLogout }) => (
+const SidebarContent = ({ collapsed, onToggle, user, onLogout, onClose }) => (
   <div className="flex flex-col h-full">
     {/* Logo + toggle area */}
     <div
@@ -77,8 +78,8 @@ const SidebarContent = ({ collapsed, onToggle, user, onLogout }) => (
         )}
       </div>
 
-      {/* Toggle button (only when expanded) */}
-      {!collapsed && (
+      {/* Toggle button – only shown on desktop (when onToggle exists) */}
+      {!collapsed && onToggle && (
         <button
           onClick={onToggle}
           title="Collapse sidebar"
@@ -97,8 +98,8 @@ const SidebarContent = ({ collapsed, onToggle, user, onLogout }) => (
       className="flex-1 py-4 space-y-0.5 overflow-y-auto overflow-x-hidden"
       style={{ padding: collapsed ? '1rem 0.5rem' : '1rem 0.75rem' }}
     >
-      {/* Expand button when collapsed */}
-      {collapsed && (
+      {/* Expand button – only shown on desktop (when collapsed and onToggle exists) */}
+      {collapsed && onToggle && (
         <button
           onClick={onToggle}
           title="Expand sidebar"
@@ -116,7 +117,7 @@ const SidebarContent = ({ collapsed, onToggle, user, onLogout }) => (
         <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">Menu</p>
       )}
       {links.map(link => (
-        <NavItem key={link.to} {...link} collapsed={collapsed} />
+        <NavItem key={link.to} {...link} collapsed={collapsed} onClose={onClose} />
       ))}
       {collapsed && <div className="my-3 mx-auto h-px w-8" style={{ background: '#ECEAE6' }} />}
     </nav>
@@ -186,11 +187,7 @@ const AdminLayout = () => {
   // Persist sidebar collapsed state in localStorage
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('admin_sb_collapsed') === 'true')
 
-  // Update CSS variable on the root element when collapsed changes
-  const sidebarWidth = collapsed ? 64 : 224 // px
-  if (typeof document !== 'undefined') {
-    document.documentElement.style.setProperty('--admin-sidebar-w', `${sidebarWidth}px`)
-  }
+  const sidebarWidth = collapsed ? 64 : 224
 
   const toggleCollapse = () => {
     const next = !collapsed
@@ -205,7 +202,7 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Desktop Sidebar (hidden on mobile) */}
+      {/* Desktop Sidebar */}
       <aside
         className="hidden lg:flex flex-col fixed left-0 top-0 h-screen z-40 bg-white overflow-hidden"
         style={{
@@ -218,7 +215,7 @@ const AdminLayout = () => {
         <SidebarContent collapsed={collapsed} onToggle={toggleCollapse} user={user} onLogout={handleLogout} />
       </aside>
 
-      {/* Mobile drawer (unchanged) */}
+      {/* Mobile drawer */}
       {mobileOpen && (
         <>
           <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} style={{ animation: 'backdropIn 0.18s ease both' }} />
@@ -228,9 +225,10 @@ const AdminLayout = () => {
         </>
       )}
 
-      {/* Main column – responsive margin using CSS variable */}
-      <div className="flex-1 flex flex-col min-h-screen lg:ml-(--admin-sidebar-w,224px) transition-all duration-300">
-        {/* Top bar (mobile menu button + page title) */}
+      {/* Main content margin for desktop */}
+      <style>{`@media(min-width:1024px){.admin-main{margin-left:${sidebarWidth}px}}`}</style>
+      <div className="admin-main flex-1 flex flex-col min-h-screen transition-all duration-300 overflow-x-hidden">
+        {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white border-b border-gray-100 h-14 flex items-center justify-between px-4 lg:px-6 w-full"
           style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
           <div className="flex items-center gap-3">
