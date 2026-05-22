@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
       }
     }
     init()
-  }, []) // eslint-disable-line
+  }, [])
 
   const login = useCallback((user) => {
     storage.setUser(user)
