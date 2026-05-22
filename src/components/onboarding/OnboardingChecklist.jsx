@@ -18,7 +18,7 @@ const OnboardingChecklist = () => {
 
   return (
     <div
-      className="fixed bottom-24 right-4 z-[90] w-64"
+      className="fixed bottom-24 right-4 z-90 w-64"
       style={{ animation: 'slideInRight 0.4s cubic-bezier(0.34,1.56,0.64,1) both' }}
     >
       <div

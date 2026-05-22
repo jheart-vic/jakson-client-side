@@ -179,7 +179,7 @@ const WealthCarousel = ({ onInvest, onRefer }) => {
 const Dashboard = () => {
   const navigate = useNavigate()
   const { user, refreshUser } = useAuth()
-  const { showWelcome } = useOnboarding()   // know when welcome modal is active
+  const { showWelcome, showTour } = useOnboarding()   // wait for both before showing Telegram
   const [showBalance, setShowBalance] = useState(false)
 
   const { usd_to_ngn_rate } = usePublicSettings()
@@ -223,13 +223,14 @@ const Dashboard = () => {
   useEffect(() => {
     // if (sessionStorage.getItem('tg_shown')) return  // already shown this session
     if (showWelcome) return                          // welcome modal is open — wait
+    if (showTour)    return                          // tour is running — wait
 
     const t = setTimeout(() => {
       setModal('telegram')
-      sessionStorage.setItem('tg_shown', '1')
+      // sessionStorage.setItem('tg_shown', '1')
     }, 900)
     return () => clearTimeout(t)
-  }, [showWelcome])
+  }, [showWelcome, showTour])  // re-evaluates when welcome or tour state changes
 
   const handleAction = (a) => {
     if (a.modal) { setModal(a.modal); return }
@@ -467,7 +468,8 @@ const Dashboard = () => {
       )}
 
       {/* Modals */}
-      <Modal isOpen={modal === 'telegram'} onClose={() => setModal(null)}>
+      <Modal isOpen={modal === 'telegram'} onClose={() => setModal(null)}
+        containerStyle={{ paddingBottom: '80px' }}>
         <div className="text-center space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-[#e8f4fb] flex items-center justify-center mx-auto"><span className="text-3xl">💬</span></div>
           <div>
@@ -477,7 +479,7 @@ const Dashboard = () => {
           <a href="https://t.me/jaksonsolar" target="_blank" rel="noopener noreferrer" className="block">
             <button className="btn btn-primary rounded-2xl h-12 text-sm">🚀 Join Telegram Group</button>
           </a>
-          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-3 flex items-start gap-2 text-left mt-2.5">
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-3 flex items-start gap-2 text-left">
             <span className="text-orange-500 text-sm shrink-0">⚠️</span>
             <p className="text-orange-600 text-xs font-medium">Disruptive behavior or spam will result in an immediate ban.</p>
           </div>

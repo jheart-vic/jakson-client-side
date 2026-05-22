@@ -9,36 +9,8 @@ const OnboardingContext = createContext(null)
 const obKey        = (user) => `luminos_ob_${user?._id || user?.phone || 'guest'}`
 const loadObState  = (user) => {
   try {
-    // ── New per-user key (current format) ────────────────────────────────
     const raw = localStorage.getItem(obKey(user))
-    if (raw) return JSON.parse(raw)
-
-    // ── Migration: old global key (luminos_onboarding_v1) ────────────────
-    // Existing users stored their state under a shared key before per-user
-    // keys were introduced. If they already saw the welcome, carry that over
-    // so they don't see it again.
-    const oldRaw = localStorage.getItem('luminos_onboarding_v1')
-    if (oldRaw) {
-      const old = JSON.parse(oldRaw)
-      if (old.welcomeSeen) {
-        const migrated = { welcomeSeen: true, tourCompleted: true }
-        localStorage.setItem(obKey(user), JSON.stringify(migrated))
-        return migrated
-      }
-    }
-
-    // ── Also treat any user who has a session token as non-new ────────────
-    // If the user is in localStorage (cached from a previous login) but has
-    // no onboarding record, they registered before this system existed.
-    // Mark them as having already seen the welcome to avoid false "new user" state.
-    const cachedUser = localStorage.getItem('user')
-    if (cachedUser) {
-      const migrated = { welcomeSeen: true, tourCompleted: true }
-      localStorage.setItem(obKey(user), JSON.stringify(migrated))
-      return migrated
-    }
-
-    return {}
+    return raw ? JSON.parse(raw) : {}
   } catch { return {} }
 }
 const saveObState  = (user, s) => {
