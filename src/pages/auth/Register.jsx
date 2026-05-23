@@ -30,6 +30,7 @@ const Register = () => {
   const [step, setStep]         = useState(0)
   const [form, setForm]         = useState({
     phone: '', password: '', confirmPassword: '',
+    fullName: '', userName: '',
     securityQuestionId: '', securityAnswer: '',
     captchaAnswer: '', referralCode: searchParams.get('c') || '',
   })
@@ -81,6 +82,8 @@ const Register = () => {
     try {
       const { data } = await register({
         phone: form.phone.trim(), password: form.password, countryCode: '+234',
+        fullName: form.fullName.trim() || undefined,
+        userName: form.userName.trim() || undefined,
         securityQuestionId: parseInt(form.securityQuestionId),
         securityAnswer: form.securityAnswer.trim(),
         captchaId: captcha.id, captchaAnswer: form.captchaAnswer.trim(),
@@ -187,6 +190,19 @@ const Register = () => {
                   <span className="text-xs font-bold text-gray-400 border-r border-gray-200 pr-3 shrink-0 leading-none">+234</span>
                   <input type="tel" placeholder="Phone number" value={form.phone} onChange={set('phone')} inputMode="numeric"
                     onFocus={() => setFocus('phone')} onBlur={() => setFocus('')}
+                    className="flex-1 outline-none text-sm font-medium text-gray-800 placeholder:text-gray-400 bg-transparent min-w-0" />
+                </Field>
+
+                <Field focused={focus === 'fullName'}>
+                  <input type="text" placeholder="Full name (e.g. John Doe)" value={form.fullName} onChange={set('fullName')}
+                    onFocus={() => setFocus('fullName')} onBlur={() => setFocus('')}
+                    className="flex-1 outline-none text-sm font-medium text-gray-800 placeholder:text-gray-400 bg-transparent min-w-0" />
+                </Field>
+
+                <Field focused={focus === 'userName'}>
+                  <span className="text-xs font-bold text-gray-400 border-r border-gray-200 pr-3 shrink-0 leading-none">@</span>
+                  <input type="text" placeholder="Username (optional)" value={form.userName} onChange={set('userName')}
+                    onFocus={() => setFocus('userName')} onBlur={() => setFocus('')}
                     className="flex-1 outline-none text-sm font-medium text-gray-800 placeholder:text-gray-400 bg-transparent min-w-0" />
                 </Field>
 

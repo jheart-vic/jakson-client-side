@@ -4,7 +4,7 @@ import { ArrowRight, X, Zap, TrendingUp, Users, Shield } from 'lucide-react'
 
 const features = [
   { icon: TrendingUp, color: '#10b981', bg: '#ecfdf5', label: 'Smart Investing',  desc: 'Grow your capital with solar-backed plans'      },
-  { icon: Users,      color: '#8b5cf6', bg: '#ede9fe', label: 'Team Rewards',     desc: 'Earn 3% on every referral investment'             },
+  { icon: Users,      color: '#8b5cf6', bg: '#ede9fe', label: 'Team Rewards',     desc: 'Earn 8% on every referral investment'             },
   { icon: Zap,        color: '#f59e0b', bg: '#fffbeb', label: 'Daily Check-ins',  desc: 'Claim bonuses every day just by showing up'      },
   { icon: Shield,     color: '#1a9fd4', bg: '#e0f4fc', label: 'Secure Platform',  desc: 'Bank-grade security on all your transactions'    },
 ]

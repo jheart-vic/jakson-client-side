@@ -244,7 +244,7 @@ const DesktopSidebar = () => {
               className="w-8 h-8 rounded-xl flex items-center justify-center font-extrabold text-sm text-white cursor-default"
               style={{ background: 'linear-gradient(135deg,#C67B2C,#A25F1F)' }}
             >
-              {user?.name?.charAt(0)?.toUpperCase() || user?.phone?.charAt(0) || 'U'}
+              {user?.initials || user?.fullName?.charAt(0)?.toUpperCase() || user?.phone?.charAt(0) || 'U'}
             </div>
             <button
               onClick={handleLogout}
@@ -265,7 +265,7 @@ const DesktopSidebar = () => {
                 className="w-8 h-8 rounded-xl flex items-center justify-center font-extrabold text-sm text-white shrink-0"
                 style={{ background: 'linear-gradient(135deg,#C67B2C,#A25F1F)' }}
               >
-                {user?.name?.charAt(0)?.toUpperCase() || user?.phone?.charAt(0) || 'U'}
+                {user?.initials || user?.fullName?.charAt(0)?.toUpperCase() || user?.phone?.charAt(0) || 'U'}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold truncate" style={{ color: '#2C2825' }}>{user?.name || 'User'}</p>
