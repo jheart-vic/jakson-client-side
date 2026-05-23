@@ -15,7 +15,6 @@ const Account = () => {
   const { user, logout } = useAuth()
   const [showBalance, setShowBalance] = useState(false)
 
-  // Pull live exchange rate from backend instead of hardcoding
   const { usd_to_ngn_rate } = usePublicSettings()
   const safeRate = usd_to_ngn_rate ?? 1560
 
@@ -26,44 +25,69 @@ const Account = () => {
   }
 
   const GRID = [
-    { icon: BarChart2,       label: 'My Invests',            path: '/main/invest-log',           color: '#1a9fd4', bg: '#e0f4fc' },
-    { icon: History,         label: 'Account History',        path: '/main/funding',              color: '#8b5cf6', bg: '#ede9fe' },
-    { icon: Headphones,      label: 'Online Service',         path: null, action: 'support',      color: '#10b981', bg: '#ecfdf5' },
-    { icon: Sun,             label: 'Solar Panel',            path: '/main/solar-panel',          color: '#f97316', bg: '#fff4ed' },
-    { icon: ArrowDownCircle, label: 'Recharge Record',        path: '/main/deposit/log',          color: '#06b6d4', bg: '#ecfeff' },
-    { icon: ArrowUpCircle,   label: 'Withdrawal Record',      path: '/main/withdraw/log',         color: '#f43f5e', bg: '#fff1f2' },
-    { icon: Landmark,        label: 'Withdrawal Account',     path: '/main/bank/accounts',        color: '#d97706', bg: '#fffbeb' },
-    { icon: Landmark,        label: 'Wealth Funds',           path: '/main/wealth-fund',          color: '#b8860b', bg: '#fff8e7' },
-    { icon: Lock,            label: 'Modify Login Password',  path: '/main/change-password',      color: '#0284c7', bg: '#f0f9ff' },
-    { icon: KeyRound,        label: 'Modify Withdraw PIN',    path: '/main/change-withdraw-pin',  color: '#0f766e', bg: '#f0fdfa' },
-    { icon: Smartphone,      label: 'Download App',           path: null, action: 'app',          color: '#4f46e5', bg: '#eef2ff' },
-    { icon: LogOut,          label: 'Log out',                path: null, action: 'logout',       color: '#ef4444', bg: '#fef2f2' },
+    { icon: BarChart2,       label: 'My Invests',           path: '/main/invest-log',          color: '#1a9fd4', bg: '#e0f4fc' },
+    { icon: History,         label: 'Account History',       path: '/main/funding',             color: '#8b5cf6', bg: '#ede9fe' },
+    { icon: Headphones,      label: 'Online Service',        path: null, action: 'support',     color: '#10b981', bg: '#ecfdf5' },
+    { icon: Sun,             label: 'Solar Panel',           path: '/main/solar-panel',         color: '#f97316', bg: '#fff4ed' },
+    { icon: ArrowDownCircle, label: 'Recharge Record',       path: '/main/deposit/log',         color: '#06b6d4', bg: '#ecfeff' },
+    { icon: ArrowUpCircle,   label: 'Withdrawal Record',     path: '/main/withdraw/log',        color: '#f43f5e', bg: '#fff1f2' },
+    { icon: Landmark,        label: 'Withdrawal Account',    path: '/main/bank/accounts',       color: '#d97706', bg: '#fffbeb' },
+    { icon: Landmark,        label: 'Wealth Funds',          path: '/main/wealth-fund',         color: '#b8860b', bg: '#fff8e7' },
+    { icon: Lock,            label: 'Modify Login Password', path: '/main/change-password',     color: '#0284c7', bg: '#f0f9ff' },
+    { icon: KeyRound,        label: 'Modify Withdraw PIN',   path: '/main/change-withdraw-pin', color: '#0f766e', bg: '#f0fdfa' },
+    { icon: Smartphone,      label: 'Download App',          path: null, action: 'app',         color: '#4f46e5', bg: '#eef2ff' },
+    { icon: LogOut,          label: 'Log out',               path: null, action: 'logout',      color: '#ef4444', bg: '#fef2f2' },
   ]
 
   const handleTap = (item) => {
-    if (item.path)                  return navigate(item.path)
-    if (item.action === 'logout')   return handleLogout()
-    if (item.action === 'support')  return toast('Contact support via Telegram')
-    if (item.action === 'app')      return toast('App coming soon')
+    if (item.path)                 return navigate(item.path)
+    if (item.action === 'logout')  return handleLogout()
+    if (item.action === 'support') return toast('Contact support via Telegram')
+    if (item.action === 'app')     return toast('App coming soon')
   }
 
-  const maskedBalance = () =>
-    showBalance ? fmtUSD(user?.balance || 0) : '*****'
+  const maskedBalance = () => showBalance ? fmtUSD(user?.balance || 0) : '*****'
+  const maskedNGN     = () => showBalance ? fmtNGN(toNGN(user?.balance || 0, safeRate)) : '*****'
 
-  const maskedNGN = () =>
-    showBalance ? fmtNGN(toNGN(user?.balance || 0, safeRate)) : '*****'
+  // ── Display helpers ──────────────────────────────────────────────────────
+  // Primary name: fullName > userName > masked phone (works for existing users)
+  const primaryName = user?.fullName || user?.userName || user?.phone
+
+  // Secondary line: @username or phone — only when there is a name above it
+  const secondaryLine = (user?.fullName || user?.userName)
+    ? (user.userName ? `@${user.userName}` : user.phone)
+    : null
+
+  // Avatar initials: from fullName (e.g. "John Doe" → "JD"), else first char of phone
+  const avatarInitials = user?.initials || null
 
   return (
     <div className="min-h-dvh bg-surface pb-24">
-      {/* Header */}
+
+      {/* ── Header ── */}
       <div style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}
         className="px-4 pt-12 pb-16">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center">
-            <span className="text-2xl">☀️</span>
+
+          {/* Avatar — initials if available, otherwise sun emoji */}
+          <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center shrink-0">
+            {avatarInitials
+              ? <span className="text-white text-xl font-extrabold leading-none">{avatarInitials}</span>
+              : <span className="text-2xl leading-none">☀️</span>
+            }
           </div>
-          <div>
-            <p className="text-white font-extrabold text-base">{user?.phone}</p>
+
+          <div className="min-w-0">
+            {/* Primary display name */}
+            <p className="text-white font-extrabold text-base leading-tight truncate">
+              {primaryName}
+            </p>
+
+            {/* Secondary line — only when a name is shown above */}
+            {secondaryLine && (
+              <p className="text-white/65 text-xs mt-0.5 truncate">{secondaryLine}</p>
+            )}
+
             <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold mt-1">
               VIP{user?.vipLevel ?? 0}
             </span>
@@ -71,7 +95,7 @@ const Account = () => {
         </div>
       </div>
 
-      {/* Balance card */}
+      {/* ── Balance card ── */}
       <div className="px-4 -mt-8">
         <div className="card card-p shadow-float animate-slide-up">
           <p className="text-xs text-primary font-medium uppercase tracking-wide">Funding Account</p>
@@ -90,19 +114,19 @@ const Account = () => {
           <div className="flex gap-2.5">
             <button onClick={() => navigate('/main/deposit')}
               className="flex-1 py-2.5 bg-primary text-white text-xs font-bold rounded-xl
-                        shadow-[0_4px_12px_rgba(26,159,212,0.3)] active:scale-95 transition-transform">
+                         shadow-[0_4px_12px_rgba(26,159,212,0.3)] active:scale-95 transition-transform">
               Recharge
             </button>
             <button onClick={() => navigate('/main/withdraw')}
               className="flex-1 py-2.5 border-2 border-primary text-primary text-xs font-bold rounded-xl
-                        active:scale-95 transition-transform">
+                         active:scale-95 transition-transform">
               Withdraw
             </button>
           </div>
         </div>
       </div>
 
-      {/* Actions grid */}
+      {/* ── Actions grid ── */}
       <div className="px-4 mt-4">
         <div className="grid grid-cols-3 gap-3">
           {GRID.map((item) => (
