@@ -406,9 +406,12 @@ const Dashboard = () => {
                 <div className='px-4 pt-3 pb-1 animate-slide-down'>
                     <div className='flex items-center justify-between mb-4'>
                         <div className='flex items-center gap-2.5'>
-                            <div className='w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center border border-white/20'>
-                                <span className='text-lg leading-none'>☀️</span>
-                            </div>
+                            <img
+                                src='/logo.jpeg'
+                                alt='Luminos Energy'
+                                className='w-9 h-9 rounded-xl object-cover shrink-0'
+                                style={{ border: '1px solid rgba(255,255,255,0.25)' }}
+                            />
                             <div>
                                 <p className='text-white font-extrabold text-sm leading-tight'>
                                     {user?.displayName ||
@@ -702,9 +705,7 @@ const Dashboard = () => {
                 containerStyle={{ paddingBottom: '80px' }}
             >
                 <div className='text-center space-y-4'>
-                    <div className='w-16 h-16 rounded-2xl bg-[#e8f4fb] flex items-center justify-center mx-auto'>
-                        <span className='text-3xl'>💬</span>
-                    </div>
+                    <img src='/logo.jpeg' alt='Luminos Energy' className='w-16 h-16 rounded-2xl object-cover mx-auto' style={{ border: '1px solid rgba(198,123,44,0.2)' }} />
                     <div>
                         <h3 className='text-gray-800 text-lg font-extrabold'>
                             Join Our Community

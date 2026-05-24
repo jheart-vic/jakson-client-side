@@ -69,12 +69,14 @@ const Account = () => {
         className="px-4 pt-12 pb-16">
         <div className="flex items-center gap-3">
 
-          {/* Avatar — initials if available, otherwise sun emoji */}
-          <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center shrink-0">
-            {avatarInitials
-              ? <span className="text-white text-xl font-extrabold leading-none">{avatarInitials}</span>
-              : <span className="text-2xl leading-none">☀️</span>
-            }
+          {/* Avatar — initials from fullName, logo as fallback */}
+          <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 relative border border-white/30">
+            <img src="/logo.jpeg" alt="Luminos Energy" className="absolute inset-0 w-full h-full object-cover" />
+            {avatarInitials && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                <span className="text-white text-xl font-extrabold leading-none">{avatarInitials}</span>
+              </div>
+            )}
           </div>
 
           <div className="min-w-0">

@@ -4,33 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <title>Luminos Energy</title>
-    <!-- Favicon – modern minimal design with inline SVG data URI (ensures icon appears without external files) -->
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231B2F4C' rx='20'/%3E%3Cpath d='M50 20 L62 45 L55 45 L60 60 L40 45 L47 45 L38 20 Z' fill='%23F9D56E' stroke='%23F4C542' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='72' r='8' fill='%23F9D56E'/%3E%3C/svg%3E"
-    />
-    <!-- Fallback classic favicon (if browser prefers .ico) – uses data URI minimal icon as well but ensures broad support -->
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/wAAAAAAAAAAAAAAAAAAAAB2dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv8AAAAAAAAAAAAAAAAAAAAAdnZ2/3Z2dv+tra3/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/6ampv92dnb/dnZ2/wAAAAAAAAAAAAAAAAAAAAB2dnb/dnZ2/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/3Z2dv92dnb/AAAAAAAAAAAAAAAAAAAAAHZ2dv92dnb/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/dnZ2/3Z2dv8AAAAAAAAAAAAAAAAAAAAAdnZ2/3Z2dv+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP92dnb/dnZ2/wAAAAAAAAAAAAAAAAAAAAB2dnb/dnZ2/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/3Z2dv92dnb/AAAAAAAAAAAAAAAAAAAAAHZ2dv92dnb/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/dnZ2/3Z2dv8AAAAAAAAAAAAAAAAAAAAAdnZ2/3Z2dv+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP92dnb/dnZ2/wAAAAAAAAAAAAAAAAAAAAB2dnb/dnZ2/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/3Z2dv92dnb/AAAAAAAAAAAAAAAAAAAAAHZ2dv92dnb/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/dnZ2/3Z2dv8AAAAAAAAAAAAAAAAAAAAAdnZ2/3Z2dv+mpqb/tLS0/7S0tP+0tLT/tLS0/7S0tP+0tLT/tLS0/6ampv92dnb/dnZ2/wAAAAAAAAAAAAAAAAAAAAB2dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv8AAAAAAAAAAAAAAAAAAAAAdnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAHZ2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/3Z2dv92dnb/dnZ2/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA"
-    />
-    <!-- additional modern fallback for devices that prefer PNG (explicit 32x32) with embedded base64 -->
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABPklEQVR4nO2WPU7DQBCFX5yURHQ0CBGhRByABSqQKChpkWjgBkgoFBQ04gY0FGj5aewKxYGQcXbtrDdKvOQpVvbuzttvZsfekWVZUAiSJEmbOo7j1XEcbx3H8RZFUTuO4whJ0sY4juPbt+/a1H+ZzTa+WCyaWVvP5/NerVYrZFkGp9OpBkRgrVZrYBhG1wD+9S+GYTQajUYI9zAAhmF0jOM4HgwGRdd1K5ZlNbquC5qmPUvTtBdhGK7evzgMw+twPA7gOI6LYRjBPM8HeZ4XHMfxrOu6TsvzHMBms9nEeZ7LsiwXjuMM+b5d58lkMnDOOefcS9M0B77vXxWGYbwsywLHcVzoug5834c0TQ/gOI5hGEbQNE0CpmnC4XB4hizLXkEIwRHAFyAMQwjDMBjP2Ww2YJqmIYQQBwB+HaBpmqZpGlwPpmlS3/c/KaX+M0oppZT6A+UeFj4lTUdEAAAAAElFTkSuQmCC"
-    />
-    <!-- Apple Touch Icon for iOS home screen -->
-    <link
-      rel="apple-touch-icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%231B2F4C' rx='36'/%3E%3Cpath d='M90 36 L112 81 L100 81 L108 108 L72 81 L86 81 L68 36 Z' fill='%23F9D56E' stroke='%23F4C542' stroke-width='3' stroke-linejoin='round'/%3E%3Ccircle cx='90' cy='130' r='14' fill='%23F9D56E'/%3E%3C/svg%3E"
-    />
+
+    <!-- Favicon — real logo -->
+    <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
+    <link rel="apple-touch-icon" href="/logo.jpeg" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
   </head>

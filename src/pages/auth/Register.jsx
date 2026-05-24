@@ -109,9 +109,7 @@ const Register = () => {
 
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-12">
-            <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center border border-white/25">
-              <span className="text-2xl leading-none">☀️</span>
-            </div>
+            <img src="/logo.jpeg" alt="Luminos Energy" className="w-14 h-14 rounded-2xl object-cover" style={{ border: '1px solid rgba(255,255,255,0.25)' }} />
             <div>
               <p className="text-white font-extrabold text-lg leading-tight">Luminos Energy</p>
               <p className="text-white/60 text-xs font-medium">Smart Solar Investment</p>

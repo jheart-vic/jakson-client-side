@@ -78,6 +78,11 @@ const ForgotPassword = () => {
         <div className="w-10 shrink-0" />
       </div>
 
+      {/* Logo */}
+      <div className="flex justify-center pb-2">
+        <img src="/logo.jpeg" alt="Luminos Energy" className="w-16 h-16 rounded-2xl object-cover opacity-90" style={{ border: '1px solid rgba(255,255,255,0.2)' }} />
+      </div>
+
       {/* Step dots */}
       <div className="flex justify-center gap-2 pb-6">
         {STEPS.map((_, i) => (

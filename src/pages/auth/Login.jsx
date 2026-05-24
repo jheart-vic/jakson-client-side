@@ -81,9 +81,7 @@ const Login = () => {
         {/* Logo */}
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-12">
-            <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center border border-white/25">
-              <span className="text-2xl leading-none">☀️</span>
-            </div>
+            <img src="/logo.jpeg" alt="Luminos Energy" className="w-14 h-14 rounded-2xl object-cover" style={{ border: '1px solid rgba(255,255,255,0.25)' }} />
             <div>
               <p className="text-white font-extrabold text-lg leading-tight tracking-tight">Luminos Energy</p>
               <p className="text-white/60 text-xs font-medium">Smart Solar Investment</p>
@@ -122,9 +120,7 @@ const Login = () => {
           className="lg:hidden flex flex-col items-center pt-12 pb-6 px-6"
           style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}
         >
-          <div className="w-16 h-16 rounded-2xl bg-white/20 border border-white/25 flex items-center justify-center mb-3">
-            <span className="text-3xl">☀️</span>
-          </div>
+          <img src="/logo.jpeg" alt="Luminos Energy" className="w-20 h-20 rounded-2xl object-cover mb-3" style={{ border: '1px solid rgba(255,255,255,0.25)' }} />
           <h1 className="text-white text-xl font-extrabold tracking-tight">Luminos Energy</h1>
           <p className="text-white/65 text-xs mt-1">Smart Solar Investment</p>
         </div>
