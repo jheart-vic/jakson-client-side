@@ -97,10 +97,9 @@ const ResetPassword = () => {
                 >
                     <ChevronLeft size={20} />
                 </Link>
-                <div className='flex-1 text-center'>
-                    <p className='text-white text-base font-bold'>
-                        Set New Password
-                    </p>
+                <div className='flex-1 flex flex-col items-center gap-1'>
+                    <img src='/logo.jpeg' alt='Luminos Energy' className='w-10 h-10 rounded-xl object-cover' style={{ border: '1px solid rgba(255,255,255,0.25)' }} />
+                    <p className='text-white text-sm font-bold'>Set New Password</p>
                 </div>
                 <div className='w-10 shrink-0' />
             </div>

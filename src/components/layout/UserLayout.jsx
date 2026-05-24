@@ -12,10 +12,28 @@ const UserLayout = () => {
     <>
       <DesktopSidebar />
 
-      {/* Only apply margin on desktop (≥1024px) */}
+      {/* Watermark — logo.png as fixed background watermark */}
       <div
-        className="flex flex-col min-h-screen transition-all duration-300 lg:ml-(--sidebar-w,224px)"
-      >
+        aria-hidden="true"
+        style={{
+          position:           'fixed',
+          top:                '50%',
+          left:               '50%',
+          transform:          'translate(-50%, -50%)',
+          width:              'min(100vw, 700px)',
+          height:             'min(100vw, 700px)',
+          backgroundImage:    "url('/logo.png')",
+          backgroundSize:     'contain',
+          backgroundRepeat:   'no-repeat',
+          backgroundPosition: 'center',
+          opacity:            0.05,  // Increased to 25% for better visibility
+          pointerEvents:      'none',
+          zIndex:             5,
+          userSelect:         'none',
+        }}
+      />
+
+      <div className="flex flex-col min-h-screen transition-all duration-300 lg:ml-(--sidebar-w,224px)">
         <DesktopHeader />
         <main
           key={pathname}

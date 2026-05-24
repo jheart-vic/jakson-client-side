@@ -64,12 +64,12 @@ const SidebarContent = ({ collapsed, onToggle, user, onLogout, onClose }) => (
         className="flex items-center gap-3 min-w-0"
         style={{ overflow: 'hidden', flex: collapsed ? '0 0 auto' : 1 }}
       >
-        <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: 'linear-gradient(135deg,#C67B2C,#A25F1F)' }}
-        >
-          <span className="text-lg leading-none">☀️</span>
-        </div>
+        <img
+          src="/logo.jpeg"
+          alt="Luminos Energy"
+          className="w-9 h-9 rounded-xl object-cover shrink-0"
+          style={{ border: '1px solid rgba(198,123,44,0.3)' }}
+        />
         {!collapsed && (
           <div className="min-w-0">
             <p className="font-extrabold text-gray-900 text-sm leading-tight truncate">Luminos Energy</p>
