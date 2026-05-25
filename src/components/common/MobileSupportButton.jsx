@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { X, Headphones } from 'lucide-react'
 
-const WHATSAPP_URL = 'https://wa.me/2348000000000'
+const WHATSAPP_URL = 'https://wa.me/447470059551'
 const TELEGRAM_URL = 'https://t.me/luminosenergy'
 
 const MobileSupportButton = () => {

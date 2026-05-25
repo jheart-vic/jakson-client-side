@@ -182,7 +182,7 @@ const DesktopSidebar = () => {
 
         {/* WhatsApp */}
         <a
-          href="https://wa.me/2348000000000"
+          href="https://wa.me/447470059551"
           target="_blank"
           rel="noopener noreferrer"
           title={collapsed ? 'WhatsApp' : undefined}
