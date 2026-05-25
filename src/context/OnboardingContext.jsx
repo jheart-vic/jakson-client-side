@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext'
 const OnboardingContext = createContext(null)
 
 // ── Per-user localStorage ─────────────────────────────────────────────────
-const obKey        = (user) => `luminos_ob_${user?._id || user?.phone || 'guest'}`
+const obKey        = (user) => `Luminos_ob_${user?._id || user?.phone || 'guest'}`
 const loadObState  = (user) => {
   try {
     const raw = localStorage.getItem(obKey(user))

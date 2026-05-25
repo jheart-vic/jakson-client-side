@@ -105,10 +105,18 @@ const DesktopSidebar = () => {
           minHeight:      60,
         }}
       >
-        {/* Logo mark — always visible */}
-        <div
-          className="flex items-center gap-3 min-w-0"
-          style={{ overflow: 'hidden', flex: collapsed ? '0 0 auto' : 1 }}
+        {/* Logo mark — always visible and clickable */}
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-3 min-w-0 cursor-pointer transition-opacity hover:opacity-80"
+          style={{
+            overflow: 'hidden',
+            flex: collapsed ? '0 0 auto' : 1,
+            background: 'none',
+            border: 'none',
+            outline: 'none',
+          }}
+          aria-label="Go to Home"
         >
           <img
             src="/logo.jpeg"
@@ -122,7 +130,7 @@ const DesktopSidebar = () => {
               <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#C67B2C' }}>Energy</p>
             </div>
           )}
-        </div>
+        </button>
 
         {/* Toggle button */}
         {!collapsed && (
@@ -207,7 +215,7 @@ const DesktopSidebar = () => {
 
         {/* Telegram */}
         <a
-          href="https://t.me/luminosenergy"
+          href="https://t.me/Luminos_Energy_manager"
           target="_blank"
           rel="noopener noreferrer"
           title={collapsed ? 'Telegram' : undefined}

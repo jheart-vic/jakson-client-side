@@ -10,6 +10,7 @@ import {
     BarChart2,
     Users,
     ChevronRight,
+    ChevronDown,
     Copy,
     Megaphone,
     Eye,
@@ -78,6 +79,77 @@ const ACTIONS = [
     },
 ]
 
+// ── FAQ Component ──
+const FAQS = [
+    {
+        q: 'How do I start investing?',
+        a: 'Recharge your wallet, go to Invest, choose a plan that suits you, and tap Buy. Your daily income starts the next weekday.',
+    },
+    {
+        q: 'When is daily income credited?',
+        a: 'Income is queued each weekday (Mon–Fri) by midnight. You must claim it from the Invest Log before the next midnight or it is forfeited.',
+    },
+    {
+        q: 'How do I withdraw my earnings?',
+        a: 'Bind a bank account under Account → Withdrawal Account, then tap Withdraw. Processing takes 5 minutes to 48 hours.',
+    },
+    {
+        q: 'How does the referral program work?',
+        a: 'Share your invite link. You earn 8% on every first investment your direct referrals make, plus ongoing daily commission from their returns.',
+    },
+    {
+        q: 'Is my money safe?',
+        a: 'Luminos Energy is backed by real solar assets. All transactions are secured and encrypted. Withdrawals are reviewed before processing.',
+    },
+    {
+        q: 'What are Wealth Funds?',
+        a: 'Wealth Funds are long-term premium plans with a fixed maturity payout. You invest once and claim the full maturity value when it matures.',
+    },
+]
+
+const FaqSection = () => {
+    const [open, setOpen] = useState(null)
+    return (
+        <div className='px-4 mt-4 mb-2 animate-slide-up delay-300'>
+            <p className='text-sm font-extrabold text-gray-700 mb-3'>
+                Frequently Asked Questions
+            </p>
+            <div className='space-y-2'>
+                {FAQS.map((faq, i) => (
+                    <div
+                        key={i}
+                        className='bg-white rounded-2xl shadow-card border border-gray-50 overflow-hidden'
+                    >
+                        <button
+                            onClick={() => setOpen(open === i ? null : i)}
+                            className='w-full flex items-center justify-between px-4 py-3.5 text-left active:bg-gray-50 transition-colors'
+                        >
+                            <span className='text-sm font-bold text-gray-800 pr-3'>
+                                {faq.q}
+                            </span>
+                            <ChevronDown
+                                size={16}
+                                className='text-primary shrink-0 transition-transform duration-200'
+                                style={{
+                                    transform:
+                                        open === i
+                                            ? 'rotate(180deg)'
+                                            : 'rotate(0deg)',
+                                }}
+                            />
+                        </button>
+                        {open === i && (
+                            <div className='px-4 pb-4 text-xs text-gray-500 leading-relaxed border-t border-gray-50 pt-3'>
+                                {faq.a}
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+}
+
 // ── Wealth Carousel Component (replaces the old banner carousel) ──
 const WealthCarousel = ({ onInvest, onRefer }) => {
     const [wealthFunds, setWealthFunds] = useState([])
@@ -92,7 +164,6 @@ const WealthCarousel = ({ onInvest, onRefer }) => {
                 let funds = res?.funds || res?.data?.funds || res || []
                 setWealthFunds(funds)
             } catch (err) {
-                // console.error('Failed to load wealth funds for carousel', err)
                 handleApiError(err, 'Failed to load wealth funds')
                 setWealthFunds([])
             }
@@ -261,7 +332,7 @@ const WealthCarousel = ({ onInvest, onRefer }) => {
 const Dashboard = () => {
     const navigate = useNavigate()
     const { user, refreshUser } = useAuth()
-    const { showWelcome, showTour } = useOnboarding() // wait for both before showing Telegram
+    const { showWelcome, showTour } = useOnboarding()
     const [showBalance, setShowBalance] = useState(false)
 
     const { usd_to_ngn_rate } = usePublicSettings()
@@ -320,19 +391,16 @@ const Dashboard = () => {
         })()
     }, [loadBal, loadAnnouncements, loadUnreadCount])
 
-    // Telegram modal — shown once per session, but only AFTER the welcome modal
-    // is gone. If both fire together the user sees two modals at once.
+    // Telegram modal
     useEffect(() => {
-        // if (sessionStorage.getItem('tg_shown')) return  // already shown this session
-        if (showWelcome) return // welcome modal is open — wait
-        if (showTour) return // tour is running — wait
+        if (showWelcome) return
+        if (showTour) return
 
         const t = setTimeout(() => {
             setModal('telegram')
-            // sessionStorage.setItem('tg_shown', '1')
         }, 900)
         return () => clearTimeout(t)
-    }, [showWelcome, showTour]) // re-evaluates when welcome or tour state changes
+    }, [showWelcome, showTour])
 
     const handleAction = (a) => {
         if (a.modal) {
@@ -375,7 +443,6 @@ const Dashboard = () => {
         }
     }
 
-
     const copyInvite = () => {
         const link = `https://jaksonsolar.org/register?c=${user?.referralCode || ''}`
         navigator.clipboard
@@ -406,27 +473,37 @@ const Dashboard = () => {
                 <div className='px-4 pt-3 pb-1 animate-slide-down'>
                     <div className='flex items-center justify-between mb-4'>
                         <div className='flex items-center gap-2.5'>
-                            <img
-                                src='/logo.jpeg'
-                                alt='Luminos Energy'
-                                className='w-9 h-9 rounded-xl object-cover shrink-0'
-                                style={{ border: '1px solid rgba(255,255,255,0.25)' }}
-                            />
-                            <div>
-                                <p className='text-white font-extrabold text-sm leading-tight'>
-                                    {user?.displayName ||
-                                        user?.userName ||
-                                        'Luminos'}
-                                </p>
-                                <p className='text-surface text-[10px] font-medium'>
-                                    Investment Platform
-                                </p>
-                            </div>
+                            {/* Back to Home button - logo clickable */}
+                            <button
+                                onClick={() => navigate('/')}
+                                className='flex items-center gap-2.5 cursor-pointer'
+                                aria-label="Back to Home"
+                            >
+                                <img
+                                    src='/logo.jpeg'
+                                    alt='Luminos Energy'
+                                    className='w-9 h-9 rounded-xl object-cover shrink-0'
+                                    style={{
+                                        border: '1px solid rgba(255,255,255,0.25)',
+                                    }}
+                                />
+                                <div className='text-left'>
+                                    <p className='text-white font-extrabold text-sm leading-tight'>
+                                        {user?.displayName ||
+                                            user?.userName ||
+                                            'Luminos'}
+                                    </p>
+                                    <p className='text-surface text-[10px] font-medium'>
+                                        Investment Platform
+                                    </p>
+                                </div>
+                            </button>
                         </div>
                         <div className='flex items-center gap-2'>
                             <button
-                                onClick={() => navigate('/main/notifications')}
+                                onClick={() => navigate('/main/notifications?tab=announcements')}
                                 className='relative w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform'
+                                aria-label="Notifications"
                             >
                                 <Bell size={16} />
                                 {unreadNotifCount > 0 && (
@@ -437,10 +514,16 @@ const Dashboard = () => {
                                     </span>
                                 )}
                             </button>
-                            <button className='w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform'>
+                            <button
+                                className='w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform'
+                                aria-label="QR Code"
+                            >
                                 <QrCode size={16} />
                             </button>
-                            <button className='w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform'>
+                            <button
+                                className='w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform'
+                                aria-label="Currency"
+                            >
                                 <span className='text-center leading-none'>
                                     🇳🇬
                                 </span>
@@ -448,6 +531,7 @@ const Dashboard = () => {
                         </div>
                     </div>
 
+                    {/* Rest of your component remains the same... */}
                     {/* Balance card */}
                     <div
                         data-tour='balance-card'
@@ -467,6 +551,7 @@ const Dashboard = () => {
                                 <button
                                     onClick={() => setShowBalance(!showBalance)}
                                     className='text-white/80 hover:text-white transition-colors'
+                                    aria-label={showBalance ? "Hide balance" : "Show balance"}
                                 >
                                     {showBalance ? (
                                         <EyeOff size={18} />
@@ -560,7 +645,10 @@ const Dashboard = () => {
 
             {/* Company profile link */}
             <div className='px-4 mt-3 animate-slide-up delay-200'>
-                <button className='w-full flex items-center gap-3 bg-white rounded-2xl p-4 shadow-card active:scale-[0.99] transition-transform border border-gray-100'>
+                <button
+                    onClick={() => window.open('https://jaksonsolar.org/about', '_blank')}
+                    className='w-full flex items-center gap-3 bg-white rounded-2xl p-4 shadow-card active:scale-[0.99] transition-transform border border-gray-100'
+                >
                     <div className='w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center shrink-0'>
                         <span className='text-lg leading-none'>📢</span>
                     </div>
@@ -576,7 +664,7 @@ const Dashboard = () => {
                 </button>
             </div>
 
-            {/* Invite banner (updated to 8%) */}
+            {/* Invite banner */}
             <div
                 data-tour='invite-banner'
                 className='px-4 mt-3 animate-slide-up delay-200'
@@ -612,7 +700,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Announcements feed — dynamic, first 3, no bonus codes */}
+            {/* Announcements feed */}
             {announcements.length > 0 && (
                 <div className='px-4 mt-4 mb-2 animate-slide-up delay-250'>
                     <div className='flex items-center justify-between mb-3'>
@@ -620,7 +708,7 @@ const Dashboard = () => {
                             Announcements
                         </p>
                         <button
-                            onClick={() => navigate('/main/notifications')}
+                            onClick={() => navigate('/main/notifications?tab=announcements')}
                             className='text-xs text-primary font-bold cursor-pointer'
                         >
                             View all
@@ -690,6 +778,23 @@ const Dashboard = () => {
                                         <p className='text-xs text-gray-500 leading-relaxed line-clamp-2'>
                                             {n.body}
                                         </p>
+                                        {n.bonusCode && (
+                                            <div className='mt-2 flex items-center gap-2'>
+                                                <div className='flex items-center gap-1.5 bg-purple-50 border border-purple-200 rounded-xl px-2.5 py-1.5 flex-1 min-w-0'>
+                                                    <Gift size={11} className='text-purple-500 shrink-0' />
+                                                    <span className='text-purple-700 font-extrabold text-xs tracking-widest truncate'>{n.bonusCode}</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(n.bonusCode)
+                                                        toast.success('Bonus code copied!')
+                                                    }}
+                                                    className='flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-xl shrink-0 bg-purple-50 text-purple-600 border border-purple-200 active:scale-95 transition-transform'
+                                                >
+                                                    <Copy size={10} /> Copy
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )
@@ -698,6 +803,9 @@ const Dashboard = () => {
                 </div>
             )}
 
+            {/* FAQ Section */}
+            <FaqSection />
+
             {/* Modals */}
             <Modal
                 isOpen={modal === 'telegram'}
@@ -705,7 +813,14 @@ const Dashboard = () => {
                 containerStyle={{ paddingBottom: '80px' }}
             >
                 <div className='text-center space-y-4'>
-                    <img src='/logo.jpeg' alt='Luminos Energy' className='w-16 h-16 rounded-2xl object-cover mx-auto' style={{ border: '1px solid rgba(198,123,44,0.2)' }} />
+                    <div className='w-16 h-16 rounded-2xl bg-[#e8f4fb] flex items-center justify-center mx-auto'>
+                        <img
+                            src='/logo.jpeg'
+                            alt='Luminos Energy'
+                            className='w-16 h-16 rounded-2xl object-cover mx-auto'
+                            style={{ border: '1px solid rgba(198,123,44,0.2)' }}
+                        />
+                    </div>
                     <div>
                         <h3 className='text-gray-800 text-lg font-extrabold'>
                             Join Our Community
@@ -720,7 +835,7 @@ const Dashboard = () => {
                         </p>
                     </div>
                     <a
-                        href='https://t.me/jaksonsolar'
+                        href='https://t.me/Luminos_Energy_manager'
                         target='_blank'
                         rel='noopener noreferrer'
                         className='block'
