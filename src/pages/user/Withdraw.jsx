@@ -115,7 +115,7 @@ const Withdraw = () => {
   }
 
   return (
-    <div className="min-h-dvh bg-surface pb-8">
+    <div className="min-h-dvh pb-8">
       <PageHeader
         title="Withdraw"
         right={

@@ -47,7 +47,7 @@ const Team = () => {
   if (loading) return <div className="min-h-dvh bg-surface"><PageHeader title="Team" /><Spinner /></div>
 
   return (
-    <div className="min-h-dvh bg-surface pb-24">
+    <div className="min-h-dvh pb-24">
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}
         className="px-4 pt-12 pb-6">
@@ -125,8 +125,9 @@ const Team = () => {
 
       {/* Tier members modal */}
       <Modal isOpen={!!tierModal} onClose={() => { setTierModal(null); setMembers([]) }}
-        title={tierModal ? `${tierModal.label} — ${tierModal.commission}` : ''}>
-        <div className="max-h-72 overflow-y-auto space-y-2">
+        title={tierModal ? `${tierModal.label} — ${tierModal.commission}` : ''}
+        containerStyle={{ paddingBottom: '80px' }}>
+        <div className="overflow-y-auto space-y-2" style={{ maxHeight: "60vh" }}>
           {membersLoading ? <Spinner size="sm" /> : members.length === 0
             ? <EmptyState message="No members in this tier yet" icon="👥" />
             : members.map((m, i) => (

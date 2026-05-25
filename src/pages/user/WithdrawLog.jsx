@@ -20,7 +20,7 @@ const WithdrawLog = () => {
   useEffect(() => { ;(async () => { await load() })() }, [load])
 
   return (
-    <div className="min-h-dvh bg-surface pb-8">
+    <div className="min-h-dvh pb-8">
       <PageHeader title="Withdrawal Records" />
       <div className="px-4 mt-4 space-y-3">
         {loading ? <Spinner /> : items.length === 0

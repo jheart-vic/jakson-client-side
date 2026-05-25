@@ -462,7 +462,7 @@ const Dashboard = () => {
     }
 
     return (
-        <div className='min-h-dvh bg-surface pb-24'>
+        <div className='min-h-dvh pb-24'>
             {/* Top bar */}
             <div
                 style={{
@@ -477,7 +477,7 @@ const Dashboard = () => {
                             <button
                                 onClick={() => navigate('/')}
                                 className='flex items-center gap-2.5 cursor-pointer'
-                                aria-label="Back to Home"
+                                aria-label='Back to Home'
                             >
                                 <img
                                     src='/logo.jpeg'
@@ -501,9 +501,13 @@ const Dashboard = () => {
                         </div>
                         <div className='flex items-center gap-2'>
                             <button
-                                onClick={() => navigate('/main/notifications?tab=announcements')}
+                                onClick={() =>
+                                    navigate(
+                                        '/main/notifications?tab=announcements',
+                                    )
+                                }
                                 className='relative w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform'
-                                aria-label="Notifications"
+                                aria-label='Notifications'
                             >
                                 <Bell size={16} />
                                 {unreadNotifCount > 0 && (
@@ -516,13 +520,13 @@ const Dashboard = () => {
                             </button>
                             <button
                                 className='w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform'
-                                aria-label="QR Code"
+                                aria-label='QR Code'
                             >
                                 <QrCode size={16} />
                             </button>
                             <button
                                 className='w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white active:scale-95 transition-transform'
-                                aria-label="Currency"
+                                aria-label='Currency'
                             >
                                 <span className='text-center leading-none'>
                                     🇳🇬
@@ -551,7 +555,11 @@ const Dashboard = () => {
                                 <button
                                     onClick={() => setShowBalance(!showBalance)}
                                     className='text-white/80 hover:text-white transition-colors'
-                                    aria-label={showBalance ? "Hide balance" : "Show balance"}
+                                    aria-label={
+                                        showBalance
+                                            ? 'Hide balance'
+                                            : 'Show balance'
+                                    }
                                 >
                                     {showBalance ? (
                                         <EyeOff size={18} />
@@ -581,7 +589,8 @@ const Dashboard = () => {
                             </button>
                         </div>
 
-                        <div className='grid grid-cols-3 gap-2 pt-3 border-t text-surface'>
+                        {/* Stats - Stack on mobile, grid on desktop */}
+                        <div className='flex flex-col gap-2 pt-3 border-t text-surface md:grid md:grid-cols-3 md:gap-2'>
                             {[
                                 { label: 'Today', val: bal.todayEarnings },
                                 {
@@ -590,12 +599,15 @@ const Dashboard = () => {
                                 },
                                 { label: 'Total', val: bal.totalEarnings },
                             ].map(({ label, val }) => (
-                                <div key={label} className='text-center'>
+                                <div
+                                    key={label}
+                                    className='flex items-center justify-between md:flex-col md:justify-center md:text-center'
+                                >
+                                    <p className='text-surface text-[10px] font-medium'>
+                                        {label}
+                                    </p>
                                     <p className='text-white font-bold text-sm leading-none'>
                                         {fmtUSD(val)}
-                                    </p>
-                                    <p className='text-surface text-[10px] font-medium mt-1'>
-                                        {label}
                                     </p>
                                 </div>
                             ))}
@@ -646,7 +658,9 @@ const Dashboard = () => {
             {/* Company profile link */}
             <div className='px-4 mt-3 animate-slide-up delay-200'>
                 <button
-                    onClick={() => window.open('https://jaksonsolar.org/about', '_blank')}
+                    onClick={() =>
+                        window.open('https://jaksonsolar.org/about', '_blank')
+                    }
                     className='w-full flex items-center gap-3 bg-white rounded-2xl p-4 shadow-card active:scale-[0.99] transition-transform border border-gray-100'
                 >
                     <div className='w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center shrink-0'>
@@ -708,7 +722,11 @@ const Dashboard = () => {
                             Announcements
                         </p>
                         <button
-                            onClick={() => navigate('/main/notifications?tab=announcements')}
+                            onClick={() =>
+                                navigate(
+                                    '/main/notifications?tab=announcements',
+                                )
+                            }
                             className='text-xs text-primary font-bold cursor-pointer'
                         >
                             View all
@@ -781,13 +799,22 @@ const Dashboard = () => {
                                         {n.bonusCode && (
                                             <div className='mt-2 flex items-center gap-2'>
                                                 <div className='flex items-center gap-1.5 bg-purple-50 border border-purple-200 rounded-xl px-2.5 py-1.5 flex-1 min-w-0'>
-                                                    <Gift size={11} className='text-purple-500 shrink-0' />
-                                                    <span className='text-purple-700 font-extrabold text-xs tracking-widest truncate'>{n.bonusCode}</span>
+                                                    <Gift
+                                                        size={11}
+                                                        className='text-purple-500 shrink-0'
+                                                    />
+                                                    <span className='text-purple-700 font-extrabold text-xs tracking-widest truncate'>
+                                                        {n.bonusCode}
+                                                    </span>
                                                 </div>
                                                 <button
                                                     onClick={() => {
-                                                        navigator.clipboard.writeText(n.bonusCode)
-                                                        toast.success('Bonus code copied!')
+                                                        navigator.clipboard.writeText(
+                                                            n.bonusCode,
+                                                        )
+                                                        toast.success(
+                                                            'Bonus code copied!',
+                                                        )
                                                     }}
                                                     className='flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-xl shrink-0 bg-purple-50 text-purple-600 border border-purple-200 active:scale-95 transition-transform'
                                                 >
@@ -835,7 +862,7 @@ const Dashboard = () => {
                         </p>
                     </div>
                     <a
-                        href='https://t.me/Luminos_Energy_manager'
+                        href='https://t.me/+FywiCmE-6hVlYjU0'
                         target='_blank'
                         rel='noopener noreferrer'
                         className='block'

@@ -100,7 +100,7 @@ const Invest = () => {
             : products
 
     return (
-        <div className='min-h-dvh bg-surface pb-28'>
+        <div className='min-h-dvh pb-28'>
             {/* Header */}
             <div
                 style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}

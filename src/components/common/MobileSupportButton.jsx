@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { X, Headphones } from 'lucide-react'
 
 const WHATSAPP_URL = 'https://wa.me/447470059551'
-const TELEGRAM_URL = 'https://t.me/Luminos_Energy_manager'
+const TELEGRAM_URL = 'https://t.me/Cs_luminos_Energy'
 
 const MobileSupportButton = () => {
   const [open, setOpen] = useState(false)

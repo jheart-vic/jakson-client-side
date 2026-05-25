@@ -72,7 +72,7 @@ useEffect(() => { ;(async () => { await loadData() })() }, [loadData])
 
   if (loading) {
     return (
-      <div className="min-h-dvh bg-surface">
+      <div className="min-h-dvh ">
         <PageHeader
           title="Wealth Funds"
           right={

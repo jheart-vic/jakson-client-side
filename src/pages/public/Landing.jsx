@@ -72,7 +72,7 @@ const NavActions = ({ mobile }) => {
                 className={`font-bold text-white transition-all active:scale-95 ${
                     mobile
                         ? 'text-center py-3 rounded-xl text-sm block'
-                        : 'px-4 py-2 rounded-xl text-sm'
+                        : 'px-4 py-2 rounded-xl text-sm hidden md:block'
                 }`}
                 style={{ background: 'linear-gradient(135deg,#C67B2C,#A25F1F)', boxShadow: '0 4px 12px rgba(198,123,44,0.4)' }}
             >
@@ -158,10 +158,10 @@ const Navbar = () => {
             }}
         >
             <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                {/* Logo */}
+                {/* Logo - text hidden on mobile */}
                 <div className="flex items-center gap-2.5">
                     <img src="/logo.jpeg" alt="Luminos Energy" className="w-9 h-9 rounded-xl object-cover" />
-                    <div>
+                    <div className="hidden sm:block">
                         <span className="text-white font-extrabold text-sm leading-tight block">Luminos Energy</span>
                         <span className="text-white/50 text-[10px] leading-tight block">Solar Investment</span>
                     </div>
@@ -261,14 +261,16 @@ const Landing = () => {
                     style={{ background: 'radial-gradient(circle,rgba(101,155,94,0.15) 0%,transparent 70%)', filter: 'blur(40px)' }} />
 
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pt-20 pb-16">
-                    {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6 border"
+                    {/* Badge - responsive text */}
+                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full mb-6 border max-w-full"
                         style={{ background: 'rgba(198,123,44,0.12)', borderColor: 'rgba(198,123,44,0.3)' }}>
-                        <span className="text-yellow-400 text-xs">⚡</span>
-                        <span className="text-xs font-bold" style={{ color: '#C67B2C' }}>Nigeria's Leading Solar Investment Platform</span>
+                        <span className="text-yellow-400 text-xs shrink-0">⚡</span>
+                        <span className="text-[10px] sm:text-xs font-bold whitespace-normal text-center" style={{ color: '#C67B2C' }}>
+                            Nigeria's Leading Solar Investment Platform
+                        </span>
                     </div>
 
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6"
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6"
                         style={{ letterSpacing: '-0.02em' }}>
                         Earn Daily Returns<br />
                         <span style={{ background: 'linear-gradient(135deg,#C67B2C,#F5C26B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
@@ -276,37 +278,41 @@ const Landing = () => {
                         </span>
                     </h1>
 
-                    <p className="text-white/60 text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
+                    <p className="text-white/60 text-base md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto px-2">
                         Invest in real solar energy infrastructure. Earn consistent weekday income.
                         Withdraw to your bank account anytime.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
                         <AuthCTA
-                            className="flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold text-white transition-all active:scale-95"
+                            className="flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-sm sm:text-base font-bold text-white transition-all active:scale-95"
                             style={{ background: 'linear-gradient(135deg,#C67B2C,#A25F1F)', boxShadow: '0 8px 32px rgba(198,123,44,0.45)' }}
                         >
                             Start Earning Free <ChevronRight size={18} />
                         </AuthCTA>
                         <Link
                             to="/login"
-                            className="flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold text-white/80 hover:text-white border border-white/20 hover:border-white/40 transition-all"
+                            className="flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-sm sm:text-base font-bold text-white/80 hover:text-white border border-white/20 hover:border-white/40 transition-all"
                         >
                             Sign In to Account
                         </Link>
                     </div>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
+                    {/* Stats - Fixed for small screens */}
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4 max-w-lg mx-auto">
                         {[
                             { val: '12,000+', label: 'Active Investors' },
                             { val: 'Up to 3%', label: 'Daily Returns' },
                             { val: '4.9 ★', label: 'App Rating' },
                         ].map(({ val, label }) => (
-                            <div key={label} className="rounded-2xl p-4 border"
+                            <div key={label} className="rounded-2xl p-2 sm:p-4 border text-center"
                                 style={{ background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.1)' }}>
-                                <p className="text-white font-extrabold text-xl leading-tight">{val}</p>
-                                <p className="text-white/45 text-xs mt-1 font-medium">{label}</p>
+                                <p className="text-white font-extrabold text-sm sm:text-xl leading-tight wrap-break-word">
+                                    {val}
+                                </p>
+                                <p className="text-white/45 text-[9px] sm:text-xs mt-1 font-medium wrap-break-word">
+                                    {label}
+                                </p>
                             </div>
                         ))}
                     </div>
@@ -319,7 +325,8 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* ── HOW IT WORKS ── */}
+            {/* ── Rest of the sections remain the same ── */}
+            {/* HOW IT WORKS */}
             <section id="how-it-works" className="py-20 px-4" style={{ background: '#1C1A18' }}>
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-14">
@@ -349,7 +356,7 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* ── FEATURES ── */}
+            {/* FEATURES */}
             <section className="py-20 px-4" style={{ background: '#f5f3ef' }}>
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-14">
@@ -374,7 +381,7 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* ── PLANS ── */}
+            {/* PLANS */}
             <section id="plans" className="py-20 px-4" style={{ background: '#1C1A18' }}>
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-14">
@@ -399,7 +406,6 @@ const Landing = () => {
                                         Most Popular
                                     </div>
                                 )}
-                                {/* Product image */}
                                 <div className="w-full h-36 overflow-hidden">
                                     <img src={plan.image} alt={plan.name}
                                         className="w-full h-full object-cover"
@@ -446,7 +452,7 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* ── TESTIMONIALS ── */}
+            {/* TESTIMONIALS */}
             <section id="testimonials" className="py-20 px-4" style={{ background: '#f5f3ef' }}>
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-14">
@@ -487,7 +493,7 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* ── FAQ ── */}
+            {/* FAQ */}
             <section id="faq" className="py-20 px-4" style={{ background: '#f5f3ef' }}>
                 <div className="max-w-3xl mx-auto">
                     <div className="text-center mb-12">
@@ -501,7 +507,7 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* ── CTA BANNER ── */}
+            {/* CTA BANNER */}
             <section className="py-20 px-4" style={{ background: 'linear-gradient(135deg,#1C1A18 0%,#2D1F0E 100%)' }}>
                 <div className="max-w-3xl mx-auto text-center">
                     <img src="/logo.jpeg" alt="Luminos Energy" className="w-20 h-20 rounded-2xl object-cover mx-auto mb-6"
@@ -526,11 +532,10 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* ── FOOTER ── */}
+            {/* FOOTER */}
             <footer style={{ background: '#111110' }}>
                 <div className="max-w-5xl mx-auto px-4 py-12">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
-                        {/* Brand */}
                         <div className="md:col-span-2">
                             <div className="flex items-center gap-2.5 mb-4">
                                 <img src="/logo.jpeg" alt="Luminos Energy" className="w-10 h-10 rounded-xl object-cover" />
@@ -544,7 +549,6 @@ const Landing = () => {
                             </p>
                         </div>
 
-                        {/* Links */}
                         <div>
                             <p className="text-white font-bold text-sm mb-4">Platform</p>
                             <div className="space-y-2.5">
@@ -554,7 +558,6 @@ const Landing = () => {
                             </div>
                         </div>
 
-                        {/* Support */}
                         <div>
                             <p className="text-white font-bold text-sm mb-4">Support</p>
                             <div className="space-y-2.5">

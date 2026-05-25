@@ -42,7 +42,7 @@ const FundingDetails = () => {
   useEffect(() => { ;(async () => { await load(tab) })() }, [load, tab])
 
   return (
-    <div className="min-h-dvh bg-surface pb-8">
+    <div className="min-h-dvh pb-8">
       <PageHeader title="Funding Details" />
 
       {/* Tabs */}

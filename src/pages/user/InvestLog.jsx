@@ -67,7 +67,7 @@ const InvestLog = () => {
   }
 
   return (
-    <div className="min-h-dvh bg-surface pb-8">
+    <div className="min-h-dvh pb-8">
       <PageHeader title="Investment Records" />
 
       <div className="px-4 mt-4 space-y-3">
