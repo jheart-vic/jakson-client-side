@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
     Bell,
     Gift,
@@ -15,6 +16,7 @@ import {
     MailOpen,
     Loader2,
     Eye,
+    AlertTriangle,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import PageHeader from '../../components/layout/PageHeader'
@@ -26,6 +28,7 @@ import {
     deleteAllNotifications,
 } from '../../api/notification'
 import { handleApiError } from '../../utils/errorHandler'
+import { getAnnouncements } from '../../api/settings'
 
 const TYPE_META = {
     deposit: {
@@ -86,6 +89,7 @@ const TYPE_META = {
 
 const FILTERS = [
     { key: 'all', label: 'All' },
+    { key: 'announcements', label: '📢 Announcements' },
     { key: 'unread', label: 'Unread' },
     { key: 'bonus_code', label: 'Bonus' },
     { key: 'deposit', label: 'Deposit' },
@@ -111,9 +115,14 @@ const Notifications = () => {
     const [notifications, setNotifications] = useState([])
     const [unreadCount, setUnreadCount] = useState(0)
     const [loading, setLoading] = useState(true)
-    const [activeFilter, setActiveFilter] = useState('all')
+    const { search } = useLocation()
+    const initTab = new URLSearchParams(search).get('tab') || 'all'
+    const [activeFilter, setActiveFilter] = useState(initTab)
     const [copiedId, setCopiedId] = useState(null)
     const [actionLoading, setActionLoading] = useState(null)
+    const [announcements, setAnnouncements] = useState([])
+    const [announcementsLoading, setAnnouncementsLoading] = useState(false)
+    const [copiedCode, setCopiedCode] = useState(null)
 
     const load = useCallback(async (filter) => {
         setLoading(true)
@@ -132,11 +141,22 @@ const Notifications = () => {
         }
     }, [])
 
+    const loadAnnouncements = useCallback(async () => {
+        setAnnouncementsLoading(true)
+        try {
+            const { data } = await getAnnouncements()
+            setAnnouncements(data?.notifications || [])
+        } catch { /* silent */ }
+        finally { setAnnouncementsLoading(false) }
+    }, [])
+
     useEffect(() => {
-        ;(async () => {
-            await load(activeFilter)
-        })()
-    }, [load, activeFilter])
+        if (activeFilter === 'announcements') {
+            ;(async () => { await loadAnnouncements() })()
+        } else {
+            ;(async () => { await load(activeFilter) })()
+        }
+    }, [load, loadAnnouncements, activeFilter])
 
     const handleMarkRead = async (id) => {
         if (actionLoading) return
@@ -247,7 +267,75 @@ const Notifications = () => {
                 ))}
             </div>
 
-            {/* List */}
+
+            {/* ── Announcements tab ── */}
+            {activeFilter === 'announcements' && (
+                <div className='px-4 mt-3 space-y-3'>
+                    {announcementsLoading ? (
+                        <div className='flex justify-center py-20'>
+                            <div className='w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin' />
+                        </div>
+                    ) : announcements.length === 0 ? (
+                        <div className='flex flex-col items-center justify-center py-24 text-center'>
+                            <div className='w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4'>
+                                <Bell size={28} className='text-gray-300' />
+                            </div>
+                            <p className='text-gray-400 font-semibold text-sm'>No announcements yet</p>
+                        </div>
+                    ) : announcements.map((n) => {
+                        const colorMap = { info: '#1a9fd4', success: '#10b981', warning: '#f97316', bonus: '#8b5cf6' }
+                        const bgMap   = { info: '#e0f4fc', success: '#ecfdf5', warning: '#fff4ed', bonus: '#ede9fe' }
+                        const IconMap = { info: Info, success: CheckCircle2, warning: AlertTriangle, bonus: Gift }
+                        const Icon = IconMap[n.type] || Bell
+                        return (
+                            <div key={n._id} className='bg-white rounded-2xl p-4 border border-gray-100 shadow-card'>
+                                <div className='flex items-start gap-3'>
+                                    <div className='w-10 h-10 rounded-xl flex items-center justify-center shrink-0'
+                                        style={{ backgroundColor: bgMap[n.type] || '#f3f4f6' }}>
+                                        <Icon size={18} style={{ color: colorMap[n.type] || '#6b7280' }} strokeWidth={2} />
+                                    </div>
+                                    <div className='flex-1 min-w-0'>
+                                        <div className='flex items-center justify-between gap-2 mb-1'>
+                                            <p className='text-sm font-bold text-gray-800 leading-tight'>{n.title}</p>
+                                            <span className='text-[10px] text-gray-400 font-medium shrink-0'>{timeAgo(n.createdAt)}</span>
+                                        </div>
+                                        <p className='text-xs text-gray-500 leading-relaxed'>{n.body}</p>
+                                        {/* Bonus code — shown with copy button */}
+                                        {n.bonusCode && (
+                                            <div className='mt-2.5 flex items-center gap-2'>
+                                                <div className='flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-xl px-3 py-1.5 flex-1 min-w-0'>
+                                                    <Gift size={12} className='text-purple-500 shrink-0' />
+                                                    <span className='text-purple-700 font-extrabold text-xs tracking-widest truncate'>{n.bonusCode}</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(n.bonusCode)
+                                                        setCopiedCode(n._id)
+                                                        toast.success('Code copied!')
+                                                        setTimeout(() => setCopiedCode(null), 2000)
+                                                    }}
+                                                    className='flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-xl shrink-0 transition-all active:scale-95'
+                                                    style={{
+                                                        background: copiedCode === n._id ? '#ecfdf5' : '#ede9fe',
+                                                        color:      copiedCode === n._id ? '#10b981' : '#8b5cf6',
+                                                    }}
+                                                >
+                                                    {copiedCode === n._id
+                                                        ? <><Check size={11} /> Copied</>
+                                                        : <><Copy size={11} /> Copy</>}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
+
+            {/* ── Personal notifications list ── */}
+            {activeFilter !== 'announcements' && (
             <div className='px-4 mt-3 space-y-2'>
                 {loading ? (
                     <div className='flex justify-center py-20'>
@@ -401,6 +489,7 @@ const Notifications = () => {
                     })
                 )}
             </div>
+            )}
         </div>
     )
 }
