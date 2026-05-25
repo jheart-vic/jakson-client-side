@@ -104,7 +104,7 @@ const ChangePassword = () => {
   }
 
   return (
-    <div className="min-h-dvh bg-surface pb-8">
+    <div className="min-h-dvh pb-8">
       <PageHeader title="Change Password" />
 
       <form onSubmit={handleSubmit} className="px-4 mt-6 space-y-4">

@@ -12,24 +12,26 @@ const UserLayout = () => {
     <>
       <DesktopSidebar />
 
-      {/* Watermark — logo.png as fixed background watermark */}
-      <div
+      {/* Logo watermark */}
+      <img
         aria-hidden="true"
+        src="/logo.jpeg"
+        alt=""
         style={{
-          position:           'fixed',
-          top:                '50%',
-          left:               '50%',
-          transform:          'translate(-50%, -50%)',
-          width:              'min(100vw, 700px)',
-          height:             'min(100vw, 700px)',
-          backgroundImage:    "url('/logo.png')",
-          backgroundSize:     'contain',
-          backgroundRepeat:   'no-repeat',
-          backgroundPosition: 'center',
-          opacity:            0.05,  // Increased to 25% for better visibility
-          pointerEvents:      'none',
-          zIndex:             5,
-          userSelect:         'none',
+          position:      'fixed',
+          top:           '50%',
+          left:          '50%',
+          transform:     'translate(-50%, -50%)',
+          width:         'min(65vw, 380px)',
+          maxWidth:      '380px',
+          minWidth:      '140px',
+          opacity:       0.05,
+          filter:        'invert(1) hue-rotate(180deg)',
+          pointerEvents: 'none',
+          zIndex:        5,
+          userSelect:    'none',
+          display:       'block',
+          objectFit:     'contain',
         }}
       />
 
@@ -37,10 +39,11 @@ const UserLayout = () => {
         <DesktopHeader />
         <main
           key={pathname}
-          className="flex-1 pb-20 lg:pb-8 lg:bg-gray-50"
+          className="flex-1 pb-20 lg:pb-8 bg-surface lg:bg-gray-50"
           style={{ animation: 'fadeIn 0.2s ease both' }}
         >
-          <div className="lg:max-w-3xl lg:mx-auto lg:px-4 lg:py-6">
+          {/* Content container - centered with max width */}
+          <div className="w-full max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-6">
             <Outlet />
           </div>
         </main>

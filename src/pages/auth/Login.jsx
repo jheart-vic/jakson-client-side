@@ -100,7 +100,7 @@ const Login = () => {
         <div className="relative z-10 grid grid-cols-2 gap-4">
           {[
             { label: 'Active Investors', val: '12,000+' },
-            { label: 'Daily Returns',    val: 'Up to 3%'  },
+            { label: 'Daily Returns',    val: 'Up to 8%'  },
             { label: 'Platform Rating',  val: '4.9 ★'     },
             { label: 'Established',      val: '2022'       },
           ].map(({ label, val }) => (

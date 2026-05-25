@@ -49,7 +49,7 @@ const BindBank = () => {
   if (loading) return <div className="min-h-dvh bg-surface"><PageHeader title="Bind Bank" /><Spinner /></div>
 
   return (
-    <div className="min-h-dvh bg-surface pb-8">
+    <div className="min-h-dvh pb-8">
       <PageHeader title="Bind Bank Account" />
 
       <form onSubmit={handleSubmit} className="px-4 mt-4 space-y-4">

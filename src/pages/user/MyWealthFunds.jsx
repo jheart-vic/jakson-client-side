@@ -60,7 +60,7 @@ useEffect(() => { ;(async () => { await loadFunds() })() }, [loadFunds])
   }
 
   return (
-    <div className="min-h-dvh pb-24 bg-surface">
+    <div className="min-h-dvh pb-24 ">
       <PageHeader title="My Wealth Funds" />
       <div className="p-4 space-y-4">
         {funds.length === 0 ? (
