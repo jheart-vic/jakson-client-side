@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
+import { useCallback } from 'react'
+import { useEffect } from 'react'
 // eslint-disable-next-line no-unused-vars
 import { Clock, TrendingUp, CheckCircle2, XCircle } from 'lucide-react'
-import { getMyInvestments, claimDailyIncome } from '../../api/invest'
+import { getMyInvestments, claimInvestmentIncome } from '../../api/invest'
 import { fmtUSD } from '../../utils/currency'
 import { fmtDateTime } from '../../utils/date'
 import PageHeader from '../../components/layout/PageHeader'
-import Spinner from '../../components/common/Spinner'
+import Skeleton from '../../components/common/Skeleton'
 import EmptyState from '../../components/common/EmptyState'
 import { handleApiError } from '../../utils/errorHandler'
 import toast from 'react-hot-toast'
@@ -34,15 +36,47 @@ const weekdaysRemaining = (expiryDate) => {
   while (cursor < expiry) {
     cursor.setDate(cursor.getDate() + 1)
     const dow = cursor.getDay()
-    if (dow !== 0 && dow !== 6) count++ // skip Sun(0) and Sat(6)
+    if (dow !== 0 && dow !== 6) count++
   }
   return count
 }
 
+// Skeleton that mirrors the exact card layout below
+const InvestCardSkeleton = () => (
+  <div className="card">
+    <div className="p-4">
+      {/* Header row */}
+      <div className="flex items-start justify-between mb-3 gap-2">
+        <div className="min-w-0">
+          <Skeleton width={150} height={14} />
+          <Skeleton width={90} height={20} borderRadius={20} className="mt-1.5" />
+        </div>
+        <div className="shrink-0 text-right">
+          <Skeleton width={40} height={10} />
+          <Skeleton width={80} height={13} className="mt-1" />
+        </div>
+      </div>
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-gray-50 rounded-xl p-2.5">
+            <Skeleton width={60} height={10} />
+            <Skeleton width={80} height={14} className="mt-1" />
+          </div>
+        ))}
+      </div>
+      {/* Progress bar */}
+      <Skeleton width={120} height={10} className="mb-1" />
+      <Skeleton height={6} borderRadius={99} />
+    </div>
+  </div>
+)
+
 const InvestLog = () => {
   const [items,    setItems]    = useState([])
   const [loading,  setLoading]  = useState(true)
-  const [claiming, setClaiming] = useState(false)
+  // Keyed by investment _id — each card has its own loading state
+  const [claiming, setClaiming] = useState({}) // { [invId]: boolean }
 
   const load = useCallback(async () => {
     try { const { data } = await getMyInvestments(); setItems(data.investments) }
@@ -52,17 +86,18 @@ const InvestLog = () => {
 
   useEffect(() => { (async () => { await load() })() }, [load])
 
-  // All investments share the same user-level pending pool — one claim clears all
-  const handleClaim = async () => {
-    setClaiming(true)
+  // Each investment is claimed independently.
+  // Only that card's button shows a spinner; others remain interactive.
+  const handleClaim = async (invId, productName) => {
+    setClaiming(prev => ({ ...prev, [invId]: true }))
     try {
-      const { data } = await claimDailyIncome()
-      toast.success(`Claimed! +${fmtUSD(data.amountClaimed)} 💰`)
-      load() // reload to reflect cleared pendingIncome on each card
+      const { data } = await claimInvestmentIncome(invId)
+      toast.success(`${productName}: +${fmtUSD(data.amountClaimed)} claimed! 💰`)
+      await load() // wait for fresh data before re-enabling this button
     } catch (err) {
       handleApiError(err, 'Nothing to claim right now')
     } finally {
-      setClaiming(false)
+      setClaiming(prev => ({ ...prev, [invId]: false }))
     }
   }
 
@@ -71,7 +106,9 @@ const InvestLog = () => {
       <PageHeader title="Investment Records" />
 
       <div className="px-4 mt-4 space-y-3">
-        {loading ? <Spinner /> : items.length === 0
+        {loading
+          ? [...Array(3)].map((_, i) => <InvestCardSkeleton key={i} />)
+          : items.length === 0
           ? <EmptyState message="No investments yet" icon="📊" />
           : items.map((inv, i) => {
             const s              = STATUS_MAP[inv.status] || STATUS_MAP.in_progress
@@ -81,6 +118,7 @@ const InvestLog = () => {
             const progress       = (inv.daysElapsed / totalDays) * 100
             const clampedPct     = Math.min(100, Math.max(0, progress))
             const isExpiringSoon = inv.status === 'in_progress' && days <= 3
+            const isThisClaiming = !!claiming[inv._id]
 
             return (
               <div key={inv._id} className="card animate-slide-up" style={{ animationDelay: `${i * 0.05}s` }}>
@@ -162,18 +200,18 @@ const InvestLog = () => {
                               </p>
                               <p className="text-[10px] font-medium text-gray-400">
                                 {days > 0
-                                  ? `${days} weekday${days === 1 ? '' : 's'} left · Forfeited at midnight`
-                                  : 'Forfeited at midnight'}
+                                  ? `${days} weekday${days === 1 ? '' : 's'} left · Forfeited tomorrow morning`
+                                  : 'Forfeited tomorrow morning'}
                               </p>
                             </div>
                           </div>
                           <button
-                            onClick={handleClaim}
-                            disabled={claiming}
+                            onClick={() => handleClaim(inv._id, inv.productSnapshot?.name)}
+                            disabled={isThisClaiming}
                             className="text-xs font-extrabold px-4 py-2 rounded-xl active:scale-95 transition-transform disabled:opacity-60 text-white"
                             style={{ background: 'linear-gradient(135deg,#C67B2C,#A25F1F)' }}
                           >
-                            {claiming
+                            {isThisClaiming
                               ? <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin-slow inline-block" />
                               : 'Claim'
                             }

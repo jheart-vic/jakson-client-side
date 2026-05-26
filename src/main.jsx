@@ -1,30 +1,31 @@
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { SkeletonTheme } from 'react-loading-skeleton'
 import { AuthProvider } from './context/AuthContext'
-import { LoadingProvider } from './context/LoadingContext'
 import { NetworkProvider } from './context/NetworkContext'
 import { OnboardingProvider } from './context/OnboardingContext'
 import App from './App'
-import GlobalLoader from './components/common/GlobalLoader'
 import WelcomeModal from './components/onboarding/WelcomeModal'
 import TourOverlay from './components/onboarding/TourOverlay'
-
+import 'react-loading-skeleton/dist/skeleton.css'
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <NetworkProvider>
       <AuthProvider>
-        <LoadingProvider>
-          <OnboardingProvider>
+        <OnboardingProvider>
+          {/* Global skeleton theme — matches app's warm surface palette */}
+          <SkeletonTheme
+            baseColor="#ede9e3"
+            highlightColor="#f7f4f0"
+            borderRadius="10px"
+            duration={1.5}
+          >
             <App />
-            <GlobalLoader />
-
-            {/* ── Onboarding layer (above everything) ── */}
             <WelcomeModal />
             <TourOverlay />
-
             <Toaster
               position="top-center"
               toastOptions={{
@@ -44,8 +45,8 @@ createRoot(document.getElementById('root')).render(
                 },
               }}
             />
-          </OnboardingProvider>
-        </LoadingProvider>
+          </SkeletonTheme>
+        </OnboardingProvider>
       </AuthProvider>
     </NetworkProvider>
   </BrowserRouter>

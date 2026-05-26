@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-assignment */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Skeleton from 'react-loading-skeleton'
+// import 'react-loading-skeleton/dist/skeleton.css'
 import {
     QrCode,
     ArrowDownCircle,
@@ -461,6 +463,92 @@ const Dashboard = () => {
         return '*****'
     }
 
+    // ── Skeleton version of the whole dashboard ──
+    if (loading) {
+        return (
+            <div className='min-h-dvh pb-24'>
+                {/* Top gradient area */}
+                <div
+                    style={{
+                        background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)',
+                    }}
+                >
+                    <div className='h-safe-top' />
+                    <div className='px-4 pt-3 pb-1'>
+                        <div className='flex items-center justify-between mb-4'>
+                            <div className='flex items-center gap-2.5'>
+                                <Skeleton circle width={36} height={36} />
+                                <div>
+                                    <Skeleton width={100} height={16} />
+                                    <Skeleton width={80} height={10} className='mt-1' />
+                                </div>
+                            </div>
+                            <div className='flex items-center gap-2'>
+                                <Skeleton width={36} height={36} borderRadius={12} />
+                                <Skeleton width={36} height={36} borderRadius={12} />
+                                <Skeleton width={36} height={36} borderRadius={12} />
+                            </div>
+                        </div>
+
+                        {/* Balance card skeleton */}
+                        <div className='bg-white/12 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20'>
+                            <Skeleton width={100} height={12} />
+                            <div className='flex items-center gap-2 mt-1'>
+                                <Skeleton width={120} height={32} />
+                                <Skeleton circle width={24} height={24} />
+                            </div>
+                            <Skeleton width={140} height={12} className='mt-1 mb-3' />
+                            <div className='flex gap-2.5 mb-3'>
+                                <Skeleton width='100%' height={42} borderRadius={12} />
+                                <Skeleton width='100%' height={42} borderRadius={12} />
+                            </div>
+                            <div className='flex justify-between pt-3 border-t border-white/20'>
+                                <Skeleton width={80} height={20} />
+                                <Skeleton width={80} height={20} />
+                                <Skeleton width={80} height={20} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Quick actions skeleton */}
+                <div className='px-4 mt-4'>
+                    <div className='grid grid-cols-3 gap-3'>
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className='flex flex-col items-center gap-2 py-3'>
+                                <Skeleton circle width={48} height={48} />
+                                <Skeleton width={50} height={14} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Carousel skeleton */}
+                <div className='px-4 mt-4'>
+                    <Skeleton height={170} borderRadius={16} />
+                </div>
+
+                {/* Company profile skeleton */}
+                <div className='px-4 mt-3'>
+                    <Skeleton height={78} borderRadius={16} />
+                </div>
+
+                {/* Invite banner skeleton */}
+                <div className='px-4 mt-3'>
+                    <Skeleton height={86} borderRadius={16} />
+                </div>
+
+                {/* FAQ skeleton */}
+                <div className='px-4 mt-4'>
+                    <Skeleton width={200} height={20} />
+                    <div className='space-y-2 mt-3'>
+                        <Skeleton height={56} borderRadius={16} count={3} />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className='min-h-dvh pb-24'>
             {/* Top bar */}
@@ -535,7 +623,6 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Rest of your component remains the same... */}
                     {/* Balance card */}
                     <div
                         data-tour='balance-card'
@@ -545,30 +632,26 @@ const Dashboard = () => {
                             Funding Account
                         </p>
 
-                        {loading ? (
-                            <div className='h-8 w-28 skeleton rounded-lg bg-white/20' />
-                        ) : (
-                            <div className='flex items-center gap-2 mt-1'>
-                                <p className='text-white text-2xl font-bold tracking-tight leading-none'>
-                                    {maskedBalance()}
-                                </p>
-                                <button
-                                    onClick={() => setShowBalance(!showBalance)}
-                                    className='text-white/80 hover:text-white transition-colors'
-                                    aria-label={
-                                        showBalance
-                                            ? 'Hide balance'
-                                            : 'Show balance'
-                                    }
-                                >
-                                    {showBalance ? (
-                                        <EyeOff size={18} />
-                                    ) : (
-                                        <Eye size={18} />
-                                    )}
-                                </button>
-                            </div>
-                        )}
+                        <div className='flex items-center gap-2 mt-1'>
+                            <p className='text-white text-2xl font-bold tracking-tight leading-none'>
+                                {maskedBalance()}
+                            </p>
+                            <button
+                                onClick={() => setShowBalance(!showBalance)}
+                                className='text-white/80 hover:text-white transition-colors'
+                                aria-label={
+                                    showBalance
+                                        ? 'Hide balance'
+                                        : 'Show balance'
+                                }
+                            >
+                                {showBalance ? (
+                                    <EyeOff size={18} />
+                                ) : (
+                                    <Eye size={18} />
+                                )}
+                            </button>
+                        </div>
 
                         <p className='text-surface text-xs mt-1 mb-3'>
                             {showBalance ? `≈ ${maskedNGN()}` : maskedNGN()}
@@ -589,7 +672,7 @@ const Dashboard = () => {
                             </button>
                         </div>
 
-                        {/* Stats - Stack on mobile, grid on desktop */}
+                        {/* Stats */}
                         <div className='flex flex-col gap-2 pt-3 border-t text-surface md:grid md:grid-cols-3 md:gap-2'>
                             {[
                                 { label: 'Today', val: bal.todayEarnings },

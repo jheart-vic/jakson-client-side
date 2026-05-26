@@ -4,8 +4,8 @@ import { getTransactions } from '../../api/wallet'
 import { fmtUSD } from '../../utils/currency'
 import { fmtDateTime } from '../../utils/date'
 import PageHeader from '../../components/layout/PageHeader'
-import Spinner from '../../components/common/Spinner'
 import EmptyState from '../../components/common/EmptyState'
+import Skeleton from '../../components/common/Skeleton'
 
 const TABS = [
   { key: '',    label: 'All' },
@@ -23,6 +23,17 @@ const CATEGORY_LABELS = {
   daily_checkin:  'Daily Check-in',
   refund:         'Refund',
 }
+
+const TxSkeleton = () => (
+  <div className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-card border border-gray-50">
+    <Skeleton circle width={40} height={40} />
+    <div className="flex-1">
+      <Skeleton width={120} height={13} />
+      <Skeleton width={85} height={11} className="mt-1.5" />
+    </div>
+    <Skeleton width={65} height={16} />
+  </div>
+)
 
 const FundingDetails = () => {
   const [tab, setTab]         = useState('')
@@ -59,36 +70,33 @@ const FundingDetails = () => {
       </div>
 
       <div className="px-4 mt-4 space-y-3">
-        {loading ? <Spinner /> : items.length === 0
-          ? <EmptyState message="No transactions yet" icon="📋" />
-          : items.map((tx, i) => {
-            const isIn = tx.type === 'in'
-            return (
-              <div key={tx._id} className="card animate-slide-up" style={{ animationDelay: `${i * 0.04}s` }}>
-                <div className="p-4 flex items-center gap-3">
-                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0
-                    ${isIn ? 'bg-success-light' : 'bg-danger-light'}`}>
-                    {isIn
-                      ? <ArrowDownLeft size={18} className="text-success" />
-                      : <ArrowUpRight  size={18} className="text-danger"  />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-gray-800">
-                      {CATEGORY_LABELS[tx.category] || tx.category}
+        {loading
+          ? [...Array(6)].map((_, i) => <TxSkeleton key={i} />)
+          : items.length === 0
+            ? <EmptyState message="No transactions found" icon="📋" />
+            : items.map((tx, i) => {
+                const isIn = tx.type === 'in'
+                return (
+                  <div key={tx._id} className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-card border border-gray-50 animate-slide-up"
+                    style={{ animationDelay: `${i * 0.04}s` }}>
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0
+                      ${isIn ? 'bg-success-light' : 'bg-danger-light'}`}>
+                      {isIn
+                        ? <ArrowDownLeft size={18} className="text-success" />
+                        : <ArrowUpRight  size={18} className="text-danger"  />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-gray-800 truncate">
+                        {CATEGORY_LABELS[tx.category] || tx.category}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">{fmtDateTime(tx.createdAt)}</p>
+                    </div>
+                    <p className={`text-sm font-extrabold shrink-0 ${isIn ? 'text-success' : 'text-danger'}`}>
+                      {isIn ? '+' : '-'}{fmtUSD(tx.amount)}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5 truncate">{tx.description || fmtDateTime(tx.createdAt)}</p>
-                    <p className="text-[10px] text-gray-300 mt-0.5">{fmtDateTime(tx.createdAt)}</p>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className={`font-extrabold text-base ${isIn ? 'text-success' : 'text-danger'}`}>
-                      {isIn ? '+' : '-'}{fmtUSD(tx.amountUSD)}
-                    </p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">Bal: {fmtUSD(tx.balanceAfter)}</p>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+                )
+              })}
       </div>
     </div>
   )

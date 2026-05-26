@@ -1,5 +1,13 @@
 @import 'tailwindcss';
 
+/* ── Skeleton Loader Overrides ──────────────────────────────────────────── */
+/* Matches Google's shimmer: smooth, 1.5s, left-to-right wave              */
+.react-loading-skeleton {
+    --animation-duration: 2.5s !important;
+    --animation-direction: normal !important;
+    border-radius: 10px;
+}
+
 @theme {
     --color-primary: #c67b2c;
     --color-primary-dark: #a25f1f;

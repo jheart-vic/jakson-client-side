@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext'
 import { fmtUSD, fmtNGN, toNGN } from '../../utils/currency'
 import { usePublicSettings } from '../../hooks/usePublicSettings'
 import Modal from '../../components/common/Modal'
+import Skeleton from '../../components/common/Skeleton'
 
 const Account = () => {
   const navigate = useNavigate()
@@ -58,6 +59,57 @@ const Account = () => {
     : null
 
   const avatarInitials = user?.initials || null
+
+  // ── Skeleton while user data is not yet available ────────────────────────
+  if (!user) {
+    return (
+      <div className="min-h-dvh pb-24">
+        {/* Header skeleton */}
+        <div style={{ background: 'linear-gradient(135deg, #C67B2C, #9E5E1F)' }}
+          className="px-4 pt-12 pb-16">
+          <div className="flex items-center gap-3">
+            <Skeleton
+              width={56} height={56} borderRadius={16}
+              baseColor="rgba(255,255,255,0.15)" highlightColor="rgba(255,255,255,0.28)"
+            />
+            <div>
+              <Skeleton width={130} height={16}
+                baseColor="rgba(255,255,255,0.15)" highlightColor="rgba(255,255,255,0.28)" />
+              <Skeleton width={90} height={12} className="mt-1.5"
+                baseColor="rgba(255,255,255,0.15)" highlightColor="rgba(255,255,255,0.28)" />
+              <Skeleton width={48} height={20} borderRadius={20} className="mt-1.5"
+                baseColor="rgba(255,255,255,0.15)" highlightColor="rgba(255,255,255,0.28)" />
+            </div>
+          </div>
+        </div>
+
+        {/* Balance card skeleton */}
+        <div className="px-4 -mt-8">
+          <div className="card card-p shadow-float">
+            <Skeleton width={100} height={11} />
+            <Skeleton width={140} height={28} className="mt-2" />
+            <Skeleton width={110} height={11} className="mt-1 mb-4" />
+            <div className="flex gap-2.5">
+              <Skeleton height={40} className="flex-1" borderRadius={12} />
+              <Skeleton height={40} className="flex-1" borderRadius={12} />
+            </div>
+          </div>
+        </div>
+
+        {/* Grid skeleton */}
+        <div className="px-4 mt-4">
+          <div className="grid grid-cols-3 gap-3">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-primary-deep/10 border border-primary/20">
+                <Skeleton circle width={40} height={40} />
+                <Skeleton width={60} height={10} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-dvh pb-24">

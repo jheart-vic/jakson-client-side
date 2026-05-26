@@ -10,6 +10,7 @@ import PageHeader from '../../components/layout/PageHeader'
 import Modal from '../../components/common/Modal'
 import { handleApiError } from '../../utils/errorHandler'
 import { usePublicSettings } from '../../hooks/usePublicSettings'
+import Skeleton from '../../components/common/Skeleton'
 
 const Withdraw = () => {
   const navigate = useNavigate()
@@ -108,8 +109,52 @@ const Withdraw = () => {
   // ── Loading state ─────────────────────────────────────────
   if (loading || settingsLoading) {
     return (
-      <div className="min-h-dvh bg-surface flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-dvh pb-8">
+        <PageHeader title="Withdraw" />
+        <div className="px-4 mt-4 space-y-4">
+
+          {/* Balance Card skeleton */}
+          <div className="card card-p text-center">
+            <Skeleton circle width={56} height={56} className="mx-auto mb-3" />
+            <Skeleton width={110} height={11} className="mx-auto" />
+            <Skeleton width={140} height={32} className="mx-auto mt-2" />
+            <Skeleton width={100} height={11} className="mx-auto mt-1" />
+          </div>
+
+          {/* Bank Account Card skeleton */}
+          <div className="card card-p">
+            <Skeleton width={130} height={11} className="mb-3" />
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl">
+              <Skeleton circle width={40} height={40} />
+              <div className="flex-1">
+                <Skeleton width={120} height={14} />
+                <Skeleton width={160} height={11} className="mt-1.5" />
+              </div>
+            </div>
+          </div>
+
+          {/* Amount Input Card skeleton */}
+          <div className="card card-p">
+            <Skeleton width={120} height={11} className="mb-3" />
+            <Skeleton height={52} borderRadius={16} />
+          </div>
+
+          {/* PIN Input Card skeleton */}
+          <div className="card card-p">
+            <Skeleton width={110} height={11} className="mb-3" />
+            <Skeleton height={52} borderRadius={16} />
+          </div>
+
+          {/* Rules skeleton */}
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 space-y-2">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} width={`${85 - i * 4}%`} height={12} />
+            ))}
+          </div>
+
+          {/* Submit button skeleton */}
+          <Skeleton height={56} borderRadius={16} />
+        </div>
       </div>
     )
   }

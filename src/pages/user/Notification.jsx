@@ -29,6 +29,7 @@ import {
 } from '../../api/notification'
 import { handleApiError } from '../../utils/errorHandler'
 import { getAnnouncements } from '../../api/settings'
+import Skeleton from '../../components/common/Skeleton'
 
 const TYPE_META = {
     deposit: {
@@ -225,50 +226,61 @@ const Notifications = () => {
         setTimeout(() => setCopiedId(null), 2000)
     }
 
+    // Compute unread directly from the loaded notifications as a reliable fallback
+    const unreadInList = notifications.filter(n => !n.isRead).length
+    const hasUnread = unreadCount > 0 || unreadInList > 0
+
+    // FIX: plain JSX variable instead of an inline component — avoids "component
+    // created during render" error while keeping identical markup and behaviour.
+    const actionBtn = hasUnread ? (
+        <button
+            onClick={handleMarkAllRead}
+            className="flex items-center gap-1 text-xs font-bold text-primary bg-primary-light px-2.5 py-1.5 rounded-xl"
+        >
+            <MailOpen size={12} /> Read all
+        </button>
+    ) : notifications.length > 0 ? (
+        <button
+            onClick={handleDeleteAll}
+            className="flex items-center gap-1 text-xs font-bold text-red-400 bg-red-50 px-2.5 py-1.5 rounded-xl"
+        >
+            <Trash2 size={12} /> Clear all
+        </button>
+    ) : null
+
     return (
         <div className='min-h-dvh pb-8'>
+            {/* Header: button only visible on mobile */}
             <PageHeader
                 title='Notifications'
-                right={
-                    unreadCount > 0 ? (
-                        <button
-                            onClick={handleMarkAllRead}
-                            className='flex items-center gap-1 text-xs font-bold text-primary bg-primary-light px-2.5 py-1.5 rounded-xl'
-                        >
-                            <MailOpen size={12} /> Read all
-                        </button>
-                    ) : notifications.length > 0 ? (
-                        <button
-                            onClick={handleDeleteAll}
-                            className='flex items-center gap-1 text-xs font-bold text-red-400 bg-red-50 px-2.5 py-1.5 rounded-xl'
-                        >
-                            <Trash2 size={12} /> Clear all
-                        </button>
-                    ) : null
-                }
+                right={<div className="lg:hidden">{actionBtn}</div>}
             />
 
-            {/* Filter tabs - wrapped, no overflow */}
-            <div className='flex flex-wrap gap-2 px-4 pt-3 pb-1'>
-                {FILTERS.map((f) => (
-                    <button
-                        key={f.key}
-                        onClick={() => setActiveFilter(f.key)}
-                        className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all
-              ${activeFilter === f.key ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-500 border border-gray-100'}`}
-                    >
-                        {f.label}
-                        {f.key === 'unread' && unreadCount > 0 && (
-                            <span className='ml-1 bg-white text-primary rounded-full px-1.5 text-[10px] font-extrabold'>
-                                {unreadCount}
-                            </span>
-                        )}
-                    </button>
-                ))}
+            {/* Filter tabs + desktop action button */}
+            <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-3 pb-1">
+                <div className="flex flex-wrap gap-2">
+                    {FILTERS.map((f) => (
+                        <button
+                            key={f.key}
+                            onClick={() => setActiveFilter(f.key)}
+                            className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all
+                                ${activeFilter === f.key ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-500 border border-gray-100'}`}
+                        >
+                            {f.label}
+                            {f.key === 'unread' && hasUnread && (
+                                <span className='ml-1 bg-white text-primary rounded-full px-1.5 text-[10px] font-extrabold'>
+                                    {unreadCount || unreadInList}
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+                <div className="hidden lg:block">
+                    {actionBtn}
+                </div>
             </div>
 
-
-            {/* ── Announcements tab ── */}
+            {/* Announcements tab */}
             {activeFilter === 'announcements' && (
                 <div className='px-4 mt-3 space-y-3'>
                     {announcementsLoading ? (
@@ -300,7 +312,6 @@ const Notifications = () => {
                                             <span className='text-[10px] text-gray-400 font-medium shrink-0'>{timeAgo(n.createdAt)}</span>
                                         </div>
                                         <p className='text-xs text-gray-500 leading-relaxed'>{n.body}</p>
-                                        {/* Bonus code — shown with copy button */}
                                         {n.bonusCode && (
                                             <div className='mt-2.5 flex items-center gap-2'>
                                                 <div className='flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-xl px-3 py-1.5 flex-1 min-w-0'>
@@ -317,7 +328,7 @@ const Notifications = () => {
                                                     className='flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-xl shrink-0 transition-all active:scale-95'
                                                     style={{
                                                         background: copiedCode === n._id ? '#ecfdf5' : '#ede9fe',
-                                                        color:      copiedCode === n._id ? '#10b981' : '#8b5cf6',
+                                                        color: copiedCode === n._id ? '#10b981' : '#8b5cf6',
                                                     }}
                                                 >
                                                     {copiedCode === n._id
@@ -334,161 +345,117 @@ const Notifications = () => {
                 </div>
             )}
 
-            {/* ── Personal notifications list ── */}
+            {/* Personal notifications list */}
             {activeFilter !== 'announcements' && (
-            <div className='px-4 mt-3 space-y-2'>
-                {loading ? (
-                    <div className='flex justify-center py-20'>
-                        <div className='w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin' />
-                    </div>
-                ) : notifications.length === 0 ? (
-                    <div className='flex flex-col items-center justify-center py-24 text-center'>
-                        <div className='w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4'>
-                            <Bell size={28} className='text-gray-300' />
-                        </div>
-                        <p className='text-sm font-bold text-gray-400'>
-                            No notifications here
-                        </p>
-                        <p className='text-xs text-gray-300 mt-1'>
-                            {activeFilter !== 'all'
-                                ? 'Try switching to "All"'
-                                : 'Check back later'}
-                        </p>
-                    </div>
-                ) : (
-                    notifications.map((n) => {
-                        const meta = TYPE_META[n.type] || TYPE_META.system
-                        const Icon = meta.icon
-                        const isDeleting = actionLoading === n._id + '_del'
-                        const isMarking = actionLoading === n._id
-
-                        return (
-                            <div
-                                key={n._id}
-                                className={`relative rounded-2xl border p-4 transition-all
-                  ${n.isRead ? 'bg-white border-gray-100' : 'bg-primary/5 border-primary/20'}`}
-                            >
-                                {/* Unread dot - top right corner of the card */}
-                                {!n.isRead && (
-                                    <div className='absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary shadow-sm' />
-                                )}
-
-                                <div className='flex items-start gap-3'>
-                                    <div
-                                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.bg}`}
-                                    >
-                                        <Icon
-                                            size={18}
-                                            className={meta.color}
-                                        />
-                                    </div>
-                                    <div className='flex-1 min-w-0 pr-6'>
-                                        <div className='flex items-center justify-between gap-2 mb-0.5'>
-                                            <p
-                                                className={`text-sm leading-tight ${n.isRead ? 'font-semibold text-gray-700' : 'font-bold text-gray-800'}`}
-                                            >
-                                                {n.title}
-                                            </p>
-                                            <span className='text-[10px] text-gray-400 shrink-0'>
-                                                {timeAgo(n.createdAt)}
-                                            </span>
+                <div className='px-4 mt-3 space-y-2'>
+                    {loading ? (
+                        <div className='space-y-2'>
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className='bg-white rounded-2xl p-4 flex gap-3 border border-gray-50 shadow-card'>
+                                    <Skeleton circle width={40} height={40} />
+                                    <div className='flex-1'>
+                                        <div className='flex justify-between'>
+                                            <Skeleton width={130} height={13} />
+                                            <Skeleton width={40} height={11} />
                                         </div>
-                                        <p className='text-xs text-gray-500 leading-relaxed whitespace-pre-line'>
-                                            {n.body}
-                                        </p>
-
-                                        {/* Bonus code copy button */}
-                                        {n.metadata?.code && (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    copyCode(
-                                                        n._id,
-                                                        n.metadata.code,
-                                                    )
-                                                }}
-                                                className='mt-2.5 flex items-center gap-2 bg-purple-50 border border-purple-200 px-3 py-2 rounded-xl w-full active:scale-95 transition-transform'
-                                            >
-                                                <div className='flex-1 text-left'>
-                                                    <p className='text-[10px] text-gray-400 font-medium'>
-                                                        Bonus Code
-                                                    </p>
-                                                    <p className='text-sm font-extrabold tracking-widest text-purple-700'>
-                                                        {n.metadata.code}
-                                                    </p>
-                                                </div>
-                                                <div
-                                                    className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg
-                          ${copiedId === n._id ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'}`}
-                                                >
-                                                    {copiedId === n._id ? (
-                                                        <>
-                                                            <Check size={11} />{' '}
-                                                            Copied
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Copy size={11} />{' '}
-                                                            Copy
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </button>
-                                        )}
-
-                                        <div className='flex items-center justify-between mt-2'>
-                                            <span
-                                                className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}
-                                            >
-                                                {meta.label}
-                                            </span>
-                                            {/* Mark as read button (only for unread) */}
-                                            {!n.isRead && (
-                                                <button
-                                                    onClick={() =>
-                                                        handleMarkRead(n._id)
-                                                    }
-                                                    disabled={isMarking}
-                                                    className='flex items-center gap-1 text-[10px] font-bold text-primary bg-white border border-primary/30 px-2 py-1 rounded-full active:scale-95 transition-all'
-                                                >
-                                                    {isMarking ? (
-                                                        <Loader2
-                                                            size={10}
-                                                            className='animate-spin'
-                                                        />
-                                                    ) : (
-                                                        <Eye size={10} />
-                                                    )}
-                                                    Mark read
-                                                </button>
-                                            )}
-                                        </div>
+                                        <Skeleton width='90%' height={11} className='mt-1.5' />
+                                        <Skeleton width='65%' height={11} className='mt-1' />
                                     </div>
                                 </div>
-
-                                {/* Delete button - always visible */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleDelete(n._id)
-                                    }}
-                                    disabled={isDeleting}
-                                    className='absolute top-3.5 right-3.5 text-gray-400 hover:text-red-500 transition-colors'
-                                >
-                                    {isDeleting ? (
-                                        <Loader2
-                                            size={14}
-                                            className='animate-spin'
-                                        />
-                                    ) : (
-                                        <Trash2 size={14} />
-                                    )}
-                                </button>
+                            ))}
+                        </div>
+                    ) : notifications.length === 0 ? (
+                        <div className='flex flex-col items-center justify-center py-24 text-center'>
+                            <div className='w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4'>
+                                <Bell size={28} className='text-gray-300' />
                             </div>
-                        )
-                    })
-                )}
-            </div>
+                            <p className='text-sm font-bold text-gray-400'>No notifications here</p>
+                            <p className='text-xs text-gray-300 mt-1'>
+                                {activeFilter !== 'all' ? 'Try switching to "All"' : 'Check back later'}
+                            </p>
+                        </div>
+                    ) : (
+                        notifications.map((n) => {
+                            const meta = TYPE_META[n.type] || TYPE_META.system
+                            const Icon = meta.icon
+                            const isDeleting = actionLoading === n._id + '_del'
+                            const isMarking = actionLoading === n._id
+
+                            return (
+                                <div
+                                    key={n._id}
+                                    className={`relative rounded-2xl border p-4 transition-all
+                                        ${n.isRead ? 'bg-white border-gray-100' : 'bg-primary/5 border-primary/20'}`}
+                                >
+                                    {!n.isRead && (
+                                        <div className='absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary shadow-sm' />
+                                    )}
+
+                                    <div className='flex items-start gap-3'>
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.bg}`}>
+                                            <Icon size={18} className={meta.color} />
+                                        </div>
+                                        <div className='flex-1 min-w-0 pr-6'>
+                                            <div className='flex items-center justify-between gap-2 mb-0.5'>
+                                                <p className={`text-sm leading-tight ${n.isRead ? 'font-semibold text-gray-700' : 'font-bold text-gray-800'}`}>
+                                                    {n.title}
+                                                </p>
+                                                <span className='text-[10px] text-gray-400 shrink-0'>{timeAgo(n.createdAt)}</span>
+                                            </div>
+                                            <p className='text-xs text-gray-500 leading-relaxed whitespace-pre-line'>{n.body}</p>
+
+                                            {n.metadata?.code && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        copyCode(n._id, n.metadata.code)
+                                                    }}
+                                                    className='mt-2.5 flex items-center gap-2 bg-purple-50 border border-purple-200 px-3 py-2 rounded-xl w-full active:scale-95 transition-transform'
+                                                >
+                                                    <div className='flex-1 text-left'>
+                                                        <p className='text-[10px] text-gray-400 font-medium'>Bonus Code</p>
+                                                        <p className='text-sm font-extrabold tracking-widest text-purple-700'>{n.metadata.code}</p>
+                                                    </div>
+                                                    <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg
+                                                        ${copiedId === n._id ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'}`}>
+                                                        {copiedId === n._id ? <><Check size={11} /> Copied</> : <><Copy size={11} /> Copy</>}
+                                                    </div>
+                                                </button>
+                                            )}
+
+                                            <div className='flex items-center justify-between mt-2'>
+                                                <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+                                                    {meta.label}
+                                                </span>
+                                                {!n.isRead && (
+                                                    <button
+                                                        onClick={() => handleMarkRead(n._id)}
+                                                        disabled={isMarking}
+                                                        className='flex items-center gap-1 text-[10px] font-bold text-primary bg-white border border-primary/30 px-2 py-1 rounded-full active:scale-95 transition-all'
+                                                    >
+                                                        {isMarking ? <Loader2 size={10} className='animate-spin' /> : <Eye size={10} />}
+                                                        Mark read
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDelete(n._id)
+                                        }}
+                                        disabled={isDeleting}
+                                        className='absolute top-3.5 right-3.5 text-gray-400 hover:text-red-500 transition-colors'
+                                    >
+                                        {isDeleting ? <Loader2 size={14} className='animate-spin' /> : <Trash2 size={14} />}
+                                    </button>
+                                </div>
+                            )
+                        })
+                    )}
+                </div>
             )}
         </div>
     )

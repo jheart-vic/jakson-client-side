@@ -215,7 +215,7 @@ const DesktopSidebar = () => {
 
         {/* Telegram */}
         <a
-          href="https://t.me/Luminos_Energy_manager"
+          href="https://t.me/Cs_luminos_Energy"
           target="_blank"
           rel="noopener noreferrer"
           title={collapsed ? 'Telegram' : undefined}

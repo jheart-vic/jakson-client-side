@@ -8,6 +8,7 @@ import { fmtUSD, fmtNGN, toNGN } from '../../utils/currency'
 import PageHeader from '../../components/layout/PageHeader'
 import Modal from '../../components/common/Modal'
 import { usePublicSettings } from '../../hooks/usePublicSettings'
+import Skeleton from '../../components/common/Skeleton'
 
 const PRESETS = [11.5, 60, 174]
 
@@ -66,11 +67,27 @@ const Deposit = () => {
       })
   }
 
-  // Show loading spinner while settings are being fetched
+  // Skeleton while settings load
   if (settingsLoading) {
     return (
-      <div className="min-h-dvh bg-surface flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-dvh pb-8">
+        <div className="bg-white border-b border-gray-100 px-4 py-4 flex items-center gap-3">
+          <Skeleton circle width={32} height={32} />
+          <Skeleton width={80} height={16} />
+        </div>
+        <div className="px-4 mt-6 space-y-4">
+          <div className="bg-white rounded-2xl shadow-card p-4">
+            <Skeleton width={100} height={11} />
+            <div className="flex gap-2 mt-3">
+              {[...Array(3)].map((_, i) => <Skeleton key={i} height={44} className="flex-1" borderRadius={12} />)}
+            </div>
+          </div>
+          <Skeleton height={60} borderRadius={16} />
+          <Skeleton height={52} borderRadius={16} />
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => <Skeleton key={i} height={16} borderRadius={8} />)}
+          </div>
+        </div>
       </div>
     )
   }

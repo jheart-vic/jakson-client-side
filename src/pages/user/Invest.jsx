@@ -14,7 +14,7 @@ import { getProducts, buyProduct } from '../../api/invest'
 import { getMyInvestments } from '../../api/invest'
 import { fmtUSD } from '../../utils/currency'
 import Modal from '../../components/common/Modal'
-import Spinner from '../../components/common/Spinner'
+import Skeleton from '../../components/common/Skeleton'
 import { handleApiError } from '../../utils/errorHandler'
 
 const Invest = () => {
@@ -166,7 +166,31 @@ const Invest = () => {
             {/* Product list */}
             <div className='px-4 mt-4 space-y-4'>
                 {loading ? (
-                    <Spinner />
+                    // Skeleton matching the product card layout
+                    [...Array(3)].map((_, i) => (
+                        <div key={i} className='bg-white rounded-2xl shadow-card border border-gray-50 overflow-hidden'>
+                            {/* Strip */}
+                            <div className='bg-gray-100 px-4 py-3 flex items-center gap-3'>
+                                <Skeleton circle width={40} height={40} baseColor='#e0ddd9' highlightColor='#eceae6' />
+                                <div>
+                                    <Skeleton width={120} height={15} baseColor='#e0ddd9' highlightColor='#eceae6' />
+                                    <Skeleton width={70} height={20} borderRadius={20} className='mt-1.5' baseColor='#e0ddd9' highlightColor='#eceae6' />
+                                </div>
+                            </div>
+                            {/* Body */}
+                            <div className='p-4'>
+                                <div className='grid grid-cols-2 gap-3 mb-4'>
+                                    {[...Array(4)].map((_, j) => (
+                                        <div key={j} className='bg-gray-50 rounded-xl p-3'>
+                                            <Skeleton width={50} height={10} />
+                                            <Skeleton width={65} height={14} className='mt-1' />
+                                        </div>
+                                    ))}
+                                </div>
+                                <Skeleton height={48} borderRadius={14} />
+                            </div>
+                        </div>
+                    ))
                 ) : displayProducts.length === 0 ? (
                     <div className='text-center py-16 text-gray-400'>
                         <Package size={40} className='mx-auto mb-3 opacity-30' />
