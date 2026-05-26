@@ -3,7 +3,24 @@ import { useNavigate } from 'react-router-dom'
 import { Plus, CheckCircle, ChevronRight } from 'lucide-react'
 import { getBankAccounts } from '../../api/bank'
 import PageHeader from '../../components/layout/PageHeader'
-import Spinner from '../../components/common/Spinner'
+import Skeleton from '../../components/common/Skeleton'
+
+const BankAccountSkeleton = () => (
+  <div className="card overflow-hidden">
+    <div className="p-4 border-b border-gray-50">
+      <Skeleton width={110} height={11} />
+    </div>
+    <div className="flex items-center gap-3 p-4">
+      <Skeleton circle width={44} height={44} />
+      <div className="flex-1">
+        <Skeleton width={140} height={14} />
+        <Skeleton width={110} height={11} className="mt-1.5" />
+        <Skeleton width={90} height={11} className="mt-1" />
+      </div>
+      <Skeleton width={20} height={20} borderRadius={4} />
+    </div>
+  </div>
+)
 
 const BankAccounts = () => {
   const navigate  = useNavigate()
@@ -22,10 +39,13 @@ const BankAccounts = () => {
     <div className="min-h-dvh pb-8">
       <PageHeader title="Withdrawal Account" />
       <div className="px-4 mt-4 space-y-4">
-
-        {loading ? <Spinner /> : (
+        {loading ? (
           <>
-            {/* Bank */}
+            <BankAccountSkeleton />
+            <Skeleton height={52} borderRadius={16} />
+          </>
+        ) : (
+          <>
             <div className="card overflow-hidden">
               <div className="p-4 border-b border-gray-50">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Bank Account</p>
@@ -70,13 +90,11 @@ const BankAccounts = () => {
               )}
             </div>
 
-            {/* Add button */}
             <button onClick={() => navigate('/main/bank/bind')}
               className="btn btn-outline rounded-2xl h-13 text-sm font-bold flex items-center gap-2">
               <Plus size={16} /> Bind New Account
             </button>
 
-            {/* Warning */}
             <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4">
               <p className="text-orange-600 text-xs font-medium leading-relaxed">
                 ⚠️ Please ensure your account is a real-name verified account. Using an unverified account will cause withdrawal failure and account freeze.

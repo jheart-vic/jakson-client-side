@@ -1,13 +1,35 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import toast from 'react-hot-toast'
-import { Calendar, Gift, } from 'lucide-react'
+import { Calendar, Gift } from 'lucide-react'
 import PageHeader from '../../components/layout/PageHeader'
 import { getMyWealthFunds, claimWealthFund } from '../../api/wealthFund'
 import { fmtUSD } from '../../utils/currency'
-import Spinner from '../../components/common/Spinner'
+import Skeleton from '../../components/common/Skeleton'
 import EmptyState from '../../components/common/EmptyState'
 import { useAuth } from '../../context/AuthContext'
 import { handleApiError } from '../../utils/errorHandler'
+
+const MyFundCardSkeleton = () => (
+  <div className="bg-white rounded-2xl shadow-card border border-gray-50 p-4">
+    <div className="flex items-center gap-3 mb-4">
+      <Skeleton circle width={44} height={44} />
+      <div className="flex-1">
+        <Skeleton width={140} height={15} />
+        <Skeleton width={90} height={11} className="mt-1.5" />
+      </div>
+      <Skeleton width={68} height={24} borderRadius={20} />
+    </div>
+    <div className="grid grid-cols-2 gap-2 mb-3">
+      {[...Array(2)].map((_, i) => (
+        <div key={i} className="bg-gray-50 rounded-xl p-3">
+          <Skeleton width={50} height={10} />
+          <Skeleton width={70} height={15} className="mt-1" />
+        </div>
+      ))}
+    </div>
+    <Skeleton height={44} borderRadius={14} />
+  </div>
+)
 
 export default function MyWealthFunds() {
   const [funds, setFunds] = useState([])
@@ -20,21 +42,19 @@ export default function MyWealthFunds() {
     setLoading(true)
     try {
       const result = await getMyWealthFunds()
-      // Extract array from possible wrappers
       let fundsArray = result
       if (result?.funds) fundsArray = result.funds
       else if (result?.data?.funds) fundsArray = result.data.funds
       setFunds(fundsArray || [])
     } catch (err) {
       console.error(err)
-  handleApiError(err, 'Failed to load your wealth funds')
-
+      handleApiError(err, 'Failed to load your wealth funds')
     } finally {
       setLoading(false)
     }
   }, [])
 
-useEffect(() => { ;(async () => { await loadFunds() })() }, [loadFunds])
+  useEffect(() => { ;(async () => { await loadFunds() })() }, [loadFunds])
 
   const handleClaim = async (investmentId) => {
     setClaimingId(investmentId)
@@ -50,102 +70,87 @@ useEffect(() => { ;(async () => { await loadFunds() })() }, [loadFunds])
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-dvh bg-surface">
-        <PageHeader title="My Wealth Funds" />
-        <Spinner />
-      </div>
-    )
+  const statusOf = (inv) => {
+    if (inv.isClaimed) return { label: 'Claimed', color: 'text-gray-400', bg: 'bg-gray-100' }
+    if (inv.status === 'matured' || new Date(inv.maturesAt) <= now)
+      return { label: '✅ Matured', color: 'text-success', bg: 'bg-success-light' }
+    return { label: 'In Progress', color: 'text-primary', bg: 'bg-primary-light' }
   }
 
   return (
-    <div className="min-h-dvh pb-24 ">
+    <div className="min-h-dvh pb-8">
       <PageHeader title="My Wealth Funds" />
-      <div className="p-4 space-y-4">
-        {funds.length === 0 ? (
-          <EmptyState
-            message="You haven't invested in any wealth fund yet"
-            icon={<Gift size={48} className="text-gray-300" />}
-          />
-        ) : (
-          funds.map((fund) => {
-            const mature = new Date() >= new Date(fund.maturityDate)
-            const canClaim = mature && !fund.isClaimed
-            const daysLeft = !mature
-              ? Math.ceil((new Date(fund.maturityDate) - new Date()) / (1000 * 60 * 60 * 24))
-              : 0
+      <div className="px-4 mt-4 space-y-4">
+        {loading
+          ? [...Array(3)].map((_, i) => <MyFundCardSkeleton key={i} />)
+          : funds.length === 0
+            ? <EmptyState message="No wealth fund investments yet" icon="💎" />
+            : funds.map((inv, i) => {
+                const fund = inv.wealthFund || {}
+                const status = statusOf(inv)
+                const matured = !inv.isClaimed && new Date(inv.maturesAt) <= now
+                const daysLeft = Math.max(0, Math.ceil((new Date(inv.maturesAt) - now) / 86400000))
 
-            return (
-              <div key={fund._id} className="card card-p rounded-2xl animate-slide-up">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-extrabold text-gray-800">
-                      {fund.fundSnapshot?.name || 'Wealth Fund'}
-                    </h3>
-                    <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                      <Calendar size={12} /> Purchased {new Date(fund.startDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className={`px-2.5 py-1 rounded-full text-xs font-bold
-                    ${fund.isClaimed
-                      ? 'bg-success-light text-success'
-                      : mature
-                      ? 'bg-primary-light text-primary'
-                      : 'bg-gray-100 text-gray-500'}`}>
-                    {fund.isClaimed ? 'Claimed' : mature ? 'Ready' : `${daysLeft} days left`}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-                  <div>
-                    <p className="text-gray-400">Invested</p>
-                    <p className="font-bold text-gray-800">{fmtUSD(fund.investmentAmount)}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-400">Maturity Value</p>
-                    <p className="font-bold text-primary">{fmtUSD(fund.maturityAmount)}</p>
-                  </div>
-                </div>
-
-                {!fund.isClaimed && !mature && (
-                  <div className="mb-4">
-                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary rounded-full transition-all"
-                        style={{
-                          width: `${Math.min(100, Math.max(0,
-                            ((now - new Date(fund.startDate)) /
-                            (new Date(fund.maturityDate) - new Date(fund.startDate))) * 100
-                          ))}%`
-                        }}
-                      />
+                return (
+                  <div key={inv._id} className="bg-white rounded-2xl shadow-card border border-gray-50 p-4 animate-slide-up"
+                    style={{ animationDelay: `${i * 0.07}s` }}>
+                    <div className="flex items-center gap-3 mb-4">
+                      {fund.image ? (
+                        <img src={fund.image} alt={fund.name}
+                          className="w-11 h-11 rounded-2xl object-cover shrink-0" />
+                      ) : (
+                        <div className="w-11 h-11 rounded-2xl bg-primary-light flex items-center justify-center shrink-0">
+                          <span className="text-xl">💰</span>
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-extrabold text-gray-800 text-sm truncate">{fund.name || 'Wealth Fund'}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{fund.durationDays}d · {fmtUSD(fund.maturityAmount || 0)} maturity</p>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2.5 py-1.5 rounded-full shrink-0 ${status.color} ${status.bg}`}>
+                        {status.label}
+                      </span>
                     </div>
-                  </div>
-                )}
 
-                <button
-                  onClick={() => handleClaim(fund._id)}
-                  disabled={!canClaim || claimingId === fund._id}
-                  className={`w-full py-3 rounded-2xl text-sm font-bold transition-all
-                    ${canClaim
-                      ? 'btn-primary shadow-[0_4px_12px_rgba(198,123,44,0.3)]'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-                >
-                  {claimingId === fund._id ? (
-                    <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin-slow" />
-                  ) : fund.isClaimed ? (
-                    '✓ Claimed'
-                  ) : canClaim ? (
-                    'Claim Now 🎉'
-                  ) : (
-                    `Unlocks in ${daysLeft} days`
-                  )}
-                </button>
-              </div>
-            )
-          })
-        )}
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <div className="bg-gray-50 rounded-xl p-3">
+                        <div className="flex items-center gap-1 mb-1">
+                          <Calendar size={10} className="text-gray-400" />
+                          <p className="text-[10px] text-gray-400 font-medium">Matures</p>
+                        </div>
+                        <p className="text-sm font-bold text-gray-700">
+                          {new Date(inv.maturesAt).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })}
+                        </p>
+                        {!matured && !inv.isClaimed && (
+                          <p className="text-[10px] text-gray-400 mt-0.5">{daysLeft}d remaining</p>
+                        )}
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-3">
+                        <div className="flex items-center gap-1 mb-1">
+                          <Gift size={10} className="text-gray-400" />
+                          <p className="text-[10px] text-gray-400 font-medium">Payout</p>
+                        </div>
+                        <p className="text-sm font-extrabold text-primary">{fmtUSD(fund.maturityAmount || 0)}</p>
+                      </div>
+                    </div>
+
+                    {matured && !inv.isClaimed ? (
+                      <button onClick={() => handleClaim(inv._id)} disabled={claimingId === inv._id}
+                        className="w-full py-3.5 rounded-2xl bg-success text-white text-sm font-extrabold active:scale-[0.98] transition-all disabled:opacity-60">
+                        {claimingId === inv._id ? 'Claiming…' : '🎉 Claim Payout'}
+                      </button>
+                    ) : inv.isClaimed ? (
+                      <div className="w-full py-3 rounded-2xl bg-gray-50 text-center text-sm font-bold text-gray-400">
+                        ✓ Claimed
+                      </div>
+                    ) : (
+                      <div className="w-full py-3 rounded-2xl bg-primary-light text-center text-sm font-bold text-primary">
+                        ⏳ {daysLeft} days remaining
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
       </div>
     </div>
   )

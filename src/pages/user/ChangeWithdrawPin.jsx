@@ -2,12 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Lock, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { changeWithdrawPassword } from '../../api/auth'
+import { changeWithdrawPassword, verifyPassword } from '../../api/auth'
 import PageHeader from '../../components/layout/PageHeader'
 import { handleApiError } from '../../utils/errorHandler'
 
 // ── PIN Box ─────────────────────────────────────────────────
-// inputRef is forwarded so the parent can call .focus() on mount
 const PinBox = ({ value, onChange, label, inputRef }) => {
   const digits = value.split('')
 
@@ -15,7 +14,6 @@ const PinBox = ({ value, onChange, label, inputRef }) => {
     <div className="space-y-3">
       <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{label}</p>
 
-      {/* Visual dots — tapping focuses the real input */}
       <div
         className="flex gap-3 justify-center"
         onClick={() => inputRef?.current?.focus()}
@@ -36,14 +34,9 @@ const PinBox = ({ value, onChange, label, inputRef }) => {
         ))}
       </div>
 
-      {/*
-        Real input — visually hidden but still in the DOM and focusable.
-        Using opacity-0 + absolute instead of sr-only so iOS/Android
-        actually opens the numeric keyboard when focused.
-      */}
       <input
         ref={inputRef}
-        type="tel"              /* tel = numeric keyboard on mobile, no decimals */
+        type="tel"
         inputMode="numeric"
         pattern="[0-9]*"
         value={value}
@@ -65,17 +58,14 @@ const ChangeWithdrawPin = () => {
   const [pin,        setPin]        = useState('')
   const [confirmPin, setConfirm]    = useState('')
   const [showPw,     setShowPw]     = useState(false)
-  const [loading,    setLoading]    = useState(false)
-  const [step,       setStep]       = useState(0) // 0 | 1 | 2
+  const [loading,    setLoading]    = useState(false) // used for both verify + submit
+  const [step,       setStep]       = useState(0)
 
-  // Separate refs for each PIN input so focus is always on the right one
   const pinRef     = useRef(null)
   const confirmRef = useRef(null)
 
-  // Auto-focus the correct input whenever the step changes
   useEffect(() => {
     if (step === 1) {
-      // Small delay lets the DOM settle after re-render
       const t = setTimeout(() => pinRef.current?.focus(), 80)
       return () => clearTimeout(t)
     }
@@ -85,14 +75,23 @@ const ChangeWithdrawPin = () => {
     }
   }, [step])
 
-  const handleNext = () => {
-    if (step === 0) {
-      if (!loginPw) return toast.error('Enter your login password')
-      setStep(1)
-    } else if (step === 1) {
-      if (pin.length !== 6) return toast.error('Enter all 6 digits')
-      setStep(2)
+  // Step 0: verify login password against the backend before advancing
+  const handleVerify = async () => {
+    if (!loginPw) return toast.error('Enter your login password')
+    setLoading(true)
+    try {
+      await verifyPassword({ password: loginPw })
+      setStep(1) // only advance on success
+    } catch (err) {
+      handleApiError(err, 'Incorrect password') // server returns 400 with message
+    } finally {
+      setLoading(false)
     }
+  }
+
+  const handleNext = () => {
+    if (pin.length !== 6) return toast.error('Enter all 6 digits')
+    setStep(2)
   }
 
   const handleSubmit = async () => {
@@ -103,9 +102,9 @@ const ChangeWithdrawPin = () => {
       toast.success('Withdrawal PIN updated!')
       navigate(-1)
     } catch (err) {
-                handleApiError(err, 'Failed to update PIN')
-                setStep(0); setPin(''); setConfirm('')
-            }finally {
+      handleApiError(err, 'Failed to update PIN')
+      setStep(0); setPin(''); setConfirm('')
+    } finally {
       setLoading(false)
     }
   }
@@ -148,6 +147,7 @@ const ChangeWithdrawPin = () => {
                   placeholder="Login password"
                   value={loginPw}
                   onChange={e => setLoginPw(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && !loading && handleVerify()}
                   className="flex-1 bg-transparent outline-none text-sm font-medium
                              text-gray-800 placeholder:text-gray-400"
                 />
@@ -159,8 +159,15 @@ const ChangeWithdrawPin = () => {
                   {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
-              <button onClick={handleNext} className="btn btn-primary rounded-2xl h-13">
-                Continue →
+              <button
+                onClick={handleVerify}
+                disabled={loading || !loginPw}
+                className="btn btn-primary rounded-2xl h-13 disabled:opacity-50"
+              >
+                {loading
+                  ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin-slow" />
+                  : 'Continue →'
+                }
               </button>
             </div>
           )}
@@ -170,9 +177,7 @@ const ChangeWithdrawPin = () => {
             <div className="space-y-6">
               <div>
                 <p className="font-extrabold text-gray-800 text-base mb-1">Set New PIN</p>
-                <p className="text-gray-500 text-sm">
-                  Enter a new 6-digit withdrawal PIN
-                </p>
+                <p className="text-gray-500 text-sm">Enter a new 6-digit withdrawal PIN</p>
               </div>
               <PinBox
                 value={pin}
