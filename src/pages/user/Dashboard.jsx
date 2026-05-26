@@ -204,7 +204,7 @@ const TelegramFloatingAd = ({ showWelcome, showTour }) => {
 
   const handleClose = () => {
     setVisible(false)
-    reshowRef.current = setTimeout(() => setVisible(true), 2 * 60 * 1000)
+    reshowRef.current = setTimeout(() => setVisible(true), 10 * 60 * 1000)
   }
 
   // Positioning: centered on mobile, right-aligned on desktop
