@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-assignment */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Skeleton from 'react-loading-skeleton'
@@ -176,172 +175,208 @@ const WealthCarousel = ({ onInvest, onRefer }) => {
 // ── Telegram Floating Ad ──
 // Fixed bottom-right corner, auto-shows on mount, reappears every 15 min after close.
 // High z-index, doesn't scroll with page, doesn't block content.
-const TelegramFloatingAd = ({ showWelcome, showTour }) => {
-    const [visible, setVisible] = useState(false)
-    const reshowRef = useRef(null)
 
-    useEffect(() => {
-        if (showWelcome || showTour) return
-        const t = setTimeout(() => setVisible(true), 900)
-        return () => clearTimeout(t)
-    }, [showWelcome, showTour])
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches)
 
-    useEffect(() => () => { if (reshowRef.current) clearTimeout(reshowRef.current) }, [])
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    const listener = (e) => setMatches(e.matches)
+    media.addEventListener('change', listener)
+    return () => media.removeEventListener('change', listener)
+  }, [query])
 
-    const handleClose = () => {
-        setVisible(false)
-        reshowRef.current = setTimeout(() => setVisible(true), 15 * 60 * 1000)
-    }
-
-    return (
-        <div
-            aria-hidden={!visible}
-            style={{
-                position: 'fixed',
-                bottom: 88,
-                right: 16,
-                zIndex: 99999,
-                width: 280,               // slightly wider for more content
-                maxWidth: 'calc(100vw - 32px)',
-                borderRadius: 24,
-                overflow: 'hidden',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.1)',
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.94)',
-                transition: 'opacity 300ms cubic-bezier(0,0,0.2,1), transform 300ms cubic-bezier(0,0,0.2,1)',
-                pointerEvents: visible ? 'auto' : 'none',
-            }}
-        >
-            {/* Close button */}
-            <button
-                onClick={handleClose}
-                aria-label='Close'
-                style={{
-                    position: 'absolute', top: 12, right: 12, zIndex: 2,
-                    width: 28, height: 28, borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
-                    border: 'none', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'white',
-                }}
-            >
-                <X size={14} strokeWidth={2.5} />
-            </button>
-
-            {/* Hero header */}
-            <div style={{
-                background: 'linear-gradient(135deg, #C67B2C 0%, #9E5E1F 100%)',
-                padding: '18px 16px 14px',
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <img
-                        src='/logo.jpeg'
-                        alt='Luminos Energy'
-                        style={{
-                            width: 44, height: 44, borderRadius: 12, objectFit: 'cover',
-                            border: '2px solid rgba(255,255,255,0.35)',
-                            boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-                            flexShrink: 0,
-                        }}
-                    />
-                    <div>
-                        <p style={{ color: 'white', fontWeight: 900, fontSize: '0.9rem', lineHeight: 1.2, margin: 0 }}>
-                            Luminos Energy
-                        </p>
-                        <p style={{
-                            color: 'rgba(255,255,255,0.85)',
-                            fontSize: '0.65rem',
-                            fontWeight: 600,
-                            letterSpacing: '0.04em',
-                            margin: 0,
-                            marginTop: 2,
-                        }}>
-                            OFFICIAL TELEGRAM COMMUNITY
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Extended body content */}
-            <div style={{ background: 'white', padding: '16px 16px 18px' }}>
-                <p style={{
-                    fontSize: '0.8rem',
-                    color: '#1f2937',
-                    fontWeight: 600,
-                    margin: '0 0 12px 0',
-                    lineHeight: 1.4,
-                }}>
-                    🚀 Get exclusive bonuses, early updates & direct support
-                </p>
-
-                {/* Benefits list – makes the ad taller */}
-                <div style={{ marginBottom: 16 }}>
-                    {[
-                        { emoji: '🎁', text: 'Bonus codes & giveaways' },
-                        { emoji: '⚡', text: 'Real‑time energy market news' },
-                        { emoji: '👥', text: 'Connect with 2,000+ investors' },
-                    ].map((item, idx) => (
-                        <div key={idx} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 10,
-                            marginBottom: 10,
-                            fontSize: '0.7rem',
-                            color: '#4b5563',
-                        }}>
-                            <span style={{ fontSize: '1rem', width: 24 }}>{item.emoji}</span>
-                            <span>{item.text}</span>
-                        </div>
-                    ))}
-                </div>
-
-                {/* CTA button */}
-                <a
-                    href='https://t.me/+FywiCmE-6hVlYjU0'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    style={{ textDecoration: 'none', display: 'block' }}
-                >
-                    <button style={{
-                        width: '100%',
-                        background: 'linear-gradient(135deg, #e8720c, #f97316, #fb923c)',
-                        color: 'white',
-                        fontWeight: 800,
-                        fontSize: '0.8rem',
-                        padding: '11px 12px',
-                        borderRadius: 60,
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 8,
-                        boxShadow: '0 6px 18px rgba(249,115,22,0.4)',
-                        transition: 'transform 0.1s ease',
-                    }}
-                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
-                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                    >
-                        <svg width='16' height='16' viewBox='0 0 24 24' fill='white' style={{ flexShrink: 0 }}>
-                            <path d='M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'/>
-                        </svg>
-                        Join Telegram Group
-                    </button>
-                </a>
-
-                {/* Small footnote */}
-                <p style={{
-                    fontSize: '0.6rem',
-                    color: '#9ca3af',
-                    textAlign: 'center',
-                    margin: '12px 0 0 0',
-                }}>
-                    ⚡ Limited spots — join today
-                </p>
-            </div>
-        </div>
-    )
+  return matches
 }
+
+const TelegramFloatingAd = ({ showWelcome, showTour }) => {
+  const [visible, setVisible] = useState(false)
+  const reshowRef = useRef(null)
+  const isMobile = useMediaQuery('(max-width: 768px)')
+
+  useEffect(() => {
+    if (showWelcome || showTour) return
+    const t = setTimeout(() => setVisible(true), 900)
+    return () => clearTimeout(t)
+  }, [showWelcome, showTour])
+
+  useEffect(() => () => { if (reshowRef.current) clearTimeout(reshowRef.current) }, [])
+
+  const handleClose = () => {
+    setVisible(false)
+    reshowRef.current = setTimeout(() => setVisible(true), 2 * 60 * 1000)
+  }
+
+  // Positioning: centered on mobile, right-aligned on desktop
+  const positionStyles = isMobile
+    ? {
+        left: '50%',
+        transform: 'translateX(-50%)',
+        right: 'auto',
+        bottom: 88,
+      }
+    : {
+        right: 16,
+        left: 'auto',
+        transform: 'none',
+        bottom: 88,
+      }
+
+  return (
+    <div
+      aria-hidden={!visible}
+      style={{
+        position: 'fixed',
+        zIndex: 99999,
+        width: 280,
+        maxWidth: 'calc(100vw - 32px)',
+        borderRadius: 24,
+        overflow: 'hidden',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.1)',
+        opacity: visible ? 1 : 0,
+        transform: visible
+          ? isMobile
+            ? 'translateX(-50%) translateY(0) scale(1)'
+            : 'translateY(0) scale(1)'
+          : isMobile
+          ? 'translateX(-50%) translateY(20px) scale(0.94)'
+          : 'translateY(20px) scale(0.94)',
+        transition: 'opacity 300ms cubic-bezier(0,0,0.2,1), transform 300ms cubic-bezier(0,0,0.2,1)',
+        pointerEvents: visible ? 'auto' : 'none',
+        ...positionStyles,
+      }}
+    >
+      {/* Close button (same as before) */}
+      <button
+        onClick={handleClose}
+        aria-label="Close"
+        style={{
+          position: 'absolute', top: 12, right: 12, zIndex: 2,
+          width: 28, height: 28, borderRadius: '50%',
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+          border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'white',
+        }}
+      >
+        <X size={14} strokeWidth={2.5} />
+      </button>
+
+      {/* Hero header */}
+      <div style={{
+        background: 'linear-gradient(135deg, #C67B2C 0%, #9E5E1F 100%)',
+        padding: '18px 16px 14px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <img
+            src="/logo.jpeg"
+            alt="Luminos Energy"
+            style={{
+              width: 44, height: 44, borderRadius: 12, objectFit: 'cover',
+              border: '2px solid rgba(255,255,255,0.35)',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+              flexShrink: 0,
+            }}
+          />
+          <div>
+            <p style={{ color: 'white', fontWeight: 900, fontSize: '0.9rem', lineHeight: 1.2, margin: 0 }}>
+              Luminos Energy
+            </p>
+            <p style={{
+              color: 'rgba(255,255,255,0.85)',
+              fontSize: '0.65rem',
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+              margin: 0,
+              marginTop: 2,
+            }}>
+              OFFICIAL TELEGRAM COMMUNITY
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Extended body content */}
+      <div style={{ background: 'white', padding: '16px 16px 18px' }}>
+        <p style={{
+          fontSize: '0.8rem',
+          color: '#1f2937',
+          fontWeight: 600,
+          margin: '0 0 12px 0',
+          lineHeight: 1.4,
+        }}>
+          🚀 Get exclusive bonuses, early updates & direct support
+        </p>
+
+        {/* Benefits list */}
+        <div style={{ marginBottom: 16 }}>
+          {[
+            { emoji: '🎁', text: 'Bonus codes & updates' },
+            { emoji: '⚡', text: 'Real‑time energy market news' },
+            { emoji: '👥', text: 'Connect with 2,000+ investors' },
+          ].map((item, idx) => (
+            <div key={idx} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              marginBottom: 10,
+              fontSize: '0.7rem',
+              color: '#4b5563',
+            }}>
+              <span style={{ fontSize: '1rem', width: 24 }}>{item.emoji}</span>
+              <span>{item.text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA button */}
+        <a
+          href="https://t.me/+FywiCmE-6hVlYjU0"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none', display: 'block' }}
+        >
+          <button style={{
+            width: '100%',
+            background: 'linear-gradient(135deg, #e8720c, #f97316, #fb923c)',
+            color: 'white',
+            fontWeight: 800,
+            fontSize: '0.8rem',
+            padding: '11px 12px',
+            borderRadius: 60,
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            boxShadow: '0 6px 18px rgba(249,115,22,0.4)',
+            transition: 'transform 0.1s ease',
+          }}
+          onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+          onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" style={{ flexShrink: 0 }}>
+              <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            </svg>
+            Join Telegram Group
+          </button>
+        </a>
+
+        {/* Small footnote */}
+        <p style={{
+          fontSize: '0.6rem',
+          color: '#9ca3af',
+          textAlign: 'center',
+          margin: '12px 0 0 0',
+        }}>
+          ⚡Need help? — join today
+        </p>
+      </div>
+    </div>
+  )
+}
+
 
 
 
