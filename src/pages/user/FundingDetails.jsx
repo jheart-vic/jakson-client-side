@@ -13,15 +13,18 @@ const TABS = [
   { key: 'out', label: 'Out' },
 ]
 
+// Matches every value in the Transaction schema enum
 const CATEGORY_LABELS = {
-  deposit:        'Deposit',
-  withdrawal:     'Withdrawal',
-  investment:     'Investment',
-  daily_income:   'Daily Income',
-  referral_bonus: 'Referral Bonus',
-  reward_code:    'Reward Code',
-  daily_checkin:  'Daily Check-in',
-  refund:         'Refund',
+  deposit:            'Deposit',
+  withdrawal:         'Withdrawal',
+  investment:         'Investment',
+  daily_income:       'Daily Income',
+  referral_bonus:     'Referral Bonus',
+  reward_code:        'Reward Code',
+  daily_checkin:      'Daily Check-in',
+  refund:             'Refund',
+  wealth_fund:        'Wealth Fund',
+  wealth_fund_payout: 'Wealth Fund Payout',
 }
 
 const TxSkeleton = () => (
@@ -76,8 +79,11 @@ const FundingDetails = () => {
             ? <EmptyState message="No transactions found" icon="📋" />
             : items.map((tx, i) => {
                 const isIn = tx.type === 'in'
+                // Schema field is `amountUSD` — fall back to `amount` for safety
+                const amount = tx.amountUSD ?? tx.amount ?? 0
                 return (
-                  <div key={tx._id} className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-card border border-gray-50 animate-slide-up"
+                  <div key={tx._id}
+                    className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-card border border-gray-50 animate-slide-up"
                     style={{ animationDelay: `${i * 0.04}s` }}>
                     <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0
                       ${isIn ? 'bg-success-light' : 'bg-danger-light'}`}>
@@ -91,9 +97,17 @@ const FundingDetails = () => {
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">{fmtDateTime(tx.createdAt)}</p>
                     </div>
-                    <p className={`text-sm font-extrabold shrink-0 ${isIn ? 'text-success' : 'text-danger'}`}>
-                      {isIn ? '+' : '-'}{fmtUSD(tx.amount)}
-                    </p>
+                    <div className="shrink-0 text-right">
+                      <p className={`text-sm font-extrabold ${isIn ? 'text-success' : 'text-danger'}`}>
+                        {isIn ? '+' : '-'}{fmtUSD(amount)}
+                      </p>
+                      {/* Show running balance if available */}
+                      {tx.balanceAfter != null && (
+                        <p className="text-[10px] text-gray-400 mt-0.5">
+                          Bal: {fmtUSD(tx.balanceAfter)}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )
               })}
