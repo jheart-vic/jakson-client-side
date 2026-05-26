@@ -742,7 +742,7 @@ const Dashboard = () => {
             <div className='px-4 mt-3 animate-slide-up delay-200'>
                 <button
                     onClick={() =>
-                        window.open('https://jaksonsolar.org/about', '_blank')
+                        window.open('https://jakson-client-side.vercel.app/#how-it-works', '_blank')
                     }
                     className='w-full flex items-center gap-3 bg-white rounded-2xl p-4 shadow-card active:scale-[0.99] transition-transform border border-gray-100'
                 >
