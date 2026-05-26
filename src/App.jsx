@@ -82,7 +82,7 @@ const App = () => (
             <Route path='change-password'   element={<ChangePassword />} />
             <Route path='change-withdraw-pin' element={<ChangeWithdrawPin />} />
             <Route path='wealth-fund'       element={<WealthFunds />} />
-            <Route path='wealth-fund/me'    element={<MyWealthFunds />} />
+            <Route path='my-wealth-funds/me'    element={<MyWealthFunds />} />
             <Route path='notifications'     element={<Notifications />} />
         </Route>
 

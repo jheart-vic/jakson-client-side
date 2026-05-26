@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
-const EXPANDED_W = 280   // px — wider desktop sidebar
+const EXPANDED_W = 298   // px — wider desktop sidebar
 const COLLAPSED_W = 64   // px — matches w-16
 
 const mainLinks = [

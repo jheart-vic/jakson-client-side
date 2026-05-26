@@ -187,7 +187,7 @@ const AdminLayout = () => {
   // Persist sidebar collapsed state in localStorage
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('admin_sb_collapsed') === 'true')
 
-  const sidebarWidth = collapsed ? 64 : 224
+  const sidebarWidth = collapsed ? 64 : 296
 
   const toggleCollapse = () => {
     const next = !collapsed
