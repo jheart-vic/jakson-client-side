@@ -311,7 +311,7 @@ const TelegramFloatingAd = ({ showWelcome, showTour }) => {
         {/* Benefits list */}
         <div style={{ marginBottom: 16 }}>
           {[
-            { emoji: '🎁', text: 'Bonus codes & giveaways' },
+            { emoji: '🎁', text: 'Bonus codes & updates' },
             { emoji: '⚡', text: 'Real‑time energy market news' },
             { emoji: '👥', text: 'Connect with 2,000+ investors' },
           ].map((item, idx) => (
@@ -370,7 +370,7 @@ const TelegramFloatingAd = ({ showWelcome, showTour }) => {
           textAlign: 'center',
           margin: '12px 0 0 0',
         }}>
-          ⚡ Limited spots — join today
+          ⚡Need help? — join today
         </p>
       </div>
     </div>
