@@ -71,8 +71,11 @@ export default function MyWealthFunds() {
   }
 
   const statusOf = (inv) => {
-    if (inv.isClaimed) return { label: 'Claimed', color: 'text-gray-400', bg: 'bg-gray-100' }
-    if (inv.status === 'matured' || new Date(inv.maturesAt) <= now)
+    if (inv.isClaimed)
+      return { label: 'Claimed', color: 'text-gray-400', bg: 'bg-gray-100' }
+    // API field is maturityDate, not maturesAt
+    const maturity = new Date(inv.maturityDate || inv.maturesAt)
+    if (inv.status === 'matured' || maturity <= now)
       return { label: '✅ Matured', color: 'text-success', bg: 'bg-success-light' }
     return { label: 'In Progress', color: 'text-primary', bg: 'bg-primary-light' }
   }
@@ -86,32 +89,55 @@ export default function MyWealthFunds() {
           : funds.length === 0
             ? <EmptyState message="No wealth fund investments yet" icon="💎" />
             : funds.map((inv, i) => {
-                const fund = inv.wealthFund || {}
+                // Fund details live in fundSnapshot (wealthFund is a bare ID string)
+                const fund = inv.fundSnapshot || (typeof inv.wealthFund === 'object' ? inv.wealthFund : {})
+
                 const status = statusOf(inv)
-                const matured = !inv.isClaimed && new Date(inv.maturesAt) <= now
-                const daysLeft = Math.max(0, Math.ceil((new Date(inv.maturesAt) - now) / 86400000))
+
+                // Use maturityDate (API field); fall back to maturesAt for safety
+                const maturityDate = new Date(inv.maturityDate || inv.maturesAt)
+                const isValidDate = !isNaN(maturityDate.getTime())
+
+                const matured = !inv.isClaimed && isValidDate && maturityDate <= now
+                const daysLeft = isValidDate
+                  ? Math.max(0, Math.ceil((maturityDate - now) / 86400000))
+                  : null
 
                 return (
-                  <div key={inv._id} className="bg-white rounded-2xl shadow-card border border-gray-50 p-4 animate-slide-up"
-                    style={{ animationDelay: `${i * 0.07}s` }}>
+                  <div
+                    key={inv._id}
+                    className="bg-white rounded-2xl shadow-card border border-gray-50 p-4 animate-slide-up"
+                    style={{ animationDelay: `${i * 0.07}s` }}
+                  >
+                    {/* Header row */}
                     <div className="flex items-center gap-3 mb-4">
                       {fund.image ? (
-                        <img src={fund.image} alt={fund.name}
-                          className="w-11 h-11 rounded-2xl object-cover shrink-0" />
+                        <img
+                          src={fund.image}
+                          alt={fund.name}
+                          className="w-11 h-11 rounded-2xl object-cover shrink-0"
+                        />
                       ) : (
                         <div className="w-11 h-11 rounded-2xl bg-primary-light flex items-center justify-center shrink-0">
                           <span className="text-xl">💰</span>
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-extrabold text-gray-800 text-sm truncate">{fund.name || 'Wealth Fund'}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{fund.durationDays}d · {fmtUSD(fund.maturityAmount || 0)} maturity</p>
+                        <p className="font-extrabold text-gray-800 text-sm truncate">
+                          {fund.name || 'Wealth Fund'}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {fund.durationDays}d · {fmtUSD(fund.maturityAmount ?? inv.maturityAmount ?? 0)} maturity
+                        </p>
                       </div>
-                      <span className={`text-[10px] font-bold px-2.5 py-1.5 rounded-full shrink-0 ${status.color} ${status.bg}`}>
+                      <span
+                        className={`text-[10px] font-bold px-2.5 py-1.5 rounded-full shrink-0 ${status.color} ${status.bg}`}
+                      >
                         {status.label}
                       </span>
                     </div>
 
+                    {/* Stats */}
                     <div className="grid grid-cols-2 gap-2 mb-3">
                       <div className="bg-gray-50 rounded-xl p-3">
                         <div className="flex items-center gap-1 mb-1">
@@ -119,24 +145,35 @@ export default function MyWealthFunds() {
                           <p className="text-[10px] text-gray-400 font-medium">Matures</p>
                         </div>
                         <p className="text-sm font-bold text-gray-700">
-                          {new Date(inv.maturesAt).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })}
+                          {isValidDate
+                            ? maturityDate.toLocaleDateString('en-GB', {
+                                day: '2-digit', month: 'short', year: 'numeric',
+                              })
+                            : '—'}
                         </p>
-                        {!matured && !inv.isClaimed && (
+                        {!matured && !inv.isClaimed && daysLeft !== null && (
                           <p className="text-[10px] text-gray-400 mt-0.5">{daysLeft}d remaining</p>
                         )}
                       </div>
+
                       <div className="bg-gray-50 rounded-xl p-3">
                         <div className="flex items-center gap-1 mb-1">
                           <Gift size={10} className="text-gray-400" />
                           <p className="text-[10px] text-gray-400 font-medium">Payout</p>
                         </div>
-                        <p className="text-sm font-extrabold text-primary">{fmtUSD(fund.maturityAmount || 0)}</p>
+                        <p className="text-sm font-extrabold text-primary">
+                          {fmtUSD(fund.maturityAmount ?? inv.maturityAmount ?? 0)}
+                        </p>
                       </div>
                     </div>
 
-                    {matured && !inv.isClaimed ? (
-                      <button onClick={() => handleClaim(inv._id)} disabled={claimingId === inv._id}
-                        className="w-full py-3.5 rounded-2xl bg-success text-white text-sm font-extrabold active:scale-[0.98] transition-all disabled:opacity-60">
+                    {/* Action button */}
+                    {matured ? (
+                      <button
+                        onClick={() => handleClaim(inv._id)}
+                        disabled={claimingId === inv._id}
+                        className="w-full py-3.5 rounded-2xl bg-success text-white text-sm font-extrabold active:scale-[0.98] transition-all disabled:opacity-60"
+                      >
                         {claimingId === inv._id ? 'Claiming…' : '🎉 Claim Payout'}
                       </button>
                     ) : inv.isClaimed ? (
@@ -145,7 +182,7 @@ export default function MyWealthFunds() {
                       </div>
                     ) : (
                       <div className="w-full py-3 rounded-2xl bg-primary-light text-center text-sm font-bold text-primary">
-                        ⏳ {daysLeft} days remaining
+                        ⏳ {daysLeft !== null ? `${daysLeft} days remaining` : 'In Progress'}
                       </div>
                     )}
                   </div>
