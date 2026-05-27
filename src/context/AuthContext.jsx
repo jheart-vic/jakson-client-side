@@ -45,20 +45,9 @@ export const AuthProvider = ({ children }) => {
         init()
     }, [])
 
-    const login = useCallback(async (userData) => {
+    const login = useCallback((userData) => {
         storage.setUser(userData)
         setUser(userData)
-        // Re-fetch from server to guarantee the user object is fully fresh
-        // and isAdmin / isSuperAdmin computed values update correctly.
-        // Without this, impersonation sets user via setUser but components
-        // already mounted with the old auth state don't re-evaluate role flags.
-        try {
-            const { data } = await getMe()
-            setUser(data.user)
-            storage.setUser(data.user)
-        } catch {
-            // Keep the passed userData if getMe fails
-        }
     }, [])
 
     const logout = useCallback(() => {

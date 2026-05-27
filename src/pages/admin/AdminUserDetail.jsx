@@ -40,7 +40,7 @@ const TABS = [
 const AdminUserDetail = () => {
   const { id }      = useParams()
   const navigate    = useNavigate()
-  const { isSuperAdmin, login: authLogin } = useAuth()
+  const { isSuperAdmin, login: authLogin, refreshUser } = useAuth()
 
   const [data,          setData]          = useState(null)
   const [loading,       setLoading]       = useState(true)
@@ -121,14 +121,16 @@ const AdminUserDetail = () => {
     try {
       const { data: d } = await adminLoginAsUser(id)
       toast.success(`Now viewing as ${d.targetUser.phone}`)
-     await authLogin(d.token, d.targetUser)
+      // Set user immediately from response, then re-fetch from server
+      // so isAdmin / role flags are correct before UserLayout renders
+      authLogin(d.targetUser)
+      await refreshUser()
       navigate('/main/dashboard')
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed')
       setImpersonating(false)
     }
-    // Note: no finally reset — we want the spinner to persist while
-    // the new layout is loading after navigate('/main/dashboard')
+    // No finally reset — spinner persists through navigation intentionally
   }
 
   if (loading) return <div className="py-12"><Spinner /></div>
