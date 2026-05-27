@@ -50,6 +50,7 @@ import AdminLogin from './pages/admin/AdminLogin'
 import AdminWealthFunds from './pages/admin/AdminWealthFunds'
 import AdminBonusCodes from './pages/admin/AdminBonusCode'
 import AdminNotifications from './pages/admin/AdminNotifications'
+import AdminLoginRoute from './components/guards/AdminLoginRoute'
 
 const App = () => (
     <Routes>
@@ -61,7 +62,7 @@ const App = () => (
         <Route path='/register'        element={<GuestRoute><Register /></GuestRoute>} />
         <Route path='/forgot-password' element={<GuestRoute><ForgotPassword /></GuestRoute>} />
         <Route path='/reset-password'  element={<GuestRoute><ResetPassword /></GuestRoute>} />
-        <Route path='/admin/login'     element={<AdminLogin />} />
+        <Route path='/admin/login' element={<AdminLoginRoute><AdminLogin /></AdminLoginRoute>} />
 
         {/* ── User routes (authenticated) ────────────────── */}
         <Route path='/main' element={<ProtectedRoute><UserLayout /></ProtectedRoute>}>

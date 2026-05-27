@@ -45,9 +45,9 @@ export const AuthProvider = ({ children }) => {
         init()
     }, [])
 
-    const login = useCallback((user) => {
-        storage.setUser(user)
-        setUser(user)
+    const login = useCallback((userData) => {
+        storage.setUser(userData)
+        setUser(userData)
     }, [])
 
     const logout = useCallback(() => {

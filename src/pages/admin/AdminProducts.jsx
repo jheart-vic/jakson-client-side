@@ -14,7 +14,7 @@ import Modal from '../../components/common/Modal'
 
 const EMPTY_FORM = {
   name: '', image: '', amount: '', cycleDays: '',
-  dailyIncome: '', maxUnits: '1', availableUnits: '',
+  dailyIncome: '', vipLevel: '1', maxUnits: '1', availableUnits: '',
   isFree: false, sortOrder: '0',
 }
 
@@ -24,6 +24,7 @@ const FIELDS = [
   { key: 'amount',         label: 'Cost (USD)',       type: 'number', placeholder: '0 = Free',                required: true },
   { key: 'cycleDays',      label: 'Cycle (Days)',     type: 'number', placeholder: 'e.g. 35',                 required: true },
   { key: 'dailyIncome',    label: 'Daily Income ($)', type: 'number', placeholder: 'e.g. 0.40',               required: true },
+  { key: 'vipLevel',      label: 'VIP Level',        type: 'number', placeholder: 'e.g. 1',                  required: true },
   { key: 'maxUnits',       label: 'Max Units/User',  type: 'number', placeholder: 'e.g. 3'  },
   { key: 'availableUnits', label: 'Stock Available', type: 'number', placeholder: 'Total units' },
   { key: 'sortOrder',      label: 'Sort Order',      type: 'number', placeholder: '0 = first' },
@@ -67,6 +68,7 @@ const AdminProducts = () => {
       amount:         String(p.amount),
       cycleDays:      String(p.cycleDays),
       dailyIncome:    String(p.dailyIncome),
+      vipLevel:       String(p.vipLevel ?? 1),
       maxUnits:       String(p.maxUnits),
       availableUnits: String(p.availableUnits),
       isFree:         p.isFree,
@@ -88,6 +90,7 @@ const AdminProducts = () => {
       amount:         parseFloat(form.amount)         || 0,
       cycleDays:      parseInt(form.cycleDays),
       dailyIncome:    parseFloat(form.dailyIncome),
+      vipLevel:       parseInt(form.vipLevel)         || 1,
       maxUnits:       parseInt(form.maxUnits)         || 1,
       availableUnits: parseInt(form.availableUnits)   || 0,
       isFree:         form.isFree,

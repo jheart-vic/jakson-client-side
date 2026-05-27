@@ -40,12 +40,13 @@ const TABS = [
 const AdminUserDetail = () => {
   const { id }      = useParams()
   const navigate    = useNavigate()
-  const { isSuperAdmin, login: authLogin } = useAuth()
+  const { isSuperAdmin, login: authLogin, refreshUser } = useAuth()
 
   const [data,          setData]          = useState(null)
   const [loading,       setLoading]       = useState(true)
   const [modal,         setModal]         = useState(null)
   const [working,       setWorking]       = useState(false)
+  const [impersonating, setImpersonating] = useState(false)
   const [walletForm,    setWalletForm]    = useState({ amount: '', reason: '' })
   const [newRole,       setNewRole]       = useState('')
   const [suspendReason, setSuspendReason] = useState('')
@@ -116,16 +117,20 @@ const AdminUserDetail = () => {
   }
 
   const handleImpersonate = async () => {
-    setWorking(true)
+    setImpersonating(true)
     try {
       const { data: d } = await adminLoginAsUser(id)
-      // ✅ fixed: was referencing stale `data.user` instead of the response `d`
       toast.success(`Now viewing as ${d.targetUser.phone}`)
-      authLogin(d.token, d.targetUser)
+      // Set user immediately from response, then re-fetch from server
+      // so isAdmin / role flags are correct before UserLayout renders
+      authLogin(d.targetUser)
+      await refreshUser()
       navigate('/main/dashboard')
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed')
-    } finally { setWorking(false) }
+      setImpersonating(false)
+    }
+    // No finally reset — spinner persists through navigation intentionally
   }
 
   if (loading) return <div className="py-12"><Spinner /></div>
@@ -239,11 +244,19 @@ const AdminUserDetail = () => {
         </button>
         <button
           onClick={handleImpersonate}
+          disabled={impersonating}
           className="flex items-center justify-center gap-2 bg-primary-light text-primary
                      border-2 border-primary/20 py-3 rounded-2xl text-sm font-bold
-                     active:scale-95 transition-transform"
+                     active:scale-95 transition-transform disabled:opacity-70"
         >
-          <LogIn size={15} /> Login As
+          {impersonating ? (
+            <>
+              <span className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin-slow" />
+              Logging in…
+            </>
+          ) : (
+            <><LogIn size={15} /> Login As</>
+          )}
         </button>
         {isSuperAdmin && (
           <button
@@ -471,6 +484,3 @@ const AdminUserDetail = () => {
 }
 
 export default AdminUserDetail
-
-
-

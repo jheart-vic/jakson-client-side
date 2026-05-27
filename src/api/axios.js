@@ -17,12 +17,11 @@ const requestEndCallbacks   = []
 export const onRequestStart = (cb) => requestStartCallbacks.push(cb)
 export const onRequestEnd   = (cb) => requestEndCallbacks.push(cb)
 
-// ── Auth pages that should never trigger a refresh redirect ───────────────
+// ── Auth pages ────────────────────────────────────────────────────────────
 const AUTH_PATHS = ['/login', '/register', '/forgot-password', '/reset-password', '/admin/login']
 const onAuthPage = () => AUTH_PATHS.some(p => window.location.pathname.startsWith(p))
 
 const redirectToLogin = () => {
-  // Never redirect if already on a login/auth page — breaks the loop
   if (onAuthPage()) return
   localStorage.removeItem('user')
   const isAdmin = window.location.pathname.startsWith('/admin')
@@ -89,26 +88,26 @@ api.interceptors.response.use(
     // ── 401 handling ──────────────────────────────────────────────────────
     if (status === 401 && !originalRequest._retry) {
 
-      // 1. Never try to refresh from an auth page — would cause the loop
+      // On auth pages — toast the error, skip refresh
       if (onAuthPage()) {
-        err.isHandled = true   // silence page-level catch blocks
+        err.isHandled = true
+        dedupedToastError(message)
         return Promise.reject(err)
       }
 
-      // 2. No cached user = not logged in, refreshing is pointless
+      // No cached user — not logged in, skip refresh
       if (!localStorage.getItem('user')) {
-        err.isHandled = true   // silence page-level catch blocks
         return Promise.reject(err)
       }
 
-      // 3. Don't refresh the refresh or login endpoints themselves
+      // Don't refresh the refresh endpoint itself
       const url = originalRequest.url || ''
       if (url.includes('/auth/refresh') || url.includes('/auth/login')) {
         redirectToLogin()
         return Promise.reject(err)
       }
 
-      // 4. Another refresh already in flight — queue this request
+      // Another refresh already in flight — queue this request
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
@@ -148,8 +147,6 @@ api.interceptors.response.use(
     // ── 429 ───────────────────────────────────────────────────────────────
     if (status === 429) {
       err.isHandled = true
-      // On auth pages (login, register…) rate limits are expected — stay silent.
-      // On protected pages show the server's own message so it's meaningful.
       if (!onAuthPage()) {
         dedupedToastError(message || 'Too many requests. Please slow down.')
       }
