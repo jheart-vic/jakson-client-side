@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import { Calendar, Gift } from 'lucide-react'
 import PageHeader from '../../components/layout/PageHeader'
@@ -35,7 +35,7 @@ export default function MyWealthFunds() {
   const [funds, setFunds] = useState([])
   const [loading, setLoading] = useState(true)
   const [claimingId, setClaimingId] = useState(null)
-  const now = useMemo(() => new Date(), [])
+  const now = new Date()
   const { refreshUser } = useAuth()
 
   const loadFunds = useCallback(async () => {
