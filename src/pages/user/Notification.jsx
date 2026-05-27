@@ -30,108 +30,67 @@ import {
 import { handleApiError } from '../../utils/errorHandler'
 import { getAnnouncements } from '../../api/settings'
 import Skeleton from '../../components/common/Skeleton'
+import Modal from '../../components/common/Modal'
 
 const TYPE_META = {
-    deposit: {
-        icon: ArrowDownCircle,
-        color: 'text-blue-500',
-        bg: 'bg-blue-50',
-        label: 'Deposit',
-    },
-    withdrawal: {
-        icon: ArrowUpCircle,
-        color: 'text-orange-500',
-        bg: 'bg-orange-50',
-        label: 'Withdrawal',
-    },
-    bonus_code: {
-        icon: Gift,
-        color: 'text-purple-500',
-        bg: 'bg-purple-50',
-        label: 'Bonus',
-    },
-    daily_income: {
-        icon: CheckCircle2,
-        color: 'text-green-500',
-        bg: 'bg-green-50',
-        label: 'Income',
-    },
-    referral_bonus: {
-        icon: Users,
-        color: 'text-pink-500',
-        bg: 'bg-pink-50',
-        label: 'Referral',
-    },
-    invitee: {
-        icon: Users,
-        color: 'text-indigo-500',
-        bg: 'bg-indigo-50',
-        label: 'Invitee',
-    },
-    checkin: {
-        icon: Calendar,
-        color: 'text-yellow-500',
-        bg: 'bg-yellow-50',
-        label: 'Check-in',
-    },
-    admin: {
-        icon: ShieldCheck,
-        color: 'text-gray-500',
-        bg: 'bg-gray-100',
-        label: 'Admin',
-    },
-    system: {
-        icon: Info,
-        color: 'text-sky-500',
-        bg: 'bg-sky-50',
-        label: 'System',
-    },
+    deposit:        { icon: ArrowDownCircle, color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'Deposit'    },
+    withdrawal:     { icon: ArrowUpCircle,   color: 'text-orange-500', bg: 'bg-orange-50', label: 'Withdrawal' },
+    bonus_code:     { icon: Gift,            color: 'text-purple-500', bg: 'bg-purple-50', label: 'Bonus'      },
+    daily_income:   { icon: CheckCircle2,    color: 'text-green-500',  bg: 'bg-green-50',  label: 'Income'     },
+    referral_bonus: { icon: Users,           color: 'text-pink-500',   bg: 'bg-pink-50',   label: 'Referral'   },
+    invitee:        { icon: Users,           color: 'text-indigo-500', bg: 'bg-indigo-50', label: 'Invitee'    },
+    checkin:        { icon: Calendar,        color: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Check-in'   },
+    admin:          { icon: ShieldCheck,     color: 'text-gray-500',   bg: 'bg-gray-100',  label: 'Admin'      },
+    system:         { icon: Info,            color: 'text-sky-500',    bg: 'bg-sky-50',    label: 'System'     },
 }
 
 const FILTERS = [
-    { key: 'all', label: 'All' },
+    { key: 'all',           label: 'All'             },
     { key: 'announcements', label: '📢 Announcements' },
-    { key: 'unread', label: 'Unread' },
-    { key: 'bonus_code', label: 'Bonus' },
-    { key: 'deposit', label: 'Deposit' },
-    { key: 'withdrawal', label: 'Withdraw' },
-    { key: 'daily_income', label: 'Income' },
-    { key: 'referral_bonus', label: 'Referral' },
-    { key: 'invitee', label: 'Invitee' },
-    { key: 'checkin', label: 'Check-in' },
+    { key: 'unread',        label: 'Unread'          },
+    { key: 'bonus_code',    label: 'Bonus'           },
+    { key: 'deposit',       label: 'Deposit'         },
+    { key: 'withdrawal',    label: 'Withdraw'        },
+    { key: 'daily_income',  label: 'Income'          },
+    { key: 'referral_bonus',label: 'Referral'        },
+    { key: 'invitee',       label: 'Invitee'         },
+    { key: 'checkin',       label: 'Check-in'        },
 ]
 
 const timeAgo = (date) => {
     const diff = Date.now() - new Date(date).getTime()
-    const mins = Math.floor(diff / 60000)
+    const mins  = Math.floor(diff / 60000)
     const hours = Math.floor(diff / 3600000)
-    const days = Math.floor(diff / 86400000)
-    if (mins < 1) return 'Just now'
-    if (mins < 60) return `${mins}m ago`
+    const days  = Math.floor(diff / 86400000)
+    if (mins < 1)   return 'Just now'
+    if (mins < 60)  return `${mins}m ago`
     if (hours < 24) return `${hours}h ago`
     return `${days}d ago`
 }
 
 const Notifications = () => {
-    const [notifications, setNotifications] = useState([])
-    const [unreadCount, setUnreadCount] = useState(0)
-    const [loading, setLoading] = useState(true)
-    const { search } = useLocation()
-    const initTab = new URLSearchParams(search).get('tab') || 'all'
-    const [activeFilter, setActiveFilter] = useState(initTab)
-    const [copiedId, setCopiedId] = useState(null)
-    const [actionLoading, setActionLoading] = useState(null)
-    const [announcements, setAnnouncements] = useState([])
+    const [notifications,        setNotifications]        = useState([])
+    const [unreadCount,          setUnreadCount]          = useState(0)
+    const [loading,              setLoading]              = useState(true)
+    const { search }  = useLocation()
+    const initTab     = new URLSearchParams(search).get('tab') || 'all'
+    const [activeFilter,         setActiveFilter]         = useState(initTab)
+    const [copiedId,             setCopiedId]             = useState(null)
+    const [actionLoading,        setActionLoading]        = useState(null)
+    const [announcements,        setAnnouncements]        = useState([])
     const [announcementsLoading, setAnnouncementsLoading] = useState(false)
-    const [copiedCode, setCopiedCode] = useState(null)
+    const [copiedCode,           setCopiedCode]           = useState(null)
+
+    // ── Confirm modal state ──────────────────────────────────────────────────
+    const [confirmModal, setConfirmModal] = useState(null)
+    // confirmModal shape: { type: 'deleteOne' | 'deleteAll', id?: string, title, body, onConfirm }
 
     const load = useCallback(async (filter) => {
         setLoading(true)
         try {
             const params = {}
-            if (filter === 'unread') params.filter = 'unread'
-            else if (filter !== 'all') params.type = filter
-
+            if (filter === 'unread')     params.filter = 'unread'
+            else if (filter !== 'all')   params.type   = filter
             const { data } = await getNotifications(params)
             setNotifications(data?.notifications || [])
             setUnreadCount(data?.unreadCount ?? 0)
@@ -164,9 +123,7 @@ const Notifications = () => {
         setActionLoading(id)
         try {
             await markAsRead(id)
-            setNotifications((prev) =>
-                prev.map((n) => (n._id === id ? { ...n, isRead: true } : n)),
-            )
+            setNotifications((prev) => prev.map((n) => n._id === id ? { ...n, isRead: true } : n))
             setUnreadCount((c) => Math.max(0, c - 1))
             toast.success('Marked as read')
         } catch (err) {
@@ -179,9 +136,7 @@ const Notifications = () => {
     const handleMarkAllRead = async () => {
         try {
             await markAllAsRead()
-            setNotifications((prev) =>
-                prev.map((n) => ({ ...n, isRead: true })),
-            )
+            setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })))
             setUnreadCount(0)
             toast.success('All marked as read')
         } catch (err) {
@@ -190,33 +145,47 @@ const Notifications = () => {
     }
 
     const handleDelete = async (id) => {
-        setActionLoading(id + '_del')
-        try {
-            await deleteNotification(id)
-            setNotifications((prev) => {
-                const deleted = prev.find((n) => n._id === id)
-                if (deleted && !deleted.isRead)
-                    setUnreadCount((c) => Math.max(0, c - 1))
-                return prev.filter((n) => n._id !== id)
-            })
-            toast.success('Notification deleted')
-        } catch (err) {
-            handleApiError(err, 'Failed to delete')
-        } finally {
-            setActionLoading(null)
-        }
+        setConfirmModal({
+            type: 'deleteOne',
+            title: 'Delete Notification',
+            body: 'Are you sure you want to delete this notification?',
+            onConfirm: async () => {
+                setConfirmModal(null)
+                setActionLoading(id + '_del')
+                try {
+                    await deleteNotification(id)
+                    setNotifications((prev) => {
+                        const deleted = prev.find((n) => n._id === id)
+                        if (deleted && !deleted.isRead) setUnreadCount((c) => Math.max(0, c - 1))
+                        return prev.filter((n) => n._id !== id)
+                    })
+                    toast.success('Notification deleted')
+                } catch (err) {
+                    handleApiError(err, 'Failed to delete')
+                } finally {
+                    setActionLoading(null)
+                }
+            },
+        })
     }
 
-    const handleDeleteAll = async () => {
-        if (!confirm('Delete all notifications?')) return
-        try {
-            await deleteAllNotifications()
-            setNotifications([])
-            setUnreadCount(0)
-            toast.success('All notifications deleted')
-        } catch (err) {
-            handleApiError(err, 'Failed to delete all notifications')
-        }
+    const handleDeleteAll = () => {
+        setConfirmModal({
+            type: 'deleteAll',
+            title: 'Clear All Notifications',
+            body: 'This will permanently delete all your notifications. This cannot be undone.',
+            onConfirm: async () => {
+                setConfirmModal(null)
+                try {
+                    await deleteAllNotifications()
+                    setNotifications([])
+                    setUnreadCount(0)
+                    toast.success('All notifications deleted')
+                } catch (err) {
+                    handleApiError(err, 'Failed to delete all notifications')
+                }
+            },
+        })
     }
 
     const copyCode = (id, code) => {
@@ -226,31 +195,30 @@ const Notifications = () => {
         setTimeout(() => setCopiedId(null), 2000)
     }
 
-    // Compute unread directly from the loaded notifications as a reliable fallback
     const unreadInList = notifications.filter(n => !n.isRead).length
-    const hasUnread = unreadCount > 0 || unreadInList > 0
+    const hasUnread    = unreadCount > 0 || unreadInList > 0
 
-    // FIX: plain JSX variable instead of an inline component — avoids "component
-    // created during render" error while keeping identical markup and behaviour.
-    const actionBtn = hasUnread ? (
-        <button
-            onClick={handleMarkAllRead}
-            className="flex items-center gap-1 text-xs font-bold text-primary bg-primary-light px-2.5 py-1.5 rounded-xl"
-        >
-            <MailOpen size={12} /> Read all
-        </button>
-    ) : notifications.length > 0 ? (
-        <button
-            onClick={handleDeleteAll}
-            className="flex items-center gap-1 text-xs font-bold text-red-400 bg-red-50 px-2.5 py-1.5 rounded-xl"
-        >
-            <Trash2 size={12} /> Clear all
-        </button>
+    const actionBtn = notifications.length > 0 ? (
+        <div className="flex flex-col gap-1.5 lg:flex-row lg:items-center lg:gap-2">
+            {hasUnread && (
+                <button
+                    onClick={handleMarkAllRead}
+                    className="flex items-center justify-center gap-1 text-xs font-bold text-primary bg-primary-light px-2.5 py-1.5 rounded-xl"
+                >
+                    <MailOpen size={12} /> Read all
+                </button>
+            )}
+            <button
+                onClick={handleDeleteAll}
+                className="flex items-center justify-center gap-1 text-xs font-bold text-red-400 bg-red-50 px-2.5 py-1.5 rounded-xl"
+            >
+                <Trash2 size={12} /> Clear all
+            </button>
+        </div>
     ) : null
 
     return (
         <div className='min-h-dvh pb-8'>
-            {/* Header: button only visible on mobile */}
             <PageHeader
                 title='Notifications'
                 right={<div className="lg:hidden">{actionBtn}</div>}
@@ -275,9 +243,7 @@ const Notifications = () => {
                         </button>
                     ))}
                 </div>
-                <div className="hidden lg:block">
-                    {actionBtn}
-                </div>
+                <div className="hidden lg:block">{actionBtn}</div>
             </div>
 
             {/* Announcements tab */}
@@ -296,9 +262,9 @@ const Notifications = () => {
                         </div>
                     ) : announcements.map((n) => {
                         const colorMap = { info: '#1a9fd4', success: '#10b981', warning: '#f97316', bonus: '#8b5cf6' }
-                        const bgMap   = { info: '#e0f4fc', success: '#ecfdf5', warning: '#fff4ed', bonus: '#ede9fe' }
-                        const IconMap = { info: Info, success: CheckCircle2, warning: AlertTriangle, bonus: Gift }
-                        const Icon = IconMap[n.type] || Bell
+                        const bgMap    = { info: '#e0f4fc', success: '#ecfdf5', warning: '#fff4ed', bonus: '#ede9fe' }
+                        const IconMap  = { info: Info, success: CheckCircle2, warning: AlertTriangle, bonus: Gift }
+                        const Icon     = IconMap[n.type] || Bell
                         return (
                             <div key={n._id} className='bg-white rounded-2xl p-4 border border-gray-100 shadow-card'>
                                 <div className='flex items-start gap-3'>
@@ -328,7 +294,7 @@ const Notifications = () => {
                                                     className='flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-xl shrink-0 transition-all active:scale-95'
                                                     style={{
                                                         background: copiedCode === n._id ? '#ecfdf5' : '#ede9fe',
-                                                        color: copiedCode === n._id ? '#10b981' : '#8b5cf6',
+                                                        color:      copiedCode === n._id ? '#10b981' : '#8b5cf6',
                                                     }}
                                                 >
                                                     {copiedCode === n._id
@@ -376,10 +342,10 @@ const Notifications = () => {
                         </div>
                     ) : (
                         notifications.map((n) => {
-                            const meta = TYPE_META[n.type] || TYPE_META.system
-                            const Icon = meta.icon
+                            const meta       = TYPE_META[n.type] || TYPE_META.system
+                            const Icon       = meta.icon
                             const isDeleting = actionLoading === n._id + '_del'
-                            const isMarking = actionLoading === n._id
+                            const isMarking  = actionLoading === n._id
 
                             return (
                                 <div
@@ -457,6 +423,37 @@ const Notifications = () => {
                     )}
                 </div>
             )}
+
+            {/* ── Confirm Modal ── */}
+            <Modal
+                isOpen={!!confirmModal}
+                onClose={() => setConfirmModal(null)}
+                title={confirmModal?.title || 'Confirm'}
+            >
+                {confirmModal && (
+                    <div className="space-y-4 text-center">
+                        <div className="w-14 h-14 rounded-2xl bg-danger-light flex items-center justify-center mx-auto">
+                            <Trash2 size={22} className="text-danger" />
+                        </div>
+                        <p className="text-sm text-gray-500">{confirmModal.body}</p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setConfirmModal(null)}
+                                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-gray-500 text-sm font-bold active:scale-95 transition-transform"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmModal.onConfirm}
+                                className="flex-1 py-3 rounded-2xl bg-danger text-white text-sm font-bold
+                                           shadow-[0_4px_12px_rgba(239,68,68,0.25)] active:scale-95 transition-transform"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </Modal>
         </div>
     )
 }
