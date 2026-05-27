@@ -4,9 +4,15 @@ import OfflineBanner from '../common/OfflineBanner'
 import DesktopSidebar from './DesktopSidebar'
 import DesktopHeader from './DesktopHeader'
 import MobileSupportButton from '../common/MobileSupportButton'
+import { useAuth } from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import { ShieldCheck } from 'lucide-react'
 
 const UserLayout = () => {
   const { pathname } = useLocation()
+const { isAdmin, loading } = useAuth()
+const navigate = useNavigate()
+
 
   return (
     <>
@@ -52,8 +58,20 @@ const UserLayout = () => {
       <MobileSupportButton />
       <BottomNav />
       <OfflineBanner />
+{!loading && isAdmin && (
+  <button
+    onClick={() => navigate('/admin/dashboard')}
+    className="fixed bottom-24 right-4 z-50 flex items-center gap-2 px-3 py-2
+               bg-primary text-white text-xs font-bold rounded-xl shadow-lg
+               active:scale-95 transition-transform"
+  >
+    <ShieldCheck size={14} />
+    Admin Panel
+  </button>
+)}
     </>
   )
+
 }
 
 export default UserLayout

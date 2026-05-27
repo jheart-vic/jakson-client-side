@@ -221,7 +221,11 @@ const Invest = () => {
                                 ? 'bronze'
                                 : p.amount <= 100
                                 ? 'silver'
-                                : 'gold'
+                                : p.amount <= 300
+                                ? 'gold'
+                                : p.amount <= 1000
+                                ? 'platinum'
+                                : 'elite'
 
                         const TIER_STYLE = {
                             free: {
@@ -243,6 +247,16 @@ const Invest = () => {
                                 grad: 'from-amber-500 to-orange-400',
                                 badge: 'bg-amber-100 text-amber-700',
                                 label: '🏆 Premium',
+                            },
+                            platinum: {
+                                grad: 'from-slate-500 to-slate-400',
+                                badge: 'bg-slate-100 text-slate-700',
+                                label: '🪙 Platinum',
+                            },
+                            elite: {
+                                grad: 'from-rose-600 to-pink-500',
+                                badge: 'bg-rose-100 text-rose-700',
+                                label: '💎 Elite',
                             },
                         }[tier]
 
@@ -272,11 +286,18 @@ const Invest = () => {
                                             <p className='text-white font-extrabold text-sm leading-tight'>
                                                 {p.name}
                                             </p>
-                                            <span
-                                                className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${TIER_STYLE.badge}`}
-                                            >
-                                                {TIER_STYLE.label}
-                                            </span>
+                                            <div className='flex items-center gap-1.5 mt-0.5'>
+                                                <span
+                                                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${TIER_STYLE.badge}`}
+                                                >
+                                                    {TIER_STYLE.label}
+                                                </span>
+                                                {p.vipLevel > 0 && (
+                                                    <span className='text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-white/25 text-white border border-white/30'>
+                                                        VIP {p.vipLevel}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
