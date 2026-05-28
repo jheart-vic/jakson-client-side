@@ -441,7 +441,7 @@ const Dashboard = () => {
     }
 
     const copyInvite = () => {
-        const link = `https://jaksonsolar.org/register?c=${user?.referralCode || ''}`
+        const link = `https://www.luminos-energy.com?c=${user?.referralCode || ''}`
         navigator.clipboard.writeText(link).then(() => toast.success('Invite link copied!')).catch(() => toast.error('Could not copy'))
     }
 
