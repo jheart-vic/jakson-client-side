@@ -17,6 +17,7 @@ import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/common/Modal'
 import Spinner from '../../components/common/Spinner'
 
+
 const ROLE_OPTIONS = ['user', 'admin', 'superadmin']
 
 const CATEGORY_LABELS = {
@@ -40,7 +41,7 @@ const TABS = [
 const AdminUserDetail = () => {
   const { id }      = useParams()
   const navigate    = useNavigate()
-  const { isSuperAdmin, login: authLogin, refreshUser } = useAuth()
+  const { isSuperAdmin, login: authLogin } = useAuth()
 
   const [data,          setData]          = useState(null)
   const [loading,       setLoading]       = useState(true)
@@ -123,8 +124,9 @@ const AdminUserDetail = () => {
       toast.success(`Now viewing as ${d.targetUser.phone}`)
       // Set user immediately from response, then re-fetch from server
       // so isAdmin / role flags are correct before UserLayout renders
+      localStorage.setItem('isImpersonating', 'true')
       authLogin(d.targetUser)
-      await refreshUser()
+      // await refreshUser()
       navigate('/main/dashboard')
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed')
