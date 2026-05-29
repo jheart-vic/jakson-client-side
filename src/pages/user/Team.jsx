@@ -167,7 +167,7 @@ const Team = () => {
         ) : (
           <div className="space-y-3 max-h-72 overflow-y-auto">
             {members.map(m => (
-              <div key={m._id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+              <div key={m._id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0 animate-slide-up">
                 <div className="w-9 h-9 rounded-full bg-primary-light flex items-center justify-center shrink-0">
                   <span className="text-sm font-extrabold text-primary">
                     {(m.displayName || m.userName || '?')[0].toUpperCase()}
@@ -177,7 +177,7 @@ const Team = () => {
                   <p className="text-sm font-bold text-gray-800 truncate">{m.displayName || m.userName}</p>
                   <p className="text-xs text-gray-400">{fmtDate(m.createdAt)}</p>
                 </div>
-                <p className="text-xs font-bold text-success shrink-0">{fmtUSD(m.totalInvested || 0)}</p>
+                <p className="text-xs font-bold text-success shrink-0 pr-10 ">{fmtUSD(m.totalEarned || 0)}</p>
               </div>
             ))}
           </div>

@@ -33,15 +33,16 @@ import Skeleton from '../../components/common/Skeleton'
 import Modal from '../../components/common/Modal'
 
 const TYPE_META = {
-    deposit:        { icon: ArrowDownCircle, color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'Deposit'    },
-    withdrawal:     { icon: ArrowUpCircle,   color: 'text-orange-500', bg: 'bg-orange-50', label: 'Withdrawal' },
-    bonus_code:     { icon: Gift,            color: 'text-purple-500', bg: 'bg-purple-50', label: 'Bonus'      },
-    daily_income:   { icon: CheckCircle2,    color: 'text-green-500',  bg: 'bg-green-50',  label: 'Income'     },
-    referral_bonus: { icon: Users,           color: 'text-pink-500',   bg: 'bg-pink-50',   label: 'Referral'   },
-    invitee:        { icon: Users,           color: 'text-indigo-500', bg: 'bg-indigo-50', label: 'Invitee'    },
-    checkin:        { icon: Calendar,        color: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Check-in'   },
-    admin:          { icon: ShieldCheck,     color: 'text-gray-500',   bg: 'bg-gray-100',  label: 'Admin'      },
-    system:         { icon: Info,            color: 'text-sky-500',    bg: 'bg-sky-50',    label: 'System'     },
+    deposit:         { icon: ArrowDownCircle, color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'Deposit'    },
+    withdrawal:      { icon: ArrowUpCircle,   color: 'text-orange-500', bg: 'bg-orange-50', label: 'Withdrawal' },
+    bonus_code:      { icon: Gift,            color: 'text-purple-500', bg: 'bg-purple-50', label: 'Bonus'      },
+    daily_income:    { icon: CheckCircle2,    color: 'text-green-500',  bg: 'bg-green-50',  label: 'Income'     },
+    referral_bonus:  { icon: Users,           color: 'text-pink-500',   bg: 'bg-pink-50',   label: 'Referral'   },
+    team_commission: { icon: Users,           color: 'text-teal-500',   bg: 'bg-teal-50',   label: 'Team'       }, // ← add
+    invitee:         { icon: Users,           color: 'text-indigo-500', bg: 'bg-indigo-50', label: 'Invitee'    },
+    checkin:         { icon: Calendar,        color: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Check-in'   },
+    admin:           { icon: ShieldCheck,     color: 'text-gray-500',   bg: 'bg-gray-100',  label: 'Admin'      },
+    system:          { icon: Info,            color: 'text-sky-500',    bg: 'bg-sky-50',    label: 'System'     },
 }
 
 const FILTERS = [
@@ -55,6 +56,7 @@ const FILTERS = [
     { key: 'referral_bonus',label: 'Referral'        },
     { key: 'invitee',       label: 'Invitee'         },
     { key: 'checkin',       label: 'Check-in'        },
+    { key: 'team_commission', label: 'Team' },
 ]
 
 const timeAgo = (date) => {

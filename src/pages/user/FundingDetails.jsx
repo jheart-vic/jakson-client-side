@@ -20,6 +20,7 @@ const CATEGORY_LABELS = {
   investment:         'Investment',
   daily_income:       'Daily Income',
   referral_bonus:     'Referral Bonus',
+  team_commission:    'Team Commission',
   reward_code:        'Reward Code',
   daily_checkin:      'Daily Check-in',
   refund:             'Refund',
@@ -79,7 +80,6 @@ const FundingDetails = () => {
             ? <EmptyState message="No transactions found" icon="📋" />
             : items.map((tx, i) => {
                 const isIn = tx.type === 'in'
-                // Schema field is `amountUSD` — fall back to `amount` for safety
                 const amount = tx.amountUSD ?? tx.amount ?? 0
                 return (
                   <div key={tx._id}
@@ -101,7 +101,6 @@ const FundingDetails = () => {
                       <p className={`text-sm font-extrabold ${isIn ? 'text-success' : 'text-danger'}`}>
                         {isIn ? '+' : '-'}{fmtUSD(amount)}
                       </p>
-                      {/* Show running balance if available */}
                       {tx.balanceAfter != null && (
                         <p className="text-[10px] text-gray-400 mt-0.5">
                           Bal: {fmtUSD(tx.balanceAfter)}
