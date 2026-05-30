@@ -39,6 +39,7 @@ export const adminGetWealthFunds = (params) => api.get('/admin/wealth-funds', { 
 export const adminCreateWealthFund = (data) => api.post('/admin/wealth-funds', data)
 export const adminUpdateWealthFund = (id, data) => api.put(`/admin/wealth-funds/${id}`, data)
 export const adminDeleteWealthFund = (id) => api.delete(`/admin/wealth-funds/${id}`)
+// export const adminDeactivateWealthFund = (id) => api.patch(`/admin/wealth-funds/${id}/deactivate`)
 
 // ── Bonus Codes ────────────────────────────────────────────
 export const adminGetBonusCodes    = ()        => api.get('/admin/bonus-codes')
