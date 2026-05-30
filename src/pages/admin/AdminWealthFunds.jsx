@@ -6,6 +6,7 @@ import {
   adminCreateWealthFund,
   adminUpdateWealthFund,
   adminDeleteWealthFund,
+  // adminDeactivateWealthFund,
 } from '../../api/admin'
 import { fmtUSD } from '../../utils/currency'
 import Modal from '../../components/common/Modal'
@@ -107,15 +108,26 @@ export default function AdminWealthFunds() {
   }
 
   const handleDelete = async (fund) => {
-    if (!window.confirm(`Deactivate "${fund.name}"?`)) return
+    if (!window.confirm(`Delete "${fund.name}"?`)) return
     try {
       await adminDeleteWealthFund(fund._id)
-      toast.success('Wealth fund deactivated')
+      toast.success('Wealth fund deleted')
       loadFunds()
     } catch {
       toast.error('Delete failed')
     }
   }
+  // const handleDeactivate = async (fund) => {
+  //   if (!window.confirm(`Deactivate "${fund.name}"?`)) return
+  //   try {
+  //     await adminDeactivateWealthFund(fund._id)
+  //     toast.success('Wealth fund deactivated')
+  //     loadFunds()
+  //   } catch {
+  //     toast.error('Deactivation failed')
+  //   }
+  // }
+
 
   if (loading) return <Spinner />
 
