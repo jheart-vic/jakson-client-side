@@ -25,6 +25,12 @@ const fmtExpiry = (date) => {
   })
 }
 
+const isTodayWeekday = () => {
+  const day = new Date().getDay()
+console.log('Today is day', day, '(0=Sun, 6=Sat)')
+  return day !== 0 && day !== 6 // not Sun or Sat
+}
+
 // Count only Mon-Fri days between now and expiryDate
 const weekdaysRemaining = (expiryDate) => {
   if (!expiryDate) return 0
@@ -187,7 +193,7 @@ const InvestLog = () => {
                       </div>
 
                       {/* Claim button — shown when this investment has pending income */}
-                      {inv.pendingIncome > 0 && (
+                      {inv.pendingIncome > 0 && isTodayWeekday() && (
                         <div
                           className="mt-3 flex items-center justify-between rounded-2xl px-3 py-2.5"
                           style={{ background: 'rgba(220,95,95,0.10)', border: '1px solid rgba(220,95,95,0.25)' }}
@@ -200,7 +206,7 @@ const InvestLog = () => {
                               </p>
                               <p className="text-[10px] font-medium text-gray-400">
                                 {days > 0
-                                  ? `${days} weekday${days === 1 ? '' : 's'} left · Forfeited tomorrow morning`
+                                  ? `${days} weekday${days === 1 ? '' : 's'} left`
                                   : 'Forfeited tomorrow morning'}
                               </p>
                             </div>
