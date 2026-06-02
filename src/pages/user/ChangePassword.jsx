@@ -78,9 +78,9 @@ const ChangePassword = () => {
       return toast.error('New password does not meet all requirements')
     }
 
-    if (form.password !== form.confirm) {
-      return toast.error('Passwords do not match')
-    }
+    // if (form.password !== form.confirm) {
+    //   return toast.error('Passwords do not match')
+    // }
 
     if (form.password === form.current) {
       return toast.error('New password must be different from current')
