@@ -364,7 +364,7 @@ const AdminProducts = () => {
       </Modal>
 
       {/* ── Delete Modal ── */}
-      <Modal isOpen={modal === 'delete'} onClose={() => !saving && setModal(null)} title="Deactivate Product">
+      <Modal isOpen={modal === 'delete'} onClose={() => !saving && setModal(null)} title="Delete  Product">
         {editing && (
           <div className="space-y-4 text-center">
             <div className="w-16 h-16 rounded-2xl bg-danger-light flex items-center justify-center mx-auto">
@@ -372,10 +372,10 @@ const AdminProducts = () => {
             </div>
             <div>
               <p className="text-gray-700 font-semibold text-sm">
-                Deactivate <strong>"{editing.name}"</strong>?
+                Delete <strong>"{editing.name}"</strong>?
               </p>
               <p className="text-gray-400 text-xs mt-1">
-                Hidden from users but not permanently deleted. You can restore it anytime.
+                Hidden from users and permanently deleted.
               </p>
             </div>
             <div className="flex gap-3">
@@ -388,7 +388,7 @@ const AdminProducts = () => {
                            shadow-[0_4px_12px_rgba(239,68,68,0.25)] active:scale-95 transition-transform disabled:opacity-50">
                 {saving
                   ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin-slow inline-block" />
-                  : 'Deactivate'}
+                  : 'Delete'}
               </button>
             </div>
           </div>
