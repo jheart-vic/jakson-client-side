@@ -8,14 +8,35 @@ import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
+import { adminExitImpersonation } from '../../api/admin'
+// import { storage } from '../../utils/storage'
 
 const UserLayout = () => {
     const { pathname } = useLocation()
-    const { loading, refreshUser } = useAuth()
+    const { loading, login: authLogin, refreshUser } = useAuth()
     const navigate = useNavigate()
     const [isImpersonating, setIsImpersonating] = useState(
         () => !!localStorage.getItem('isImpersonating'),
     )
+
+    const handleExitImpersonation = async () => {
+        try {
+            await adminExitImpersonation() // swaps the session cookie back to the admin's
+        } catch {
+            /* best-effort — proceed regardless */
+        }
+
+        // Restore the admin user in the auth context so the UI flips back to admin
+        const savedAdmin = localStorage.getItem('adminUser')
+        if (savedAdmin) authLogin(JSON.parse(savedAdmin))
+
+        localStorage.removeItem('isImpersonating')
+        localStorage.removeItem('adminUser')
+        localStorage.removeItem('adminId')
+        setIsImpersonating(false)
+        await refreshUser()
+        navigate('/admin/users')
+    }
 
     return (
         <>
@@ -51,7 +72,6 @@ const UserLayout = () => {
                     className='flex-1 pb-20 lg:pb-8 bg-surface lg:bg-gray-50'
                     style={{ animation: 'fadeIn 0.2s ease both' }}
                 >
-                    {/* Content container - centered with max width */}
                     <div className='w-full max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-6'>
                         <Outlet />
                     </div>
@@ -63,15 +83,10 @@ const UserLayout = () => {
             <OfflineBanner />
             {!loading && isImpersonating && (
                 <button
-                    onClick={async () => {
-                        localStorage.removeItem('isImpersonating')
-                        setIsImpersonating(false)
-                        await refreshUser()
-                        navigate('/admin/users')
-                    }}
+                    onClick={handleExitImpersonation}
                     className='fixed bottom-24 right-4 z-50 flex items-center gap-2 px-3 py-2
-                 bg-primary text-white text-xs font-bold rounded-xl shadow-lg
-                 active:scale-95 transition-transform'
+                               bg-primary text-white text-xs font-bold rounded-xl shadow-lg
+                               active:scale-95 transition-transform'
                 >
                     <ShieldCheck size={14} />
                     Back to Admin

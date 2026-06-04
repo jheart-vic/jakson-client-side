@@ -16,6 +16,7 @@ import { fmtDateTime, fmtDate } from '../../utils/date'
 import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/common/Modal'
 import Spinner from '../../components/common/Spinner'
+import { storage } from '../../utils/storage'
 
 
 const ROLE_OPTIONS = ['user', 'admin', 'superadmin']
@@ -121,18 +122,26 @@ const AdminUserDetail = () => {
     setImpersonating(true)
     try {
       const { data: d } = await adminLoginAsUser(id)
+
+      // The backend has already swapped the session cookie to the target user's
+      // impersonation token, so all subsequent API calls will run as that user.
+      // We only need to update the auth context so the UI re-renders correctly.
+
+      // Stash the admin's user object so "Back to Admin" can restore it
+      localStorage.setItem('adminUser',      JSON.stringify(storage.getUser()))
+      localStorage.setItem('adminId',        d.adminId)
+      localStorage.setItem('isImpersonating','true')
+
+      // Update auth context with the target user (includes role: 'user')
+      authLogin({ ...d.targetUser })
+
       toast.success(`Now viewing as ${d.targetUser.phone}`)
-      // Set user immediately from response, then re-fetch from server
-      // so isAdmin / role flags are correct before UserLayout renders
-      localStorage.setItem('isImpersonating', 'true')
-      authLogin(d.targetUser)
-      // await refreshUser()
       navigate('/main/dashboard')
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed')
+      toast.error(err.response?.data?.message || 'Failed to impersonate user')
       setImpersonating(false)
     }
-    // No finally reset — spinner persists through navigation intentionally
+    // No finally — spinner intentionally persists through navigation
   }
 
   if (loading) return <div className="py-12"><Spinner /></div>
