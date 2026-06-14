@@ -331,7 +331,8 @@ const Withdraw = () => {
                 { label: '≈ NGN',    val: fmtNGN(receipt.netAmountNGN) },
                 { label: 'Bank',     val: receipt.bankName },
                 { label: 'Account',  val: receipt.accountNumber },
-                { label: 'Status',   val: 'Pending review' },
+                { label: 'Status',   val: 'Processing' },
+                // { label: 'Status',   val: 'Pending review' },
               ].map(({ label, val }) => (
                 <div key={label} className="flex justify-between text-xs">
                   <span className="text-gray-400 font-medium">{label}</span>
