@@ -27,8 +27,8 @@ export const adminRejectDeposit = (id, reason) => api.put(`/admin/deposits/${id}
 
 // ── Withdrawals ────────────────────────────────────────────
 export const adminGetWithdrawals = (params) => api.get('/admin/withdrawals', { params })
-export const adminApproveWithdrawal = (id) => api.put(`/admin/withdrawals/${id}/approve`)
-export const adminRejectWithdrawal = (id, reason) => api.put(`/admin/withdrawals/${id}/reject`, { reason })
+export const adminApproveWithdrawal = (id) => api.put(`/admin/withdraw/${id}/approve`)
+export const adminRejectWithdrawal = (id, reason) => api.put(`/admin/withdraw/${id}/reject`, { reason })
 
 // ── Settings ───────────────────────────────────────────────
 export const adminGetSettings = () => api.get('/admin/settings')
