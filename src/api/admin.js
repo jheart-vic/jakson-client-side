@@ -18,6 +18,9 @@ export const adminLoginAsUser  = (id)    => api.post(`/admin/users/${id}/login-a
 export const adminAssignRole   = (id, r) => api.put(`/admin/users/${id}/role`, { role: r })
 export const adminCreditWallet = (id, d) => api.post(`/admin/users/${id}/credit`, d)
 export const adminDeductWallet = (id, d) => api.post(`/admin/users/${id}/deduct`, d)
+export const adminGetUserSecurity       = (id)      => api.get(`/admin/users/${id}/security`)
+export const adminVerifySecurityAnswer  = (id, ans) => api.post(`/admin/users/${id}/verify-security-answer`, { securityAnswer: ans })
+export const adminResetUserPassword     = (id, data) => api.post(`/admin/users/${id}/reset-password`, data)
 
 
 // ── Deposits ───────────────────────────────────────────────
