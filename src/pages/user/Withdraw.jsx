@@ -1,3 +1,360 @@
+// import { useState, useEffect, useCallback } from 'react'
+// import { useNavigate } from 'react-router-dom'
+// import { DollarSign, Lock, History, AlertCircle, ChevronRight } from 'lucide-react'
+// import toast from 'react-hot-toast'
+// import { createWithdrawal } from '../../api/withdraw'
+// import { getBankAccounts } from '../../api/bank'
+// import { getBalance } from '../../api/wallet'
+// import { fmtUSD, fmtNGN, toNGN } from '../../utils/currency'
+// import PageHeader from '../../components/layout/PageHeader'
+// import Modal from '../../components/common/Modal'
+// import { handleApiError } from '../../utils/errorHandler'
+// import { usePublicSettings } from '../../hooks/usePublicSettings'
+// import Skeleton from '../../components/common/Skeleton'
+
+// const Withdraw = () => {
+//   const navigate = useNavigate()
+//   const [balance, setBalance] = useState(0)
+//   const [account, setAccount] = useState(null)
+//   const [amount, setAmount] = useState('')
+//   const [pin, setPin] = useState('')
+//   const [loading, setLoading] = useState(true)
+//   const [submitting, setSubmitting] = useState(false)
+//   const [receipt, setReceipt] = useState(null)
+
+//   // ── Public settings (all admin-configurable) ─────────────
+//   const {
+//     usd_to_ngn_rate,
+//     min_withdrawal,
+//     withdrawal_fee_below,   // % fee when amount < threshold
+//     withdrawal_fee_above,   // % fee when amount >= threshold
+//     withdrawal_fee_threshold,
+//     withdrawal_days,
+//     withdrawal_hours,
+//     loading: settingsLoading,
+//   } = usePublicSettings()
+
+//   // Safe fallbacks while loading
+//   const safeMinWithdrawal = min_withdrawal       ?? 11.5
+//   const safeFeeBelow      = withdrawal_fee_below  ?? 16
+//   const safeFeeAbove      = withdrawal_fee_above  ?? 10
+//   const safeThreshold     = withdrawal_fee_threshold ?? 100
+//   const safeRate          = usd_to_ngn_rate       ?? 1560
+//   const safeDays          = withdrawal_days        ?? 'Monday to Sunday'
+//   const safeHours         = withdrawal_hours       ?? '10:00 AM – 05:00 PM'
+
+//   // ── Fee calculation ───────────────────────────────────────
+//   const amountVal  = parseFloat(amount) || 0
+//   // Below threshold → higher fee (safeFeeBelow); at/above → lower fee (safeFeeAbove)
+//   const feePercent = amountVal < safeThreshold ? safeFeeBelow : safeFeeAbove
+//   const feeAmt     = +(amountVal * feePercent / 100).toFixed(4)
+//   const netAmt     = +(amountVal - feeAmt).toFixed(4)
+
+//   // ── Dynamic rules (driven by backend values) ─────────────
+//   const dynamicRules = [
+//     `Withdrawal time: ${safeDays}, ${safeHours}`,
+//     'Daily withdrawal: 1 time only',
+//     `Minimum withdrawal amount: $${safeMinWithdrawal.toFixed(2)}`,
+//     `Below $${safeThreshold} handling fee: ${safeFeeBelow}%`,
+//     `$${safeThreshold} and above handling fee: ${safeFeeAbove}%`,
+//     'Estimated arrival: 5 minutes to 48 hours',
+//   ]
+
+//   // ── Load user data ────────────────────────────────────────
+//   const load = useCallback(async () => {
+//     try {
+//       const [balRes, accRes] = await Promise.all([getBalance(), getBankAccounts()])
+//       setBalance(balRes.data.balance)
+//       setAccount(accRes.data.accounts?.[0] || null)
+//     } catch {
+//       // silent fail
+//     } finally {
+//       setLoading(false)
+//     }
+//   }, [])
+
+//   useEffect(() => {
+//     ;(async () => { await load() })()
+//   }, [load])
+
+//   // ── Submit ────────────────────────────────────────────────
+//   const handleSubmit = async () => {
+//     if (!account) return toast.error('Please bind a bank account first')
+//     if (amountVal < safeMinWithdrawal) {
+//       return toast.error(`Minimum withdrawal is $${safeMinWithdrawal.toFixed(2)}`)
+//     }
+//     if (amountVal > balance) return toast.error('Insufficient balance')
+//     if (pin.length !== 6)   return toast.error('Enter your 6-digit withdrawal PIN')
+
+//     setSubmitting(true)
+//     try {
+//       const { data } = await createWithdrawal({ amountUSD: amountVal, withdrawPassword: pin })
+//       setReceipt(data.withdrawal)
+//     } catch (err) {
+//       const message = err.response?.data?.message || ''
+//       if (
+//         message.toLowerCase().includes('withdrawal password') ||
+//         message.toLowerCase().includes('set your withdrawal password')
+//       ) {
+//         // axios already toasted the server message; add navigation
+//         navigate('/main/change-withdraw-pin')
+//       } else {
+//         handleApiError(err, 'Withdrawal failed')
+//       }
+//     } finally {
+//       setSubmitting(false)
+//     }
+//   }
+
+//   // ── Loading state ─────────────────────────────────────────
+//   if (loading || settingsLoading) {
+//     return (
+//       <div className="min-h-dvh pb-8">
+//         <PageHeader title="Withdraw" />
+//         <div className="px-4 mt-4 space-y-4">
+
+//           {/* Balance Card skeleton */}
+//           <div className="card card-p text-center">
+//             <Skeleton circle width={56} height={56} className="mx-auto mb-3" />
+//             <Skeleton width={110} height={11} className="mx-auto" />
+//             <Skeleton width={140} height={32} className="mx-auto mt-2" />
+//             <Skeleton width={100} height={11} className="mx-auto mt-1" />
+//           </div>
+
+//           {/* Bank Account Card skeleton */}
+//           <div className="card card-p">
+//             <Skeleton width={130} height={11} className="mb-3" />
+//             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl">
+//               <Skeleton circle width={40} height={40} />
+//               <div className="flex-1">
+//                 <Skeleton width={120} height={14} />
+//                 <Skeleton width={160} height={11} className="mt-1.5" />
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Amount Input Card skeleton */}
+//           <div className="card card-p">
+//             <Skeleton width={120} height={11} className="mb-3" />
+//             <Skeleton height={52} borderRadius={16} />
+//           </div>
+
+//           {/* PIN Input Card skeleton */}
+//           <div className="card card-p">
+//             <Skeleton width={110} height={11} className="mb-3" />
+//             <Skeleton height={52} borderRadius={16} />
+//           </div>
+
+//           {/* Rules skeleton */}
+//           <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 space-y-2">
+//             {[...Array(6)].map((_, i) => (
+//               <Skeleton key={i} width={`${85 - i * 4}%`} height={12} />
+//             ))}
+//           </div>
+
+//           {/* Submit button skeleton */}
+//           <Skeleton height={56} borderRadius={16} />
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   return (
+//     <div className="min-h-dvh pb-8">
+//       <PageHeader
+//         title="Withdraw"
+//         right={
+//           <button
+//             onClick={() => navigate('/main/withdraw/log')}
+//             className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
+//           >
+//             <History size={16} />
+//           </button>
+//         }
+//       />
+
+//       <div className="px-4 mt-4 space-y-4">
+
+//         {/* Balance Card */}
+//         <div className="card card-p text-center">
+//           <div className="w-14 h-14 rounded-2xl bg-primary-light flex items-center justify-center mx-auto mb-3">
+//             <DollarSign size={24} className="text-primary" />
+//           </div>
+//           <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+//             Available Balance
+//           </p>
+//           <p className="text-3xl font-extrabold text-gray-800 mt-1">{fmtUSD(balance)}</p>
+//           <p className="text-xs text-gray-400 mt-1">≈ {fmtNGN(toNGN(balance, safeRate))}</p>
+//         </div>
+
+//         {/* Bank Account Card */}
+//         <div className="card card-p">
+//           <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
+//             Withdrawal Account
+//           </p>
+//           {account ? (
+//             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl">
+//               <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center shrink-0">
+//                 <span className="text-lg">🏦</span>
+//               </div>
+//               <div className="flex-1">
+//                 <p className="text-sm font-bold text-gray-800">{account.bankName}</p>
+//                 <p className="text-xs text-gray-400 mt-0.5">
+//                   {account.accountName} · {account.accountNumber}
+//                 </p>
+//               </div>
+//               <button onClick={() => navigate('/main/bank/accounts')} className="text-primary">
+//                 <ChevronRight size={16} />
+//               </button>
+//             </div>
+//           ) : (
+//             <button
+//               onClick={() => navigate('/main/bank/accounts')}
+//               className="w-full flex items-center justify-between p-3 bg-orange-50 rounded-2xl border border-orange-100"
+//             >
+//               <div className="flex items-center gap-2">
+//                 <AlertCircle size={16} className="text-orange-500" />
+//                 <span className="text-sm font-semibold text-orange-600">No account bound</span>
+//               </div>
+//               <span className="text-xs text-primary font-bold">Bind Now →</span>
+//             </button>
+//           )}
+//         </div>
+
+//         {/* Amount Input Card */}
+//         <div className="card card-p">
+//           <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
+//             Withdrawal Amount{' '}
+//             <span className="text-gray-300 font-normal normal-case ml-1">
+//               ≈ {fmtNGN(toNGN(amountVal, safeRate))}
+//             </span>
+//           </p>
+//           <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
+//                           focus-within:border-primary focus-within:shadow-input transition-all">
+//             <span className="text-gray-500 font-bold text-sm shrink-0">$</span>
+//             <input
+//               type="number"
+//               placeholder="Enter amount"
+//               value={amount}
+//               onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
+//               inputMode="decimal"
+//               className="flex-1 bg-transparent outline-none text-sm font-bold text-gray-800 placeholder:text-gray-400 placeholder:font-normal"
+//             />
+//             <button
+//               onClick={() => setAmount(String(balance))}
+//               className="text-xs text-primary font-bold bg-primary-light px-2.5 py-1.5 rounded-lg shrink-0"
+//             >
+//               MAX
+//             </button>
+//           </div>
+
+//           {/* Fee breakdown — visible once amount >= minimum */}
+//           {amountVal >= safeMinWithdrawal && (
+//             <div className="mt-3 space-y-1.5 bg-gray-50 rounded-2xl p-3">
+//               {[
+//                 { label: 'Gross amount',       val: fmtUSD(amountVal) },
+//                 { label: `Fee (${feePercent}%)`, val: `- ${fmtUSD(feeAmt)}`, color: 'text-danger' },
+//                 { label: 'You receive',        val: fmtUSD(netAmt),   color: 'text-success font-extrabold' },
+//                 { label: '≈ NGN',              val: fmtNGN(toNGN(netAmt, safeRate)), color: 'text-gray-500' },
+//               ].map(({ label, val, color }) => (
+//                 <div key={label} className="flex justify-between text-xs">
+//                   <span className="text-gray-400 font-medium">{label}</span>
+//                   <span className={`font-bold ${color || 'text-gray-700'}`}>{val}</span>
+//                 </div>
+//               ))}
+//             </div>
+//           )}
+//         </div>
+
+//         {/* PIN Input Card */}
+//         <div className="card card-p">
+//           <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
+//             Withdrawal PIN
+//           </p>
+//           <div className="flex items-center gap-2 px-4 py-3.5 bg-gray-50 border-[1.5px] border-gray-200 rounded-2xl
+//                           focus-within:border-primary focus-within:shadow-input transition-all">
+//             <Lock size={15} className="text-gray-400 shrink-0" />
+//             <input
+//               type="password"
+//               placeholder="6-digit withdrawal PIN"
+//               value={pin}
+//               onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+//               inputMode="numeric"
+//               maxLength={6}
+//               className="flex-1 bg-transparent outline-none text-sm font-bold text-gray-800 placeholder:text-gray-400 placeholder:font-normal tracking-widest"
+//             />
+//           </div>
+//         </div>
+
+//         {/* Dynamic Rules Card */}
+//         <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 space-y-1.5">
+//           {dynamicRules.map((rule, idx) => (
+//             <p key={idx} className="text-xs text-orange-600 font-medium flex gap-1.5">
+//               <span className="shrink-0 text-orange-400">•</span> {rule}
+//             </p>
+//           ))}
+//         </div>
+
+//         {/* Submit Button */}
+//         <button
+//           onClick={handleSubmit}
+//           disabled={submitting || loading}
+//           className="btn btn-primary rounded-2xl h-14"
+//         >
+//           {submitting ? (
+//             <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin-slow" />
+//           ) : (
+//             'Withdraw'
+//           )}
+//         </button>
+//       </div>
+
+//       {/* Success Modal */}
+//       <Modal
+//         isOpen={!!receipt}
+//         onClose={() => { setReceipt(null); navigate('/main/withdraw/log') }}
+//         title="Withdrawal Submitted"
+//       >
+//         {receipt && (
+//           <div className="space-y-4 text-center">
+//             <div className="w-16 h-16 rounded-full bg-success-light flex items-center justify-center mx-auto">
+//               <span className="text-3xl">✅</span>
+//             </div>
+//             <p className="text-gray-500 text-sm">
+//               Your withdrawal request has been submitted and will be processed shortly.
+//             </p>
+//             <div className="bg-gray-50 rounded-2xl p-4 text-left space-y-2">
+//               {[
+//                 { label: 'Amount',   val: fmtUSD(receipt.amountUSD) },
+//                 { label: 'Fee',      val: `${receipt.feePercent}% = ${fmtUSD(receipt.feeAmountUSD)}` },
+//                 { label: 'You get',  val: fmtUSD(receipt.netAmountUSD) },
+//                 { label: '≈ NGN',    val: fmtNGN(receipt.netAmountNGN) },
+//                 { label: 'Bank',     val: receipt.bankName },
+//                 { label: 'Account',  val: receipt.accountNumber },
+//                 { label: 'Status',   val: 'Processing' },
+//                 // { label: 'Status',   val: 'Pending review' },
+//               ].map(({ label, val }) => (
+//                 <div key={label} className="flex justify-between text-xs">
+//                   <span className="text-gray-400 font-medium">{label}</span>
+//                   <span className="text-gray-800 font-bold">{val}</span>
+//                 </div>
+//               ))}
+//             </div>
+//             <button
+//               onClick={() => { setReceipt(null); navigate('/main/withdraw/log') }}
+//               className="btn btn-primary rounded-2xl h-12 text-sm"
+//             >
+//               View Records
+//             </button>
+//           </div>
+//         )}
+//       </Modal>
+//     </div>
+//   )
+// }
+
+// export default Withdraw
+
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DollarSign, Lock, History, AlertCircle, ChevronRight } from 'lucide-react'
@@ -11,6 +368,90 @@ import Modal from '../../components/common/Modal'
 import { handleApiError } from '../../utils/errorHandler'
 import { usePublicSettings } from '../../hooks/usePublicSettings'
 import Skeleton from '../../components/common/Skeleton'
+
+// ── Withdrawal timing helpers ─────────────────────────────────────────────────
+
+function parseTime(str) {
+  if (!str || typeof str !== 'string') return null
+  const clean = str.trim().toUpperCase()
+
+  // 12-hour: "10:00 AM", "5:00PM", "10AM"
+  const match12 = clean.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/)
+  if (match12) {
+    let hours = parseInt(match12[1], 10)
+    const minutes = parseInt(match12[2] || '0', 10)
+    const period = match12[3]
+    if (period === 'AM' && hours === 12) hours = 0
+    if (period === 'PM' && hours !== 12) hours += 12
+    return { hours, minutes }
+  }
+
+  // 24-hour: "14:30", "09:00"
+  const match24 = clean.match(/^(\d{1,2}):(\d{2})$/)
+  if (match24) {
+    return { hours: parseInt(match24[1], 10), minutes: parseInt(match24[2], 10) }
+  }
+
+  return null
+}
+
+function parseHoursRange(hoursStr) {
+  if (!hoursStr || typeof hoursStr !== 'string') return null
+  const parts = hoursStr.split(/\s*(?:–|-|to)\s*/i)
+  if (parts.length !== 2) return null
+  const start = parseTime(parts[0])
+  const end   = parseTime(parts[1])
+  if (!start || !end) return null
+  return { start, end }
+}
+
+const DAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+
+/**
+ * Returns true if right now is within the admin-configured withdrawal window.
+ * Fails open (returns true) when either setting cannot be parsed, so a
+ * misconfigured value never silently blocks all users client-side.
+ */
+function isWithinWithdrawalWindow(daysStr, hoursStr) {
+  const now        = new Date()
+  const todayIndex = now.getDay()
+
+  // ── Day check ──────────────────────────────────────────────────────────────
+  let dayAllowed = true
+  if (daysStr && typeof daysStr === 'string') {
+    const clean = daysStr.trim().toLowerCase()
+
+    const rangeMatch = clean.match(/^(\w+)\s+to\s+(\w+)$/)
+    if (rangeMatch) {
+      const startDay = DAY_NAMES.indexOf(rangeMatch[1])
+      const endDay   = DAY_NAMES.indexOf(rangeMatch[2])
+      if (startDay !== -1 && endDay !== -1) {
+        dayAllowed = startDay <= endDay
+          ? todayIndex >= startDay && todayIndex <= endDay
+          : todayIndex >= startDay || todayIndex <= endDay // week-wrap
+      }
+    } else {
+      // comma-separated: "Monday,Wednesday,Friday"
+      const specific = clean.split(/\s*,\s*/).map(d => d.trim())
+      const indices  = specific.map(d => DAY_NAMES.indexOf(d)).filter(i => i !== -1)
+      if (indices.length > 0) dayAllowed = indices.includes(todayIndex)
+    }
+  }
+
+  if (!dayAllowed) return false
+
+  // ── Hour check ─────────────────────────────────────────────────────────────
+  const range = parseHoursRange(hoursStr)
+  if (!range) return true // can't parse → open access
+
+  const nowMins   = now.getHours() * 60 + now.getMinutes()
+  const startMins = range.start.hours * 60 + range.start.minutes
+  const endMins   = range.end.hours   * 60 + range.end.minutes
+
+  return nowMins >= startMins && nowMins < endMins
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const Withdraw = () => {
   const navigate = useNavigate()
@@ -26,8 +467,8 @@ const Withdraw = () => {
   const {
     usd_to_ngn_rate,
     min_withdrawal,
-    withdrawal_fee_below,   // % fee when amount < threshold
-    withdrawal_fee_above,   // % fee when amount >= threshold
+    withdrawal_fee_below,
+    withdrawal_fee_above,
     withdrawal_fee_threshold,
     withdrawal_days,
     withdrawal_hours,
@@ -35,17 +476,16 @@ const Withdraw = () => {
   } = usePublicSettings()
 
   // Safe fallbacks while loading
-  const safeMinWithdrawal = min_withdrawal       ?? 11.5
-  const safeFeeBelow      = withdrawal_fee_below  ?? 16
-  const safeFeeAbove      = withdrawal_fee_above  ?? 10
+  const safeMinWithdrawal = min_withdrawal          ?? 11.5
+  const safeFeeBelow      = withdrawal_fee_below     ?? 16
+  const safeFeeAbove      = withdrawal_fee_above     ?? 10
   const safeThreshold     = withdrawal_fee_threshold ?? 100
-  const safeRate          = usd_to_ngn_rate       ?? 1560
-  const safeDays          = withdrawal_days        ?? 'Monday to Sunday'
-  const safeHours         = withdrawal_hours       ?? '10:00 AM – 05:00 PM'
+  const safeRate          = usd_to_ngn_rate          ?? 1560
+  const safeDays          = withdrawal_days          ?? 'Monday to Sunday'
+  const safeHours         = withdrawal_hours         ?? '10:00 AM – 05:00 PM'
 
   // ── Fee calculation ───────────────────────────────────────
   const amountVal  = parseFloat(amount) || 0
-  // Below threshold → higher fee (safeFeeBelow); at/above → lower fee (safeFeeAbove)
   const feePercent = amountVal < safeThreshold ? safeFeeBelow : safeFeeAbove
   const feeAmt     = +(amountVal * feePercent / 100).toFixed(4)
   const netAmt     = +(amountVal - feeAmt).toFixed(4)
@@ -79,6 +519,14 @@ const Withdraw = () => {
 
   // ── Submit ────────────────────────────────────────────────
   const handleSubmit = async () => {
+    // Timing window — checked client-side for instant feedback.
+    // The backend enforces this independently as the source of truth.
+    if (!isWithinWithdrawalWindow(safeDays, safeHours)) {
+      return toast.error(
+        `Withdrawals are only available ${safeDays}, ${safeHours}. Please try again during that window.`
+      )
+    }
+
     if (!account) return toast.error('Please bind a bank account first')
     if (amountVal < safeMinWithdrawal) {
       return toast.error(`Minimum withdrawal is $${safeMinWithdrawal.toFixed(2)}`)
@@ -96,7 +544,6 @@ const Withdraw = () => {
         message.toLowerCase().includes('withdrawal password') ||
         message.toLowerCase().includes('set your withdrawal password')
       ) {
-        // axios already toasted the server message; add navigation
         navigate('/main/change-withdraw-pin')
       } else {
         handleApiError(err, 'Withdrawal failed')
@@ -112,16 +559,12 @@ const Withdraw = () => {
       <div className="min-h-dvh pb-8">
         <PageHeader title="Withdraw" />
         <div className="px-4 mt-4 space-y-4">
-
-          {/* Balance Card skeleton */}
           <div className="card card-p text-center">
             <Skeleton circle width={56} height={56} className="mx-auto mb-3" />
             <Skeleton width={110} height={11} className="mx-auto" />
             <Skeleton width={140} height={32} className="mx-auto mt-2" />
             <Skeleton width={100} height={11} className="mx-auto mt-1" />
           </div>
-
-          {/* Bank Account Card skeleton */}
           <div className="card card-p">
             <Skeleton width={130} height={11} className="mb-3" />
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl">
@@ -132,27 +575,19 @@ const Withdraw = () => {
               </div>
             </div>
           </div>
-
-          {/* Amount Input Card skeleton */}
           <div className="card card-p">
             <Skeleton width={120} height={11} className="mb-3" />
             <Skeleton height={52} borderRadius={16} />
           </div>
-
-          {/* PIN Input Card skeleton */}
           <div className="card card-p">
             <Skeleton width={110} height={11} className="mb-3" />
             <Skeleton height={52} borderRadius={16} />
           </div>
-
-          {/* Rules skeleton */}
           <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 space-y-2">
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} width={`${85 - i * 4}%`} height={12} />
             ))}
           </div>
-
-          {/* Submit button skeleton */}
           <Skeleton height={56} borderRadius={16} />
         </div>
       </div>
@@ -252,10 +687,10 @@ const Withdraw = () => {
           {amountVal >= safeMinWithdrawal && (
             <div className="mt-3 space-y-1.5 bg-gray-50 rounded-2xl p-3">
               {[
-                { label: 'Gross amount',       val: fmtUSD(amountVal) },
+                { label: 'Gross amount',         val: fmtUSD(amountVal) },
                 { label: `Fee (${feePercent}%)`, val: `- ${fmtUSD(feeAmt)}`, color: 'text-danger' },
-                { label: 'You receive',        val: fmtUSD(netAmt),   color: 'text-success font-extrabold' },
-                { label: '≈ NGN',              val: fmtNGN(toNGN(netAmt, safeRate)), color: 'text-gray-500' },
+                { label: 'You receive',          val: fmtUSD(netAmt),   color: 'text-success font-extrabold' },
+                { label: '≈ NGN',                val: fmtNGN(toNGN(netAmt, safeRate)), color: 'text-gray-500' },
               ].map(({ label, val, color }) => (
                 <div key={label} className="flex justify-between text-xs">
                   <span className="text-gray-400 font-medium">{label}</span>
@@ -325,14 +760,13 @@ const Withdraw = () => {
             </p>
             <div className="bg-gray-50 rounded-2xl p-4 text-left space-y-2">
               {[
-                { label: 'Amount',   val: fmtUSD(receipt.amountUSD) },
-                { label: 'Fee',      val: `${receipt.feePercent}% = ${fmtUSD(receipt.feeAmountUSD)}` },
-                { label: 'You get',  val: fmtUSD(receipt.netAmountUSD) },
-                { label: '≈ NGN',    val: fmtNGN(receipt.netAmountNGN) },
-                { label: 'Bank',     val: receipt.bankName },
-                { label: 'Account',  val: receipt.accountNumber },
-                { label: 'Status',   val: 'Processing' },
-                // { label: 'Status',   val: 'Pending review' },
+                { label: 'Amount',  val: fmtUSD(receipt.amountUSD) },
+                { label: 'Fee',     val: `${receipt.feePercent}% = ${fmtUSD(receipt.feeAmountUSD)}` },
+                { label: 'You get', val: fmtUSD(receipt.netAmountUSD) },
+                { label: '≈ NGN',   val: fmtNGN(receipt.netAmountNGN) },
+                { label: 'Bank',    val: receipt.bankName },
+                { label: 'Account', val: receipt.accountNumber },
+                { label: 'Status',  val: 'Processing' },
               ].map(({ label, val }) => (
                 <div key={label} className="flex justify-between text-xs">
                   <span className="text-gray-400 font-medium">{label}</span>
