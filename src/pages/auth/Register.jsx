@@ -32,7 +32,7 @@ const Register = () => {
     phone: '', password: '', confirmPassword: '',
     fullName: '', userName: '',
     securityQuestionId: '', securityAnswer: '',
-    captchaAnswer: '', referralCode: searchParams.get('c') || '',
+    captchaAnswer: '', referralCode: searchParams.get('c') || sessionStorage.getItem('referralCode') || '',
   })
   const [questions, setQuestions]         = useState([])
   const [captcha, setCaptcha]             = useState({ id: '', image: '' })
@@ -90,6 +90,7 @@ const Register = () => {
         ...(form.referralCode && { referralCode: form.referralCode.trim().toUpperCase() }),
       })
       authLogin(data.user)
+      sessionStorage.removeItem('referralCode')
       toast.success('Account created! Welcome 🎉')
       navigate('/main/dashboard', { replace: true })
     } catch (err) { handleApiError(err, 'Failed to create account'); fetchCaptcha() }

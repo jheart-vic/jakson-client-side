@@ -160,6 +160,9 @@ const fmtUSD   = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractio
 // ── Auth-aware nav buttons ──
 const NavActions = ({ mobile }) => {
     const { isAuthenticated, isAdmin } = useAuth()
+   const [searchParams] = useSearchParams()
+    const code = searchParams.get('c') || sessionStorage.getItem('referralCode') || ''
+    const registerDest = `/register${code ? `?c=${code}` : ''}`
     const dest = isAdmin ? '/admin/dashboard' : '/main/dashboard'
 
     if (isAuthenticated) {
@@ -187,7 +190,7 @@ const NavActions = ({ mobile }) => {
                 Sign In
             </Link>
             <Link
-                to='/register'
+                to={registerDest}
                 className='w-full text-center py-3 rounded-xl text-sm font-bold text-white block'
                 style={{ background: 'linear-gradient(135deg,#C67B2C,#A25F1F)' }}
             >
@@ -200,7 +203,7 @@ const NavActions = ({ mobile }) => {
                 Sign In
             </Link>
             <Link
-                to='/register'
+                to={registerDest}
                 className='px-4 py-2 rounded-xl text-sm font-bold text-white transition-all active:scale-95'
                 style={{
                     background: 'linear-gradient(135deg,#C67B2C,#A25F1F)',
@@ -238,11 +241,14 @@ const ScrollToTop = () => {
 }
 
 // ── Smart CTA ──
+// Replace your AuthCTA component with this:
 const AuthCTA = ({ children, className, style }) => {
     const { isAuthenticated, isAdmin } = useAuth()
+    const [searchParams] = useSearchParams()
+    const code = searchParams.get('c') || sessionStorage.getItem('referralCode') || ''
     const dest = isAuthenticated
         ? isAdmin ? '/admin/dashboard' : '/main/dashboard'
-        : '/login'
+        : `/register${code ? `?c=${code}` : ''}`
     return <Link to={dest} className={className} style={style}>{children}</Link>
 }
 
@@ -533,7 +539,15 @@ const PlansSection = () => {
 
 // ── MAIN ──────────────────────────────────────────────────────────────────
 
+import { useSearchParams } from 'react-router-dom'
 const Landing = () => {
+// near the top of Landing():
+const [searchParams] = useSearchParams()
+
+useEffect(() => {
+    const code = searchParams.get('c')
+    if (code) sessionStorage.setItem('referralCode', code.toUpperCase())
+}, [searchParams])
     return (
         <div
             className='min-h-screen font-sans'
