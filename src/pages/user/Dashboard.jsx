@@ -936,7 +936,7 @@ const Dashboard = () => {
     }
 
     const copyInvite = () => {
-        const link = `https://www.luminos-energy.com?c=${user?.referralCode || ''}`
+        const link = `https://mylmenergy.com/register?ref=${user?.referralCode || ''}`
         navigator.clipboard.writeText(link).then(() => toast.success('Invite link copied!')).catch(() => toast.error('Could not copy'))
     }
 
@@ -1065,7 +1065,7 @@ const Dashboard = () => {
 
             {/* Company profile link */}
             <div className='px-4 mt-3 animate-slide-up delay-200'>
-                <button onClick={() => window.open('https://jakson-client-side.vercel.app/#how-it-works', '_blank')}
+                <button onClick={() => window.open('https://mylmenergy.com/#how-it-works', '_blank')}
                     className='w-full flex items-center gap-3 bg-white rounded-2xl p-4 shadow-card active:scale-[0.99] transition-transform border border-gray-100'>
                     <div className='w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center shrink-0'><span className='text-lg leading-none'>📢</span></div>
                     <div className='flex-1 text-left'>
