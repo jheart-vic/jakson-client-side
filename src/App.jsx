@@ -51,54 +51,107 @@ import AdminWealthFunds from './pages/admin/AdminWealthFunds'
 import AdminBonusCodes from './pages/admin/AdminBonusCode'
 import AdminNotifications from './pages/admin/AdminNotifications'
 import AdminLoginRoute from './components/guards/AdminLoginRoute'
+import Privacy from './pages/public/Privacy'
+import Terms from './pages/public/Terms'
 
 const App = () => (
     <Routes>
         {/* ── Public landing page ────────────────────────── */}
         <Route path='/' element={<Landing />} />
+        <Route path='/privacy' element={<Privacy />} />
+        <Route path='/terms' element={<Terms />} />
 
         {/* ── Guest-only auth routes ─────────────────────── */}
-        <Route path='/login'           element={<GuestRoute><Login /></GuestRoute>} />
-        <Route path='/register'        element={<GuestRoute><Register /></GuestRoute>} />
-        <Route path='/forgot-password' element={<GuestRoute><ForgotPassword /></GuestRoute>} />
-        <Route path='/reset-password'  element={<GuestRoute><ResetPassword /></GuestRoute>} />
-        <Route path='/admin/login' element={<AdminLoginRoute><AdminLogin /></AdminLoginRoute>} />
+        <Route
+            path='/login'
+            element={
+                <GuestRoute>
+                    <Login />
+                </GuestRoute>
+            }
+        />
+        <Route
+            path='/register'
+            element={
+                <GuestRoute>
+                    <Register />
+                </GuestRoute>
+            }
+        />
+        <Route
+            path='/forgot-password'
+            element={
+                <GuestRoute>
+                    <ForgotPassword />
+                </GuestRoute>
+            }
+        />
+        <Route
+            path='/reset-password'
+            element={
+                <GuestRoute>
+                    <ResetPassword />
+                </GuestRoute>
+            }
+        />
+        <Route
+            path='/admin/login'
+            element={
+                <AdminLoginRoute>
+                    <AdminLogin />
+                </AdminLoginRoute>
+            }
+        />
 
         {/* ── User routes (authenticated) ────────────────── */}
-        <Route path='/main' element={<ProtectedRoute><UserLayout /></ProtectedRoute>}>
+        <Route
+            path='/main'
+            element={
+                <ProtectedRoute>
+                    <UserLayout />
+                </ProtectedRoute>
+            }
+        >
             <Route index element={<Navigate to='dashboard' replace />} />
-            <Route path='dashboard'         element={<Dashboard />} />
-            <Route path='invest'            element={<Invest />} />
-            <Route path='team'              element={<Team />} />
-            <Route path='account'           element={<Account />} />
-            <Route path='deposit'           element={<Deposit />} />
-            <Route path='deposit/log'       element={<DepositLog />} />
-            <Route path='withdraw'          element={<Withdraw />} />
-            <Route path='withdraw/log'      element={<WithdrawLog />} />
-            <Route path='invest-log'        element={<InvestLog />} />
-            <Route path='funding'           element={<FundingDetails />} />
-            <Route path='bank/accounts'     element={<BankAccounts />} />
-            <Route path='bank/bind'         element={<BindBank />} />
-            <Route path='solar-panel'       element={<SolarPanelRules />} />
-            <Route path='change-password'   element={<ChangePassword />} />
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='invest' element={<Invest />} />
+            <Route path='team' element={<Team />} />
+            <Route path='account' element={<Account />} />
+            <Route path='deposit' element={<Deposit />} />
+            <Route path='deposit/log' element={<DepositLog />} />
+            <Route path='withdraw' element={<Withdraw />} />
+            <Route path='withdraw/log' element={<WithdrawLog />} />
+            <Route path='invest-log' element={<InvestLog />} />
+            <Route path='funding' element={<FundingDetails />} />
+            <Route path='bank/accounts' element={<BankAccounts />} />
+            <Route path='bank/bind' element={<BindBank />} />
+            <Route path='solar-panel' element={<SolarPanelRules />} />
+            <Route path='change-password' element={<ChangePassword />} />
             <Route path='change-withdraw-pin' element={<ChangeWithdrawPin />} />
-            <Route path='wealth-fund'       element={<WealthFunds />} />
-            <Route path='my-wealth-funds/me'    element={<MyWealthFunds />} />
-            <Route path='notifications'     element={<Notifications />} />
+            <Route path='wealth-fund' element={<WealthFunds />} />
+            <Route path='my-wealth-funds/me' element={<MyWealthFunds />} />
+            <Route path='notifications' element={<Notifications />} />
         </Route>
 
         {/* ── Admin routes ───────────────────────────────── */}
-        <Route path='/admin' element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route
+            path='/admin'
+            element={
+                <AdminRoute>
+                    <AdminLayout />
+                </AdminRoute>
+            }
+        >
             <Route index element={<Navigate to='dashboard' replace />} />
-            <Route path='dashboard'     element={<AdminDashboard />} />
-            <Route path='products'      element={<AdminProducts />} />
-            <Route path='users'         element={<AdminUsers />} />
-            <Route path='users/:id'     element={<AdminUserDetail />} />
-            <Route path='deposits'      element={<AdminDeposits />} />
-            <Route path='withdrawals'   element={<AdminWithdrawals />} />
-            <Route path='settings'      element={<AdminSettings />} />
-            <Route path='wealth-funds'  element={<AdminWealthFunds />} />
-            <Route path='bonus-codes'   element={<AdminBonusCodes />} />
+            <Route path='dashboard' element={<AdminDashboard />} />
+            <Route path='products' element={<AdminProducts />} />
+            <Route path='users' element={<AdminUsers />} />
+            <Route path='users/:id' element={<AdminUserDetail />} />
+            <Route path='deposits' element={<AdminDeposits />} />
+            <Route path='withdrawals' element={<AdminWithdrawals />} />
+            <Route path='settings' element={<AdminSettings />} />
+            <Route path='wealth-funds' element={<AdminWealthFunds />} />
+            <Route path='bonus-codes' element={<AdminBonusCodes />} />
             <Route path='notifications' element={<AdminNotifications />} />
         </Route>
 

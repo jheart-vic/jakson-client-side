@@ -799,8 +799,8 @@ useEffect(() => {
                     <div className='border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3'>
                         <p className='text-white/30 text-xs'>© 2025 Luminos Energy. All rights reserved.</p>
                         <div className='flex items-center gap-4'>
-                            <a href='#' className='text-white/30 hover:text-white/60 text-xs transition-colors'>Privacy Policy</a>
-                            <a href='#' className='text-white/30 hover:text-white/60 text-xs transition-colors'>Terms of Service</a>
+                            <Link to='/privacy' className='text-white/30 hover:text-white/60 text-xs transition-colors'>Privacy Policy</Link>
+                            <Link to='terms' className='text-white/30 hover:text-white/60 text-xs transition-colors'>Terms of Service</Link>
                         </div>
                     </div>
                 </div>
