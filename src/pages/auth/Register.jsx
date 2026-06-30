@@ -305,6 +305,25 @@ const Register = () => {
                     maxLength={4} inputMode="numeric" onFocus={() => setFocus('captcha')} onBlur={() => setFocus('')}
                     className="flex-1 outline-none text-base font-bold tracking-[0.5em] text-gray-800 placeholder:text-gray-400 placeholder:tracking-normal bg-transparent text-center min-w-0" />
                 </Field>
+              {/* ── Terms agreement ── */}
+              <div className="flex items-start gap-3 px-1">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  required
+                  className="mt-0.5 w-4 h-4 rounded accent-primary shrink-0 cursor-pointer"
+                />
+                <label htmlFor="terms" className="text-xs text-gray-500 leading-relaxed cursor-pointer">
+                  I have read and agree to the{' '}
+                  <Link to="/terms" target="_blank" className="text-primary font-bold hover:underline">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link to="/privacy" target="_blank" className="text-primary font-bold hover:underline">
+                    Privacy Policy
+                  </Link>
+                </label>
+              </div>
 
                 <button type="submit" disabled={loading}
                   className="w-full h-12 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all duration-150 active:scale-[0.98] disabled:opacity-60"
