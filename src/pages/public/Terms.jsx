@@ -206,7 +206,7 @@ const Terms = () => {
                 >
                     <p className='text-gray-600 text-sm leading-relaxed'>
                         These Terms of Service govern your use of the <strong className='text-gray-800'>Luminos Energy</strong> platform,
-                        including the website at luminos-energy.com and any associated mobile or web applications.
+                        including the website at mylmenergy.com and any associated mobile or web applications.
                         Please read them carefully before creating an account or making any investment. These Terms
                         form a binding legal agreement between you and Luminos Energy.
                     </p>
