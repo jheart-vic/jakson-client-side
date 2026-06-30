@@ -63,6 +63,9 @@ const Team = () => {
   const [tierModal, setTierModal]   = useState(null)
   const [members, setMembers]       = useState([])
   const [membersLoading, setML]     = useState(false)
+  const [membersPage, setMembersPage] = useState(1)
+  const [membersTotal, setMembersTotal] = useState(0)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const load = useCallback(async () => {
     try { const { data } = await getTeamStats(); setStats(data) }
@@ -72,13 +75,36 @@ const Team = () => {
 
   useEffect(() => { ;(async () => { await load() })() }, [load])
 
-  const openTier = async (tier) => {
+// Add to state:
+
+
+// Update openTier to reset state:
+const openTier = async (tier) => {
     setTierModal(tier)
+    setMembers([])
+    setMembersPage(1)
     setML(true)
-    try { const { data } = await getTierMembers(tier.level); setMembers(data.members) }
+    try {
+        const { data } = await getTierMembers(tier.level, 1, 50) // ← increase limit to 50
+        setMembers(data.members)
+        setMembersTotal(data.pagination.total)
+    }
     catch (err) { handleApiError(err, 'Failed to load tier members') }
     finally { setML(false) }
-  }
+}
+
+// Add load more function:
+const loadMoreMembers = async () => {
+    const nextPage = membersPage + 1
+    setLoadingMore(true)
+    try {
+        const { data } = await getTierMembers(tierModal.level, nextPage, 50)
+        setMembers(prev => [...prev, ...data.members])
+        setMembersPage(nextPage)
+    }
+    catch (err) { handleApiError(err, 'Failed to load more members') }
+    finally { setLoadingMore(false) }
+}
 
   const copy = () => {
     navigator.clipboard.writeText(stats?.inviteLink || '')
@@ -165,7 +191,7 @@ const Team = () => {
         ) : members.length === 0 ? (
           <EmptyState message="No members in this tier yet" icon="👥" />
         ) : (
-          <div className="space-y-3 max-h-72 overflow-y-auto">
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
             {members.map(m => (
               <div key={m._id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0 animate-slide-up">
                 <div className="w-9 h-9 rounded-full bg-primary-light flex items-center justify-center shrink-0">
@@ -180,6 +206,15 @@ const Team = () => {
                 <p className="text-xs font-bold text-success shrink-0 pr-10 ">{fmtUSD(m.totalEarned || 0)}</p>
               </div>
             ))}
+            {members.length < membersTotal && (
+                    <button
+                        onClick={loadMoreMembers}
+                        disabled={loadingMore}
+                        className="w-full py-3 text-xs font-bold text-primary text-center active:opacity-70 transition-opacity"
+                    >
+                        {loadingMore ? 'Loading…' : `Load more (${membersTotal - members.length} remaining)`}
+                    </button>
+            )}
           </div>
         )}
       </Modal>
