@@ -161,8 +161,8 @@ const fmtUSD   = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractio
 const NavActions = ({ mobile }) => {
     const { isAuthenticated, isAdmin } = useAuth()
    const [searchParams] = useSearchParams()
-    const code = searchParams.get('c') || sessionStorage.getItem('referralCode') || ''
-    const registerDest = `/register${code ? `?c=${code}` : ''}`
+    const code = searchParams.get('ref') || sessionStorage.getItem('referralCode') || ''
+    const registerDest = `/register${code ? `?ref=${code}` : ''}`
     const dest = isAdmin ? '/admin/dashboard' : '/main/dashboard'
 
     if (isAuthenticated) {
@@ -245,10 +245,10 @@ const ScrollToTop = () => {
 const AuthCTA = ({ children, className, style }) => {
     const { isAuthenticated, isAdmin } = useAuth()
     const [searchParams] = useSearchParams()
-    const code = searchParams.get('c') || sessionStorage.getItem('referralCode') || ''
+    const code = searchParams.get('ref') || sessionStorage.getItem('referralCode') || ''
     const dest = isAuthenticated
         ? isAdmin ? '/admin/dashboard' : '/main/dashboard'
-        : `/register${code ? `?c=${code}` : ''}`
+        : `/register${code ? `?ref=${code}` : ''}`
     return <Link to={dest} className={className} style={style}>{children}</Link>
 }
 
@@ -545,7 +545,7 @@ const Landing = () => {
 const [searchParams] = useSearchParams()
 
 useEffect(() => {
-    const code = searchParams.get('c')
+    const code = searchParams.get('ref')
     if (code) sessionStorage.setItem('referralCode', code.toUpperCase())
 }, [searchParams])
     return (
@@ -800,7 +800,7 @@ useEffect(() => {
                         <p className='text-white/30 text-xs'>© 2025 Luminos Energy. All rights reserved.</p>
                         <div className='flex items-center gap-4'>
                             <Link to='/privacy' className='text-white/30 hover:text-white/60 text-xs transition-colors'>Privacy Policy</Link>
-                            <Link to='terms' className='text-white/30 hover:text-white/60 text-xs transition-colors'>Terms of Service</Link>
+                            <Link to='/terms' className='text-white/30 hover:text-white/60 text-xs transition-colors'>Terms of Service</Link>
                         </div>
                     </div>
                 </div>

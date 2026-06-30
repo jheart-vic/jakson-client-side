@@ -32,7 +32,7 @@ const Register = () => {
     phone: '', password: '', confirmPassword: '',
     fullName: '', userName: '',
     securityQuestionId: '', securityAnswer: '',
-    captchaAnswer: '', referralCode: searchParams.get('c') || sessionStorage.getItem('referralCode') || '',
+    captchaAnswer: '', referralCode: searchParams.get('ref') || sessionStorage.getItem('referralCode') || '',
   })
   const [questions, setQuestions]         = useState([])
   const [captcha, setCaptcha]             = useState({ id: '', image: '' })
